@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#1f2937" />
+<title>รับสินค้า (GR) · วันเวลา ERP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f3ee; --card: #ffffff;
+    --ink: #1f2937; --ink-2: #4b5563; --ink-3: #9ca3af; --ink-4: #d1d5db;
+    --line: #e5e3dc; --line-2: #d6d3c8;
+    --primary: #1f2937; --primary-soft: #374151;
+    --accent: #b45309; --accent-soft: #fef3c7;
+    --green: #16a34a; --green-soft: #dcfce7;
+    --red: #dc2626; --red-soft: #fee2e2;
+    --yellow: #ca8a04; --yellow-soft: #fef9c3;
+    --blue: #2563eb; --blue-soft: #dbeafe;
+    --radius: 14px; --radius-sm: 10px;
+    --shadow: 0 1px 2px rgba(17,24,39,.04), 0 8px 24px rgba(17,24,39,.06);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--bg);
+    min-height: 100vh;
+    padding-bottom: 110px;
+    position: relative;
+  }
+  /* Header */
+  .header {
+    background: var(--primary);
+    color: #fff;
+    padding: 14px 18px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 0 rgba(0,0,0,.04);
+  }
+  .header-brand {
+    font-size: 11px;
+    color: rgba(255,255,255,.55);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .header-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .back {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,.08);
+    color: #fff;
+    cursor: pointer;
+    font-size: 20px;
+  }
+  .header-title { font-weight: 600; font-size: 17px; flex: 1; }
+  .header-sub { font-size: 12px; color: rgba(255,255,255,.65); margin-top: 2px; letter-spacing: .5px; }
+  .me-tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,.08);
+    padding: 6px 12px 6px 6px;
+    border-radius: 24px;
+  }
+  .me-tag .avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .me-tag .name { font-size: 13px; color: #fff; }
+  .me-tag .role { font-size: 10px; color: rgba(255,255,255,.6); display: block; line-height: 1; margin-top: 1px; }
+
+  /* Step indicator */
+  .steps {
+    display: flex;
+    background: var(--primary);
+    padding: 0 14px 14px;
+    gap: 6px;
+  }
+  .step {
+    flex: 1;
+    height: 3px;
+    background: rgba(255,255,255,.15);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .step.active { background: var(--accent); }
+  .step.done { background: var(--green); }
+
+  /* Section */
+  .section { padding: 16px 16px 0; }
+  .section-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    letter-spacing: 1px;
+    font-weight: 600;
+    padding: 4px 4px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .section-title .scan-btn {
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* PO cards */
+  .po-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border-left: 4px solid var(--ink-4);
+    cursor: pointer;
+    transition: transform .12s, box-shadow .12s;
+  }
+  .po-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(17,24,39,.06), 0 12px 32px rgba(17,24,39,.08);
+  }
+  .po-card[data-status="waiting"] { border-left-color: var(--blue); }
+  .po-card[data-status="partial"] { border-left-color: var(--yellow); }
+  .po-card[data-status="received"] { border-left-color: var(--green); opacity: .7; }
+  .po-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .po-no {
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: .3px;
+  }
+  .po-status {
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .po-status[data-s="waiting"] { background: var(--blue-soft); color: var(--blue); }
+  .po-status[data-s="partial"] { background: var(--yellow-soft); color: var(--yellow); }
+  .po-status[data-s="received"] { background: var(--green-soft); color: var(--green); }
+  .po-vendor {
+    font-size: 13px;
+    color: var(--ink-2);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .po-vendor b { color: var(--ink); font-weight: 600; }
+  .po-items-preview {
+    font-size: 13px;
+    color: var(--ink);
+    background: #fafaf7;
+    padding: 8px 10px;
+    border-radius: 8px;
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+  .po-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+  .po-meta .pill {
+    background: #f5f3ee;
+    padding: 3px 9px;
+    border-radius: 6px;
+    color: var(--ink-2);
+  }
+  .po-meta .pill b { color: var(--ink); font-weight: 600; }
+
+  /* PO Detail (step 2) */
+  .po-detail-head {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .pod-no {
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: .3px;
+    margin-bottom: 4px;
+  }
+  .pod-vendor {
+    font-size: 14px;
+    color: var(--ink-2);
+    margin-bottom: 8px;
+  }
+  .pod-vendor b { color: var(--ink); font-weight: 600; }
+  .pod-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .pod-meta .pill {
+    background: #f5f3ee;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--ink-2);
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-2);
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    margin-bottom: 12px;
+  }
+
+  /* Item row */
+  .grx-item {
+    background: #fdfcf9;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .grx-item[data-rejected="1"] {
+    background: var(--red-soft);
+    border-color: var(--red);
+    opacity: .85;
+  }
+  .grx-item-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .grx-item-name {
+    font-weight: 600;
+    font-size: 15px;
+    flex: 1;
+    line-height: 1.3;
+  }
+  .grx-item-ordered {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-top: 2px;
+    font-weight: 400;
+  }
+  .grx-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .grx-cell .lbl {
+    font-size: 11px;
+    color: var(--ink-3);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    font-weight: 600;
+  }
+  .qty-input {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s;
+  }
+  .qty-input:focus { border-color: var(--primary); }
+  .qty-input.warn {
+    border-color: var(--yellow);
+    background: var(--yellow-soft);
+    color: var(--yellow);
+  }
+  .qty-input.over {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .grx-unit {
+    border: 1.5px solid var(--line);
+    background: #fff;
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-size: 14px;
+    text-align: center;
+    color: var(--ink-2);
+    font-weight: 500;
+  }
+  .grx-badge-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .grx-badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    background: #f3f4f6;
+    color: var(--ink-2);
+  }
+  .grx-badge.warn { background: var(--yellow-soft); color: var(--yellow); }
+  .grx-badge.over { background: var(--accent-soft); color: var(--accent); }
+  .grx-badge.ok { background: var(--green-soft); color: var(--green); }
+  .grx-badge.rej { background: var(--red-soft); color: var(--red); }
+
+  .grx-note {
+    width: 100%;
+    border: 1px dashed var(--line-2);
+    background: #fff;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--ink-2);
+    outline: none;
+    margin-top: 6px;
+    resize: vertical;
+    min-height: 36px;
+  }
+  .grx-note::placeholder { color: var(--ink-3); }
+
+  .grx-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .grx-btn {
+    border: 1.5px solid var(--line);
+    background: #fff;
+    border-radius: 8px;
+    padding: 6px 11px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-2);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all .12s;
+  }
+  .grx-btn:hover { border-color: var(--primary); color: var(--ink); }
+  .grx-btn.danger:hover { border-color: var(--red); color: var(--red); background: var(--red-soft); }
+  .grx-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .grx-btn.danger.active { background: var(--red); color: #fff; border-color: var(--red); }
+
+  /* Form fields (overall) */
+  .field { margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
+  .label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-2);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .label .req { color: var(--red); }
+  .input, .textarea, .select {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    background: #fdfcf9;
+    border-radius: var(--radius-sm);
+    padding: 11px 13px;
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s, background .15s;
+  }
+  .input:focus, .textarea:focus, .select:focus {
+    border-color: var(--primary);
+    background: #fff;
+  }
+  .textarea { resize: vertical; min-height: 70px; }
+
+  /* Photo grid */
+  .photos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: 7px;
+    margin-top: 6px;
+  }
+  .photos.small {
+    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+    gap: 6px;
+  }
+  .photo, .photo-add {
+    aspect-ratio: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+  .photo {
+    background-size: cover;
+    background-position: center;
+    background-color: #efece4;
+  }
+  .photo-rm {
+    position: absolute;
+    top: 3px; right: 3px;
+    background: rgba(0,0,0,.6);
+    color: #fff;
+    border-radius: 50%;
+    width: 18px; height: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    cursor: pointer;
+  }
+  .photo-add {
+    background: #fdfcf9;
+    border: 1.5px dashed var(--line-2);
+    color: var(--ink-3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 10px;
+    gap: 2px;
+  }
+  .photo-add .icon { font-size: 20px; }
+
+  /* Summary preview */
+  .summary {
+    background: #fafaf7;
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  .sum-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 14px;
+  }
+  .sum-row span:first-child { color: var(--ink-3); }
+  .sum-row span:last-child { font-weight: 600; }
+  .sum-row.total {
+    border-top: 1px solid var(--line);
+    margin-top: 4px;
+    padding-top: 8px;
+    font-size: 16px;
+  }
+  .sum-row.warn span:last-child { color: var(--yellow); }
+
+  /* Bottom action bar */
+  .bottombar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255,255,255,.95);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--line);
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    z-index: 20;
+  }
+  .bottombar-inner {
+    max-width: 480px;
+    margin: 0 auto;
+    display: flex;
+    gap: 10px;
+  }
+  .btn {
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 13px 16px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  .btn:active { opacity: .8; }
+  .btn-secondary {
+    background: #efece4;
+    color: var(--ink);
+    flex: 1;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+    flex: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn-primary[disabled] { background: var(--ink-3); cursor: not-allowed; }
+
+  /* Hide/show steps */
+  .step-view { display: none; }
+  .step-view.active { display: block; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 100;
+    box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    opacity: 0;
+    transition: all .25s;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast[data-show="1"] {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .toast.success { background: var(--green); }
+  .toast.error { background: var(--red); }
+  .toast.warn { background: var(--yellow); }
+
+  /* Demo badge */
+  .demo-badge {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,.6);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    z-index: 999;
+  }
+
+  /* Success screen */
+  .success-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 200;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 24px;
+    text-align: center;
+    overflow-y: auto;
+  }
+  .success-screen[data-show="1"] {
+    display: flex;
+    animation: fadeIn .3s;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .check-circle {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: var(--green);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    margin: 20px 0 18px;
+    animation: pop .4s cubic-bezier(.2,1.5,.5,1);
+  }
+  @keyframes pop {
+    0% { transform: scale(0); }
+    100% { transform: scale(1); }
+  }
+  .success-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .success-sub {
+    color: var(--ink-2);
+    margin-bottom: 20px;
+  }
+  .gr-num {
+    background: #fff;
+    padding: 16px 24px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 18px;
+  }
+  .gr-num-label {
+    font-size: 12px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .gr-num-val {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-top: 4px;
+    letter-spacing: 2px;
+  }
+  .lots-card {
+    background: #fff;
+    padding: 14px 18px;
+    border-radius: var(--radius);
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 360px;
+    text-align: left;
+  }
+  .lots-card .lots-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--ink-3);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .lot-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    font-size: 13px;
+    border-bottom: 1px solid var(--line);
+  }
+  .lot-row:last-child { border-bottom: none; }
+  .lot-row .lot-no {
+    font-weight: 600;
+    color: var(--accent);
+    font-family: 'Sarabun', sans-serif;
+  }
+  .lot-row .lot-item {
+    color: var(--ink-2);
+    flex: 1;
+    margin: 0 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .lot-row .lot-qty {
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--ink);
+  }
+  .stock-banner {
+    background: var(--green-soft);
+    color: var(--green);
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 18px;
+    max-width: 360px;
+    width: 100%;
+  }
+  .success-actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    max-width: 360px;
+    flex-wrap: wrap;
+  }
+  .success-actions .btn { flex: 1; min-width: 100px; }
+  .success-actions .btn-link {
+    background: #fff;
+    color: var(--ink);
+    border: 1.5px solid var(--line);
+  }
+
+  /* Confirm modal */
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(17,24,39,.6);
+    z-index: 150;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-bg[data-open="1"] { opacity: 1; pointer-events: auto; }
+  .modal {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    max-width: 360px;
+    width: 100%;
+    transform: scale(.96);
+    transition: transform .2s;
+  }
+  .modal-bg[data-open="1"] .modal { transform: scale(1); }
+  .modal-title { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+  .modal-body { font-size: 14px; color: var(--ink-2); margin-bottom: 16px; line-height: 1.5; }
+  .modal-actions { display: flex; gap: 8px; }
+  .modal-actions .btn { flex: 1; padding: 11px 14px; font-size: 14px; }
+
+  /* Reject reason chips */
+  .reject-reasons {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .reject-reasons .chip {
+    padding: 5px 10px;
+    border-radius: 16px;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+  .reject-reasons .chip[data-on="1"] {
+    background: var(--red); color: #fff; border-color: var(--red);
+  }
+</style>
+</head>
+<body>
+<div class="demo-badge">DEMO · P0 · #6</div>
+
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-brand">WANWELA · TWO BUILD</div>
+    <div class="header-row">
+      <div class="back" onclick="goBack()">‹</div>
+      <div style="flex:1">
+        <div class="header-title" id="hdrTitle">📦 รับสินค้า · วันเวลา ERP</div>
+        <div class="header-sub" id="hdrSub">เลือก PO ที่จะรับสินค้า</div>
+      </div>
+      <div class="me-tag">
+        <div class="avatar">จ</div>
+        <div>
+          <div class="name">เจนจิรา</div>
+          <div class="role">จัดซื้อ</div>
+        </div>
+      </div>
+    </div>
+    <div class="steps" style="margin-top:14px;">
+      <div class="step active" id="stp1"></div>
+      <div class="step" id="stp2"></div>
+      <div class="step" id="stp3"></div>
+    </div>
+  </div>
+
+  <!-- STEP 1: PO List -->
+  <div class="step-view active" id="view1">
+    <div class="section">
+      <div class="section-title">
+        PO รอรับสินค้า · 4 ใบ
+        <span class="scan-btn" onclick="mockScan()">📷 สแกน barcode</span>
+      </div>
+
+      <div class="po-card" data-status="waiting" onclick="selectPO('PO-2026-0022')">
+        <div class="po-head">
+          <div class="po-no">PO-2026-0022</div>
+          <div class="po-status" data-s="waiting">รออยู่</div>
+        </div>
+        <div class="po-vendor">🏢 <b>TPI ตรง</b> · คุณวินัย 081-234-5678</div>
+        <div class="po-items-preview">ปูนซีเมนต์ TPI 50 กก. × 100 ถุง</div>
+        <div class="po-meta">
+          <span class="pill">📅 ส่ง <b>28 พ.ค.</b></span>
+          <span class="pill">฿15,800</span>
+          <span class="pill">1 รายการ</span>
+        </div>
+      </div>
+
+      <div class="po-card" data-status="waiting" onclick="selectPO('PO-2026-0023')">
+        <div class="po-head">
+          <div class="po-no">PO-2026-0023</div>
+          <div class="po-status" data-s="waiting">รออยู่</div>
+        </div>
+        <div class="po-vendor">🏢 <b>ร้านอุดมศักดิ์</b> · เฮียอุดม 089-345-6789</div>
+        <div class="po-items-preview">เหล็กข้ออ้อย DB12 × 50 เส้น · ทราย 5 คิว · ลวดผูกเหล็ก 10 กก.</div>
+        <div class="po-meta">
+          <span class="pill">📅 ส่ง <b>วันนี้</b></span>
+          <span class="pill">฿18,450</span>
+          <span class="pill">3 รายการ</span>
+        </div>
+      </div>
+
+      <div class="po-card" data-status="partial" onclick="selectPO('PO-2026-0019')">
+        <div class="po-head">
+          <div class="po-no">PO-2026-0019</div>
+          <div class="po-status" data-s="partial">บางส่วน</div>
+        </div>
+        <div class="po-vendor">🏢 <b>SCG Home</b> · ฝ่ายขาย 02-555-1234</div>
+        <div class="po-items-preview">กระเบื้องเคลือบ 60×60 — รับแล้ว 50/100 กล่อง · รับเพิ่ม 50</div>
+        <div class="po-meta">
+          <span class="pill">📅 ค้าง <b>50 กล่อง</b></span>
+          <span class="pill">฿8,750</span>
+          <span class="pill">รับครั้งที่ 2</span>
+        </div>
+      </div>
+
+      <div class="po-card" data-status="waiting" onclick="selectPO('PO-2026-0018')">
+        <div class="po-head">
+          <div class="po-no">PO-2026-0018</div>
+          <div class="po-status" data-s="waiting">รออยู่</div>
+        </div>
+        <div class="po-vendor">🏢 <b>Global House</b> · 02-832-1000</div>
+        <div class="po-items-preview">อิฐมอญแดง 800 ก้อน</div>
+        <div class="po-meta">
+          <span class="pill">📅 ส่ง <b>29 พ.ค.</b></span>
+          <span class="pill">฿2,400</span>
+          <span class="pill">1 รายการ</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">รับล่าสุดวันนี้</div>
+      <div class="po-card" data-status="received">
+        <div class="po-head">
+          <div class="po-no">PO-2026-0017</div>
+          <div class="po-status" data-s="received">รับครบ</div>
+        </div>
+        <div class="po-vendor">🏢 <b>HomePro</b></div>
+        <div class="po-items-preview">สี TOA Supershield 5 แกลลอน · กระดาษทราย 20 แผ่น</div>
+        <div class="po-meta">
+          <span class="pill">GR-2026-0007</span>
+          <span class="pill">รับ 09:42</span>
+          <span class="pill">฿4,250</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: PO Detail / Receipt entry -->
+  <div class="step-view" id="view2">
+    <div class="section">
+      <div class="po-detail-head">
+        <div class="pod-no" id="podNo">PO-2026-0023</div>
+        <div class="pod-vendor">🏢 <b id="podVendor">ร้านอุดมศักดิ์</b> · เฮียอุดม 089-345-6789</div>
+        <div class="pod-meta">
+          <span class="pill">📅 สั่ง 26 พ.ค.</span>
+          <span class="pill">📦 ส่งวันนี้</span>
+          <span class="pill" id="podValue">฿18,450</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">รายการสินค้าที่รับ</div>
+        <div id="itemsList"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">รายละเอียดการรับ</div>
+        <div class="field">
+          <div class="label">เลขที่ใบส่งของ vendor</div>
+          <input class="input" id="dnNo" placeholder="DN-2026-XXXX (ดูจากใบส่งของ)" />
+        </div>
+        <div class="field">
+          <div class="label">วันที่รับจริง <span class="req">*</span></div>
+          <input type="date" class="input" id="rcvDate" value="2026-05-25" />
+        </div>
+        <div class="field">
+          <div class="label">ผู้ส่ง / คนขับรถ</div>
+          <input class="input" id="driver" placeholder="ชื่อ - เบอร์โทร (ถ้ามี)" />
+        </div>
+        <div class="field">
+          <div class="label">📸 รูปใบส่งของ / รูปรวมหน้าโกดัง</div>
+          <div class="photos" id="overallPhotos">
+            <div class="photo" style="background-image:url('https://images.unsplash.com/photo-1565793979206-6d6fbf197a4c?w=200&q=80')">
+              <div class="photo-rm" onclick="rmOverallPhoto(this)">✕</div>
+            </div>
+            <div class="photo-add" onclick="addOverallPhoto()">
+              <div class="icon">📷</div>
+              <div>เพิ่ม</div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="label">หมายเหตุรวม</div>
+          <textarea class="textarea" id="noteOverall" placeholder="เช่น คนขับมาช้า, ของเปียก, ฯลฯ"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: Confirm -->
+  <div class="step-view" id="view3">
+    <div class="section">
+      <div class="card">
+        <div class="card-title">สรุปก่อนยืนยัน</div>
+        <div class="summary" id="summaryBox">
+          <!-- populated by JS -->
+        </div>
+        <div style="font-size:13px; color:var(--ink-2); line-height:1.5;">
+          เมื่อยืนยัน ระบบจะ:<br>
+          • สร้าง <b>เลขที่ใบรับของ (GR)</b><br>
+          • สร้าง <b>Lot ใหม่</b> สำหรับแต่ละรายการ (FIFO)<br>
+          • เพิ่มสต๊อกในคลัง "ร้านวันเวลาค้าวัสดุ"<br>
+          • อัปเดตสถานะ PO เป็น "รับแล้ว" / "บางส่วน"
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom action bar -->
+  <div class="bottombar" id="bbar">
+    <div class="bottombar-inner" id="bbarInner">
+      <!-- step 1: no actions -->
+    </div>
+  </div>
+</div>
+
+<!-- Success screen -->
+<div class="success-screen" id="successScreen">
+  <div class="check-circle">✓</div>
+  <div class="success-title">รับเข้าคลังสำเร็จ</div>
+  <div class="success-sub">สต๊อกคลังวันเวลาค้าวัสดุได้รับการอัปเดต</div>
+  <div class="gr-num">
+    <div class="gr-num-label">เลขที่ใบรับของ</div>
+    <div class="gr-num-val">GR-2026-0008</div>
+  </div>
+  <div class="stock-banner" id="stockBanner">📦 สต๊อกเพิ่มขึ้น 3 รายการ · มูลค่ารวม ฿18,200</div>
+  <div class="lots-card">
+    <div class="lots-title">Lot ที่สร้างใหม่</div>
+    <div id="lotsList"></div>
+  </div>
+  <div class="success-actions">
+    <button class="btn btn-link" onclick="toast('สร้างใบรับของ PDF แล้ว','success')">📄 ใบรับของ PDF</button>
+    <button class="btn btn-link" onclick="toast('อัปโหลด Drive แล้ว','success')">☁️ Drive</button>
+    <button class="btn btn-primary" style="flex-basis:100%;" onclick="resetAll()">+ ทำใบใหม่</button>
+  </div>
+</div>
+
+<!-- Confirm modal -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">ยืนยัน?</div>
+    <div class="modal-body" id="modalBody">รายละเอียด</div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn btn-primary" id="modalConfirm" onclick="confirmModal()">ยืนยัน</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ─── Mock PO Data ───
+  const POS = {
+    'PO-2026-0022': {
+      vendor: 'TPI ตรง',
+      contact: 'คุณวินัย 081-234-5678',
+      orderDate: '26 พ.ค.',
+      deliveryDate: '28 พ.ค.',
+      value: 15800,
+      items: [
+        { id: 'i1', name: 'ปูนซีเมนต์ TPI 50 กก.', qty: 100, unit: 'ถุง', price: 158 }
+      ]
+    },
+    'PO-2026-0023': {
+      vendor: 'ร้านอุดมศักดิ์',
+      contact: 'เฮียอุดม 089-345-6789',
+      orderDate: '26 พ.ค.',
+      deliveryDate: 'วันนี้',
+      value: 18450,
+      items: [
+        { id: 'i1', name: 'เหล็กข้ออ้อย DB12', qty: 50, unit: 'เส้น', price: 245 },
+        { id: 'i2', name: 'ทรายหยาบ', qty: 5, unit: 'คิว', price: 950 },
+        { id: 'i3', name: 'ลวดผูกเหล็ก', qty: 10, unit: 'กก.', price: 145 }
+      ]
+    },
+    'PO-2026-0019': {
+      vendor: 'SCG Home',
+      contact: 'ฝ่ายขาย 02-555-1234',
+      orderDate: '24 พ.ค.',
+      deliveryDate: 'รับเพิ่ม',
+      value: 8750,
+      items: [
+        { id: 'i1', name: 'กระเบื้องเคลือบ 60×60', qty: 50, unit: 'กล่อง', price: 175, note: 'ค้าง 50/100 กล่อง' }
+      ]
+    },
+    'PO-2026-0018': {
+      vendor: 'Global House',
+      contact: '02-832-1000',
+      orderDate: '25 พ.ค.',
+      deliveryDate: '29 พ.ค.',
+      value: 2400,
+      items: [
+        { id: 'i1', name: 'อิฐมอญแดง', qty: 800, unit: 'ก้อน', price: 3 }
+      ]
+    }
+  };
+
+  const DEMO_PHOTOS = [
+    'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=200&q=80',
+    'https://images.unsplash.com/photo-1565793979206-6d6fbf197a4c?w=200&q=80',
+    'https://images.unsplash.com/photo-1581094288338-2314dddb7ece?w=200&q=80',
+    'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=200&q=80',
+    'https://images.unsplash.com/photo-1542621334-a254cf47733d?w=200&q=80',
+    'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=200&q=80',
+    'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=200&q=80'
+  ];
+
+  let currentStep = 1;
+  let currentPO = null;
+  let itemState = {}; // {itemId: {qty, photos:[], note, rejected, rejectReason}}
+
+  function toast(msg, type='') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + type;
+    t.setAttribute('data-show', '1');
+    setTimeout(() => t.setAttribute('data-show', '0'), 1800);
+  }
+
+  function goBack() {
+    if (currentStep === 1) { toast('กลับสู่หน้าหลัก','success'); return; }
+    if (currentStep === 2) { showStep(1); return; }
+    if (currentStep === 3) { showStep(2); return; }
+  }
+
+  function showStep(n) {
+    currentStep = n;
+    ['view1','view2','view3'].forEach((id, i) => {
+      document.getElementById(id).classList.toggle('active', i+1 === n);
+    });
+    // step indicator
+    const stp1 = document.getElementById('stp1');
+    const stp2 = document.getElementById('stp2');
+    const stp3 = document.getElementById('stp3');
+    [stp1,stp2,stp3].forEach(s => { s.className = 'step'; });
+    if (n === 1) stp1.classList.add('active');
+    if (n === 2) { stp1.classList.add('done'); stp2.classList.add('active'); }
+    if (n === 3) { stp1.classList.add('done'); stp2.classList.add('done'); stp3.classList.add('active'); }
+
+    // header sub
+    const sub = document.getElementById('hdrSub');
+    if (n === 1) sub.textContent = 'เลือก PO ที่จะรับสินค้า';
+    if (n === 2) sub.textContent = 'กรอกจำนวนที่รับจริง · ' + currentPO;
+    if (n === 3) sub.textContent = 'ตรวจสอบและยืนยัน';
+
+    // bottombar
+    renderBottombar();
+    window.scrollTo(0, 0);
+  }
+
+  function selectPO(poNo) {
+    currentPO = poNo;
+    const po = POS[poNo];
+    document.getElementById('podNo').textContent = poNo;
+    document.getElementById('podVendor').textContent = po.vendor;
+    document.getElementById('podValue').textContent = '฿' + po.value.toLocaleString();
+
+    // init item state
+    itemState = {};
+    po.items.forEach(it => {
+      itemState[it.id] = { qty: it.qty, photos: [], note: '', rejected: false, rejectReason: '' };
+    });
+    renderItems();
+    showStep(2);
+  }
+
+  function renderItems() {
+    const po = POS[currentPO];
+    const list = document.getElementById('itemsList');
+    list.innerHTML = '';
+    po.items.forEach(it => {
+      const st = itemState[it.id];
+      const diff = st.qty - it.qty;
+      const badges = [];
+      if (st.rejected) badges.push('<span class="grx-badge rej">ปฏิเสธรับ' + (st.rejectReason ? ' · '+st.rejectReason : '') + '</span>');
+      else if (diff < 0) badges.push('<span class="grx-badge warn">⚠ ค้างส่ง '+(-diff)+' '+it.unit+'</span>');
+      else if (diff > 0) badges.push('<span class="grx-badge over">! รับเกิน '+diff+' '+it.unit+'</span>');
+      else badges.push('<span class="grx-badge ok">✓ ครบ</span>');
+      if (it.note) badges.push('<span class="grx-badge">'+it.note+'</span>');
+
+      const photosHtml = st.photos.map((p, idx) =>
+        '<div class="photo" style="background-image:url(\''+p+'\')"><div class="photo-rm" onclick="rmItemPhoto(\''+it.id+'\','+idx+')">✕</div></div>'
+      ).join('');
+
+      const qtyClass = st.rejected ? '' : (diff < 0 ? 'warn' : (diff > 0 ? 'over' : ''));
+
+      const html =
+        '<div class="grx-item" data-rejected="'+(st.rejected?'1':'0')+'">'+
+          '<div class="grx-item-head">'+
+            '<div>'+
+              '<div class="grx-item-name">'+it.name+'</div>'+
+              '<div class="grx-item-ordered">สั่ง: <b>'+it.qty+' '+it.unit+'</b> · ฿'+it.price+'/'+it.unit+'</div>'+
+            '</div>'+
+          '</div>'+
+          '<div class="grx-badge-row">'+badges.join('')+'</div>'+
+          '<div class="grx-row">'+
+            '<div class="grx-cell">'+
+              '<div class="lbl">รับจริง</div>'+
+              '<input type="number" class="qty-input '+qtyClass+'" value="'+st.qty+'" '+(st.rejected?'disabled':'')+' onchange="updItemQty(\''+it.id+'\', this.value)" />'+
+            '</div>'+
+            '<div class="grx-cell">'+
+              '<div class="lbl">หน่วย</div>'+
+              '<div class="grx-unit">'+it.unit+'</div>'+
+            '</div>'+
+          '</div>'+
+          '<textarea class="grx-note" placeholder="หมายเหตุ (เช่น แตก/สีเพี้ยน)" onchange="updItemNote(\''+it.id+'\', this.value)">'+st.note+'</textarea>'+
+          '<div class="grx-actions">'+
+            '<button class="grx-btn" onclick="addItemPhoto(\''+it.id+'\')">📷 ถ่ายรูป ('+st.photos.length+')</button>'+
+            '<button class="grx-btn danger '+(st.rejected?'active':'')+'" onclick="toggleReject(\''+it.id+'\')">'+
+              (st.rejected ? '↩ ยกเลิกปฏิเสธ' : '✕ ปฏิเสธรับ')+
+            '</button>'+
+          '</div>'+
+          (st.rejected ? renderRejectReasons(it.id, st.rejectReason) : '')+
+          (st.photos.length ? '<div class="photos small" style="margin-top:8px">'+photosHtml+'</div>' : '')+
+        '</div>';
+      list.insertAdjacentHTML('beforeend', html);
+    });
+  }
+
+  function renderRejectReasons(id, current) {
+    const reasons = ['แตก/เสียหาย','สีเพี้ยน','ไม่ตรง spec','หมดอายุ','เปียกน้ำ','อื่นๆ'];
+    return '<div class="reject-reasons">' +
+      reasons.map(r => '<span class="chip" data-on="'+(current===r?1:0)+'" onclick="setRejectReason(\''+id+'\',\''+r+'\')">'+r+'</span>').join('') +
+      '</div>';
+  }
+
+  function setRejectReason(id, reason) {
+    itemState[id].rejectReason = reason;
+    renderItems();
+  }
+
+  function updItemQty(id, v) {
+    itemState[id].qty = parseFloat(v) || 0;
+    renderItems();
+  }
+  function updItemNote(id, v) {
+    itemState[id].note = v;
+  }
+  function addItemPhoto(id) {
+    const pool = DEMO_PHOTOS;
+    const next = pool[itemState[id].photos.length % pool.length];
+    itemState[id].photos.push(next);
+    renderItems();
+    toast('เพิ่มรูป','success');
+  }
+  function rmItemPhoto(id, idx) {
+    itemState[id].photos.splice(idx, 1);
+    renderItems();
+  }
+  function toggleReject(id) {
+    itemState[id].rejected = !itemState[id].rejected;
+    if (itemState[id].rejected) itemState[id].qty = 0;
+    else itemState[id].qty = POS[currentPO].items.find(x=>x.id===id).qty;
+    renderItems();
+    toast(itemState[id].rejected ? 'ปฏิเสธรับสินค้า' : 'ยกเลิกปฏิเสธ', 'warn');
+  }
+
+  // ─── Overall photos ───
+  let overallPhotoCount = 1;
+  function addOverallPhoto() {
+    const grid = document.getElementById('overallPhotos');
+    const next = DEMO_PHOTOS[overallPhotoCount % DEMO_PHOTOS.length];
+    overallPhotoCount++;
+    const addBtn = grid.querySelector('.photo-add');
+    const div = document.createElement('div');
+    div.className = 'photo';
+    div.style.backgroundImage = "url('"+next+"')";
+    div.innerHTML = '<div class="photo-rm" onclick="rmOverallPhoto(this)">✕</div>';
+    grid.insertBefore(div, addBtn);
+    toast('เพิ่มรูป','success');
+  }
+  function rmOverallPhoto(el) {
+    el.closest('.photo').remove();
+  }
+
+  function mockScan() {
+    toast('📷 กำลังเปิดกล้อง...', '');
+    setTimeout(() => toast('สแกนสำเร็จ: PO-2026-0023','success'), 900);
+    setTimeout(() => selectPO('PO-2026-0023'), 1500);
+  }
+
+  // ─── Bottombar ───
+  function renderBottombar() {
+    const inner = document.getElementById('bbarInner');
+    if (currentStep === 1) {
+      inner.innerHTML = '<button class="btn btn-secondary" style="flex:1" onclick="toast(\'เปิดประวัติ GR ก่อนหน้า\',\'success\')">📜 ประวัติ GR</button>';
+    } else if (currentStep === 2) {
+      // check has at least 1 photo overall
+      inner.innerHTML =
+        '<button class="btn btn-secondary" onclick="showStep(1)">‹ ย้อนกลับ</button>'+
+        '<button class="btn btn-primary" onclick="goToStep3()">ต่อไป · ตรวจสอบ ›</button>';
+    } else if (currentStep === 3) {
+      inner.innerHTML =
+        '<button class="btn btn-secondary" onclick="showStep(2)">‹ แก้ไข</button>'+
+        '<button class="btn btn-primary" onclick="submitGR()">✅ รับเข้าคลัง</button>';
+    }
+  }
+
+  function goToStep3() {
+    const po = POS[currentPO];
+    let total = 0, lots = 0, behind = 0, overCount = 0, rejected = 0;
+    po.items.forEach(it => {
+      const st = itemState[it.id];
+      if (st.rejected) { rejected++; return; }
+      total += st.qty * it.price;
+      lots++;
+      if (st.qty < it.qty) behind++;
+      if (st.qty > it.qty) overCount++;
+    });
+    // warn if over
+    if (overCount > 0) {
+      openModal('รับเกินที่สั่ง',
+        'มี '+overCount+' รายการที่จำนวนรับเกินที่สั่งใน PO<br>ต้องการดำเนินการต่อไหม?',
+        () => doShowStep3(total, lots, behind, rejected));
+      return;
+    }
+    doShowStep3(total, lots, behind, rejected);
+  }
+
+  function doShowStep3(total, lots, behind, rejected) {
+    const sum = document.getElementById('summaryBox');
+    let html = '';
+    html += '<div class="sum-row"><span>รายการที่รับ</span><span>'+lots+' รายการ</span></div>';
+    html += '<div class="sum-row"><span>Lot ใหม่ที่จะสร้าง</span><span>'+lots+' lots</span></div>';
+    if (behind > 0) html += '<div class="sum-row warn"><span>ค้างส่ง</span><span>'+behind+' รายการ</span></div>';
+    if (rejected > 0) html += '<div class="sum-row" style="color:var(--red)"><span>ปฏิเสธรับ</span><span>'+rejected+' รายการ</span></div>';
+    const overallPhotos = document.querySelectorAll('#overallPhotos .photo').length;
+    html += '<div class="sum-row"><span>รูปแนบรวม</span><span>'+overallPhotos+' รูป</span></div>';
+    html += '<div class="sum-row total"><span>มูลค่ารับเข้าคลัง</span><span>฿'+total.toLocaleString()+'</span></div>';
+    sum.innerHTML = html;
+    showStep(3);
+  }
+
+  function submitGR() {
+    // build lots list
+    const po = POS[currentPO];
+    let lotNo = 142;
+    let lotsHtml = '';
+    let totalValue = 0;
+    let activeLots = 0;
+    po.items.forEach(it => {
+      const st = itemState[it.id];
+      if (st.rejected || st.qty <= 0) return;
+      const v = st.qty * it.price;
+      totalValue += v;
+      activeLots++;
+      lotsHtml += '<div class="lot-row">'+
+        '<div class="lot-no">L-'+String(lotNo).padStart(4,'0')+'</div>'+
+        '<div class="lot-item">'+it.name+'</div>'+
+        '<div class="lot-qty">'+st.qty+' '+it.unit+'</div>'+
+        '</div>';
+      lotNo++;
+    });
+    document.getElementById('lotsList').innerHTML = lotsHtml;
+    document.getElementById('stockBanner').textContent = '📦 สต๊อกเพิ่มขึ้น '+activeLots+' รายการ · มูลค่ารวม ฿'+totalValue.toLocaleString();
+    document.getElementById('successScreen').setAttribute('data-show','1');
+  }
+
+  function resetAll() {
+    document.getElementById('successScreen').setAttribute('data-show','0');
+    currentPO = null;
+    itemState = {};
+    showStep(1);
+  }
+
+  // ─── Modal ───
+  let modalCb = null;
+  function openModal(title, body, cb) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalBody').innerHTML = body;
+    document.getElementById('modalBg').setAttribute('data-open','1');
+    modalCb = cb;
+  }
+  function closeModal() {
+    document.getElementById('modalBg').setAttribute('data-open','0');
+    modalCb = null;
+  }
+  function confirmModal() {
+    if (modalCb) modalCb();
+    closeModal();
+  }
+
+  // init
+  renderBottombar();
+</script>
+</body>
+</html>

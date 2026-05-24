@@ -1,0 +1,1806 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#1f2937" />
+<title>เทียบราคา + ออก PO · วันเวลา ERP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  :root {
+    --bg: #f5f3ee; --card: #ffffff;
+    --ink: #1f2937; --ink-2: #4b5563; --ink-3: #9ca3af; --ink-4: #d1d5db;
+    --line: #e5e3dc; --line-2: #d6d3c8;
+    --primary: #1f2937; --primary-soft: #374151;
+    --accent: #b45309; --accent-soft: #fef3c7;
+    --green: #16a34a; --green-soft: #dcfce7;
+    --red: #dc2626; --red-soft: #fee2e2;
+    --yellow: #ca8a04; --yellow-soft: #fef9c3;
+    --blue: #2563eb; --blue-soft: #dbeafe;
+    --radius: 14px; --radius-sm: 10px;
+    --shadow: 0 1px 2px rgba(17,24,39,.04), 0 8px 24px rgba(17,24,39,.06);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: var(--bg);
+    min-height: 100vh;
+    padding-bottom: 140px;
+  }
+
+  /* ─── Header ─── */
+  .header {
+    background: var(--primary);
+    color: #fff;
+    padding: 14px 22px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 0 rgba(0,0,0,.04);
+  }
+  .header-brand {
+    font-size: 11px;
+    color: rgba(255,255,255,.55);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .header-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .back {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,.08);
+    color: #fff;
+    cursor: pointer;
+    font-size: 20px;
+  }
+  .header-title {
+    font-weight: 600;
+    font-size: 18px;
+    flex: 1;
+  }
+  .header-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,.65);
+    margin-top: 2px;
+  }
+  .me-tag {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,.08);
+    padding: 6px 14px 6px 6px;
+    border-radius: 24px;
+  }
+  .me-tag .avatar {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .me-tag .name {
+    font-size: 13px;
+    color: #fff;
+    font-weight: 500;
+    line-height: 1.1;
+  }
+  .me-tag .role {
+    font-size: 10px;
+    color: rgba(255,255,255,.6);
+    display: block;
+    margin-top: 2px;
+  }
+
+  /* ─── Container ─── */
+  .container {
+    padding: 18px 22px;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+    margin-bottom: 14px;
+  }
+  .card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-2);
+    text-transform: uppercase;
+    letter-spacing: .8px;
+  }
+
+  /* ─── Source RFQ info ─── */
+  .source-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+  }
+  .source-cell {
+    border-right: 1px solid var(--line);
+    padding-right: 14px;
+  }
+  .source-cell:last-child { border-right: none; }
+  .source-label {
+    font-size: 11px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 4px;
+  }
+  .source-val {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .source-val small {
+    font-weight: 400;
+    color: var(--ink-3);
+    font-size: 12px;
+    margin-left: 4px;
+  }
+  .status-pill {
+    display: inline-block;
+    background: var(--green-soft);
+    color: var(--green);
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 4px;
+  }
+  .urgency-pill {
+    display: inline-block;
+    background: var(--yellow-soft);
+    color: var(--yellow);
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  /* ─── Comparison table ─── */
+  .compare-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--line);
+  }
+  table.compare {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    font-size: 13px;
+  }
+  table.compare th, table.compare td {
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+  }
+  table.compare thead th {
+    background: var(--primary);
+    color: #fff;
+    font-weight: 600;
+    position: sticky;
+    top: 80px;
+    z-index: 2;
+    border-bottom: 2px solid #000;
+  }
+  table.compare thead th .vname {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  table.compare thead th .vmeta {
+    font-size: 10px;
+    color: rgba(255,255,255,.7);
+    font-weight: 400;
+    line-height: 1.4;
+  }
+  table.compare thead th .vrating {
+    font-size: 11px;
+    color: #fde68a;
+    margin-top: 2px;
+  }
+  table.compare th.item-col {
+    text-align: left;
+    min-width: 200px;
+  }
+  table.compare td.item-name-cell {
+    text-align: left;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  table.compare td.item-name-cell .qty {
+    display: block;
+    font-size: 11px;
+    color: var(--ink-3);
+    font-weight: 400;
+    margin-top: 2px;
+  }
+  .price-cell {
+    cursor: pointer;
+    position: relative;
+    transition: background .15s;
+    border-radius: 6px;
+  }
+  .price-cell:hover { background: #fafaf7; }
+  .price-cell .price {
+    font-weight: 600;
+    color: var(--ink);
+    font-size: 14px;
+  }
+  .price-cell .total {
+    font-size: 11px;
+    color: var(--ink-3);
+    margin-top: 1px;
+  }
+  .price-cell.best {
+    background: var(--green-soft);
+  }
+  .price-cell.best .price {
+    color: var(--green);
+  }
+  .price-cell.best::before {
+    content: '⭐';
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    font-size: 10px;
+  }
+  .price-cell.selected {
+    background: var(--ink) !important;
+    color: #fff;
+    box-shadow: inset 0 0 0 2px var(--ink);
+  }
+  .price-cell.selected .price,
+  .price-cell.selected .total { color: #fff; }
+  .price-cell.selected::after {
+    content: '✓';
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    font-size: 11px;
+    color: #fff;
+    font-weight: 700;
+  }
+  .price-cell.no-bid {
+    color: var(--ink-3);
+    background: #f9f7f1;
+    cursor: not-allowed;
+    font-size: 11px;
+  }
+  .price-cell.no-bid .price { color: var(--ink-3); font-weight: 400; }
+  .auto-pick-btn {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink-2);
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-family: inherit;
+    font-size: 11px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .12s;
+  }
+  .auto-pick-btn:hover {
+    background: var(--green-soft);
+    border-color: var(--green);
+    color: var(--green);
+  }
+  table.compare tfoot td {
+    background: #fafaf7;
+    font-weight: 600;
+  }
+  table.compare tfoot tr.subtotal td { font-size: 12px; color: var(--ink-2); }
+  table.compare tfoot tr.delivery td { font-size: 12px; color: var(--ink-2); }
+  table.compare tfoot tr.total td {
+    background: var(--primary);
+    color: #fff;
+    font-size: 14px;
+    border-top: 2px solid #000;
+  }
+  table.compare tfoot tr.total td.active {
+    background: var(--green);
+    color: #fff;
+  }
+  table.compare tfoot tr.total td:first-child {
+    text-align: left;
+    font-weight: 700;
+  }
+
+  /* ─── Suggestion panel ─── */
+  .suggestion {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin-bottom: 14px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .suggestion .icon-box {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .suggestion .body { flex: 1; }
+  .suggestion .title {
+    font-weight: 700;
+    font-size: 15px;
+    color: #78350f;
+    margin-bottom: 4px;
+  }
+  .suggestion .desc {
+    font-size: 13px;
+    color: #92400e;
+    line-height: 1.5;
+  }
+  .suggestion .desc b { color: #78350f; }
+  .suggestion .apply-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .suggestion .apply-btn:hover { background: #92400e; }
+
+  /* ─── PO summary panel ─── */
+  .po-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .po-vendor-card {
+    background: #fdfcf9;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+  }
+  .po-vendor-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .po-vendor-name {
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .po-vendor-num {
+    background: var(--ink);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .po-vendor-meta {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-bottom: 10px;
+  }
+  .po-vendor-items {
+    font-size: 13px;
+    margin-bottom: 10px;
+    border-top: 1px dashed var(--line);
+    padding-top: 8px;
+  }
+  .po-vendor-items .row {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    color: var(--ink-2);
+  }
+  .po-vendor-items .row b { color: var(--ink); font-weight: 600; }
+  .po-vendor-totals {
+    border-top: 1px dashed var(--line);
+    padding-top: 8px;
+    font-size: 13px;
+  }
+  .po-vendor-totals .row {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
+    color: var(--ink-2);
+  }
+  .po-vendor-totals .row.grand {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--green);
+    margin-top: 4px;
+    border-top: 1.5px solid var(--ink);
+    padding-top: 6px;
+  }
+  .po-vendor-preview-btn {
+    width: 100%;
+    background: #fff;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    padding: 8px;
+    margin-top: 10px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .po-vendor-preview-btn:hover {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+  .po-summary-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--ink-3);
+    padding: 30px;
+    font-size: 14px;
+  }
+
+  /* ─── Reasoning textarea ─── */
+  .textarea {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    background: #fdfcf9;
+    border-radius: var(--radius-sm);
+    padding: 11px 13px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s, background .15s;
+    resize: vertical;
+    min-height: 70px;
+  }
+  .textarea:focus {
+    border-color: var(--primary);
+    background: #fff;
+  }
+
+  /* ─── Bottom action bar ─── */
+  .bottombar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255,255,255,.95);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--line);
+    padding: 12px 22px calc(12px + env(safe-area-inset-bottom));
+    z-index: 20;
+  }
+  .bottombar-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .bottombar-info {
+    flex: 1;
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .bottombar-info b { color: var(--ink); }
+  .bottombar-info .multi-warn {
+    display: inline-block;
+    background: var(--blue-soft);
+    color: var(--blue);
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: 8px;
+  }
+  .btn {
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 12px 18px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity .15s, background .15s;
+  }
+  .btn:active { opacity: .85; }
+  .btn-secondary {
+    background: #efece4;
+    color: var(--ink);
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary:hover { background: var(--primary-soft); }
+  .btn-primary[disabled] {
+    background: var(--ink-3);
+    cursor: not-allowed;
+  }
+  .btn-accent {
+    background: var(--accent);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-accent:hover { background: #92400e; }
+
+  /* ─── Toast ─── */
+  .toast {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 100;
+    box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    opacity: 0;
+    transition: all .25s;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast[data-show="1"] {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .toast.success { background: var(--green); }
+  .toast.error { background: var(--red); }
+
+  /* ─── Demo badge ─── */
+  .demo-badge {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,.6);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    z-index: 999;
+  }
+
+  /* ─── Doc modal (PO preview) ─── */
+  .doc-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.7);
+    z-index: 300;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .doc-modal[data-show="1"] {
+    display: flex;
+    animation: fadeIn .25s;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .doc-modal-inner {
+    background: #fff;
+    border-radius: 16px;
+    max-width: 720px;
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .doc-modal-head {
+    padding: 14px 18px;
+    background: var(--primary);
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .doc-modal-head .title {
+    font-weight: 600;
+    font-size: 16px;
+  }
+  .doc-modal-close {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.1);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+  }
+  .doc-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    background: #e5e3dc;
+    padding: 18px;
+  }
+  .doc-modal-actions {
+    padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+    background: #fff;
+    border-top: 1px solid var(--line);
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+  .doc-btn {
+    background: #f5f3ee;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .doc-btn:hover {
+    background: #fff;
+    border-color: var(--primary);
+  }
+  .doc-btn.primary {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+
+  /* ─── PO Document (PDF) ─── */
+  .po-doc {
+    background: #fff;
+    color: #111;
+    font-family: 'Sarabun', sans-serif;
+    width: 100%;
+    padding: 18px 16px;
+    margin: 0 auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    font-size: 11px;
+  }
+  .po-doc.pdf-mode {
+    width: 210mm;
+    max-width: 210mm;
+    padding: 16mm 14mm;
+    box-shadow: none;
+    font-size: 13px;
+  }
+  .po-doc * { box-sizing: border-box; }
+  .po-doc-header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 3px double #111;
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+  }
+  .po-doc-header .brand { flex: 1; }
+  .po-doc-header .logo {
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: #666;
+    font-weight: 300;
+    margin-bottom: 2px;
+  }
+  .po-doc-header .company {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111;
+    line-height: 1.2;
+  }
+  .po-doc-header .company-sub {
+    font-size: 12px;
+    color: #555;
+    margin-top: 4px;
+  }
+  .po-doc-header .title-block {
+    text-align: right;
+    min-width: 220px;
+  }
+  .po-doc-header .title-th {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111;
+    line-height: 1;
+  }
+  .po-doc-header .title-en {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: #666;
+    margin-top: 3px;
+  }
+  .po-doc-header .doc-no {
+    margin-top: 10px;
+    border: 2px solid #111;
+    padding: 4px 10px;
+    display: inline-block;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
+  .po-doc-vblock {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .po-doc-vblock .box {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  .po-doc-vblock .box b {
+    display: block;
+    font-size: 10px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .po-doc-vblock .box .name {
+    font-weight: 700;
+    color: #111;
+    font-size: 14px;
+  }
+  .po-doc-vblock .box .meta {
+    color: #555;
+    line-height: 1.4;
+    margin-top: 2px;
+  }
+  .po-doc-items {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 14px;
+    font-size: 12.5px;
+  }
+  .po-doc-items th {
+    background: #1f2937;
+    color: #fff;
+    padding: 8px 6px;
+    text-align: left;
+    font-weight: 600;
+  }
+  .po-doc-items th.num { text-align: right; }
+  .po-doc-items th.center { text-align: center; }
+  .po-doc-items td {
+    padding: 7px 6px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+  }
+  .po-doc-items td.num { text-align: right; font-weight: 600; }
+  .po-doc-items td.center { text-align: center; color: #555; }
+  .po-doc-items tr:nth-child(even) { background: #fafaf7; }
+  .po-doc-totals {
+    width: 50%;
+    margin-left: auto;
+    border-collapse: collapse;
+    margin-bottom: 18px;
+    font-size: 13px;
+  }
+  .po-doc-totals td {
+    padding: 5px 8px;
+    border-bottom: 1px solid #eee;
+  }
+  .po-doc-totals td.label { color: #555; }
+  .po-doc-totals td.num {
+    text-align: right;
+    font-weight: 600;
+  }
+  .po-doc-totals tr.grand td {
+    background: #1f2937;
+    color: #fff;
+    font-size: 15px;
+    border-bottom: none;
+  }
+  .po-doc-terms {
+    background: #fafaf7;
+    border-left: 3px solid #1f2937;
+    padding: 10px 12px;
+    margin-bottom: 22px;
+    font-size: 12px;
+  }
+  .po-doc-terms b {
+    display: block;
+    font-size: 10px;
+    color: #666;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .po-doc-terms ul {
+    margin: 0;
+    padding-left: 18px;
+  }
+  .po-doc-terms li { margin-bottom: 3px; }
+  .po-doc-signs {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-top: 32px;
+    margin-bottom: 14px;
+    font-size: 12px;
+    text-align: center;
+  }
+  .po-doc-signs .sign-box {
+    border-top: 1px solid #999;
+    padding-top: 6px;
+    margin-top: 40px;
+  }
+  .po-doc-signs .sign-name { color: #555; }
+  .po-doc-signs .sign-role {
+    font-weight: 600;
+    color: #111;
+    margin-top: 2px;
+  }
+  .po-doc-signs .sign-date {
+    margin-top: 8px;
+    color: #888;
+    font-size: 11px;
+  }
+  .po-doc-footer {
+    border-top: 1px solid #ddd;
+    padding-top: 8px;
+    font-size: 10px;
+    color: #999;
+    text-align: center;
+    letter-spacing: .5px;
+  }
+  #poDocStage {
+    position: fixed;
+    top: -10000px;
+    left: 0;
+  }
+
+  /* ─── Success screen ─── */
+  .success-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 200;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    overflow-y: auto;
+  }
+  .success-screen[data-show="1"] {
+    display: flex;
+    animation: fadeIn .3s;
+  }
+  .check-circle {
+    width: 84px; height: 84px;
+    border-radius: 50%;
+    background: var(--green);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    margin-bottom: 18px;
+    animation: pop .4s cubic-bezier(.2,1.5,.5,1);
+  }
+  @keyframes pop {
+    0% { transform: scale(0); }
+    100% { transform: scale(1); }
+  }
+  .success-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+  .success-sub {
+    color: var(--ink-2);
+    text-align: center;
+    margin-bottom: 22px;
+  }
+  .po-num-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    width: 100%;
+    max-width: 720px;
+    margin-bottom: 22px;
+  }
+  .po-num-card {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .po-num-label {
+    font-size: 11px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .po-num-val {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 6px 0 6px;
+    letter-spacing: 1.5px;
+  }
+  .po-num-vendor {
+    font-size: 13px;
+    color: var(--ink-2);
+    margin-bottom: 4px;
+  }
+  .po-num-amt {
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 15px;
+  }
+  .po-num-status {
+    margin-top: 8px;
+    display: inline-block;
+    background: var(--yellow-soft);
+    color: var(--yellow);
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .success-card {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 480px;
+    margin-bottom: 14px;
+  }
+  .success-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-2);
+    margin-bottom: 10px;
+  }
+  .doc-folder {
+    background: #f5f3ee;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+  .doc-folder-label {
+    color: var(--ink-3);
+    font-size: 11px;
+    margin-bottom: 2px;
+  }
+  .doc-folder-path {
+    color: var(--ink);
+    font-weight: 500;
+    word-break: break-all;
+  }
+  .doc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .doc-btn-card {
+    background: #f5f3ee;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 8px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .doc-btn-card:hover {
+    background: #fff;
+    border-color: var(--primary);
+  }
+  .doc-btn-card .icon { font-size: 20px; }
+  .doc-btn-card.primary {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+  .doc-btn-card.line {
+    background: #06c755;
+    color: #fff;
+    border-color: #06c755;
+  }
+  .success-actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    max-width: 480px;
+    margin-top: 8px;
+  }
+  .success-actions .btn { flex: 1; }
+  .drive-saved {
+    background: var(--green-soft);
+    color: #15803d;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    margin-top: 8px;
+    display: none;
+  }
+  .drive-saved[data-show="1"] { display: block; }
+  .drive-saved b { display: block; word-break: break-all; }
+
+  @media (max-width: 700px) {
+    .source-grid { grid-template-columns: repeat(2, 1fr); }
+    .source-cell { border-right: none; }
+    .po-summary { grid-template-columns: 1fr; }
+    .container { padding: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-brand">WANWELA · TWO BUILD</div>
+    <div class="header-row">
+      <div class="back" onclick="alert('Demo: ย้อนกลับ Inbox')">‹</div>
+      <div style="flex:1">
+        <div class="header-title">เทียบราคา + ออกใบสั่งซื้อ (PO)</div>
+        <div class="header-sub">แอดมินจัดซื้อ · จาก RFQ ที่ได้ราคาครบแล้ว</div>
+      </div>
+      <div class="me-tag">
+        <div class="avatar">จจ</div>
+        <div>
+          <div class="name">เจนจิรา</div>
+          <div class="role">แอดมินจัดซื้อ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Source RFQ info -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">📨 RFQ ต้นทาง</div>
+        <span class="status-pill">✓ พร้อมเทียบราคา</span>
+      </div>
+      <div class="source-grid">
+        <div class="source-cell">
+          <div class="source-label">เลขที่ RFQ</div>
+          <div class="source-val" id="rfqIdLabel">RFQ-2026-0015</div>
+          <div class="source-val" style="font-size:11px;color:var(--ink-3);font-weight:400">จาก <b style="font-weight:600;color:var(--ink-2)">PR-2026-0042</b></div>
+        </div>
+        <div class="source-cell">
+          <div class="source-label">เป้าหมาย</div>
+          <div class="source-val">แปลง 1 <small>(89/1)</small></div>
+          <div class="source-val" style="font-size:11px;color:var(--ink-3);font-weight:400">Type A · ULTRA</div>
+        </div>
+        <div class="source-cell">
+          <div class="source-label">ผู้ขอ</div>
+          <div class="source-val">สมชาย เกตุแก้ว</div>
+          <div class="source-val" style="font-size:11px;color:var(--ink-3);font-weight:400">ทีมโก้ · โฟร์แมน</div>
+        </div>
+        <div class="source-cell">
+          <div class="source-label">รายการ / ราคา</div>
+          <div class="source-val">4 รายการ</div>
+          <div class="source-val" style="font-size:11px;color:var(--green);font-weight:600">📨 5 vendor ตอบราคา</div>
+        </div>
+        <div class="source-cell">
+          <div class="source-label">วันต้องการใช้</div>
+          <div class="source-val" style="color:var(--yellow)">28 พ.ค. 2569</div>
+          <span class="urgency-pill">🟡 ด่วน · เหลือ 3 วัน</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Suggestion banner -->
+    <div class="suggestion" id="suggestionPanel">
+      <!-- filled by JS -->
+    </div>
+
+    <!-- Comparison Matrix -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">📊 ตารางเทียบราคา</div>
+        <div style="font-size:12px;color:var(--ink-3)">
+          คลิกที่ราคาเพื่อเลือก · ⭐ = ถูกที่สุด ·
+          <a href="#" onclick="resetAllToBest();return false" style="color:var(--accent);font-weight:600">↻ รีเซ็ตเลือกถูกสุดทุกแถว</a>
+        </div>
+      </div>
+      <div class="compare-wrap">
+        <table class="compare" id="compareTable"></table>
+      </div>
+    </div>
+
+    <!-- PO Summary -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">📋 PO ที่จะออก <span id="poCountLabel" style="color:var(--ink-3);font-weight:400">(0)</span></div>
+        <div style="font-size:12px;color:var(--ink-3)" id="poSummaryHint">เลือกราคาในตารางข้างบนเพื่อสร้าง PO</div>
+      </div>
+      <div class="po-summary" id="poSummary">
+        <div class="po-summary-empty">ยังไม่ได้เลือกราคา</div>
+      </div>
+    </div>
+
+    <!-- Reasoning for MD -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">💬 บันทึกถึง MD (ทำไมเลือกเจ้านี้)</div>
+        <div style="font-size:12px;color:var(--ink-3)">MD จะเห็นข้อความนี้ตอนอนุมัติ</div>
+      </div>
+      <textarea class="textarea" id="reasoning" placeholder="เช่น เลือก TPI โรงงานตรงเพราะถูกกว่า SCG 4% และเขาส่งภายใน 2 วัน ทันใช้ก่อนเทคาน · ร้านอุดมศักดิ์ส่งฟรี ถูกสุดในเหล็ก/ทราย/ลวด..."></textarea>
+    </div>
+
+  </div>
+
+  <!-- Bottom action bar -->
+  <div class="bottombar">
+    <div class="bottombar-inner">
+      <div class="bottombar-info" id="bottomInfo">
+        ยังไม่เลือก vendor · เลือกราคาจากตารางก่อน
+      </div>
+      <button class="btn btn-secondary" onclick="saveDraft()">บันทึกร่าง</button>
+      <button class="btn btn-primary" id="submitBtn" onclick="submitPOs()" disabled>
+        💾 ออก PO ทั้งหมด → ส่ง MD อนุมัติ
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">Saved</div>
+
+  <!-- PO Doc preview modal -->
+  <div class="doc-modal" id="docModal">
+    <div class="doc-modal-inner">
+      <div class="doc-modal-head">
+        <div class="title" id="docModalTitle">📄 ตัวอย่าง PO</div>
+        <div class="doc-modal-close" onclick="closeDocModal()">✕</div>
+      </div>
+      <div class="doc-modal-body">
+        <div id="poDocPreview"></div>
+      </div>
+      <div class="doc-modal-actions">
+        <button class="doc-btn" onclick="downloadCurrentPO()">
+          <span>📥</span><span>ดาวน์โหลด PDF</span>
+        </button>
+        <button class="doc-btn primary" onclick="closeDocModal()">
+          <span>✓</span><span>ปิด</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success screen -->
+  <div class="success-screen" id="successScreen">
+    <div class="check-circle">✓</div>
+    <div class="success-title">ออก PO สำเร็จ</div>
+    <div class="success-sub" id="successSub">PO ถูกส่งให้ MD อนุมัติแล้ว</div>
+    <div class="po-num-grid" id="poNumGrid"></div>
+
+    <div class="success-card">
+      <div class="success-card-title">📄 เอกสาร PO (PDF)</div>
+      <div class="doc-folder">
+        <div class="doc-folder-label">☁️ บันทึกอัตโนมัติใน Google Drive:</div>
+        <div class="doc-folder-path">One Vela Sales Files / เอกสารจัดซื้อ / PO /</div>
+      </div>
+      <div class="doc-grid">
+        <button class="doc-btn-card" onclick="downloadAllPDFs()">
+          <span class="icon">📥</span>
+          <span>ดาวน์โหลดทั้งหมด</span>
+        </button>
+        <button class="doc-btn-card" onclick="saveToDrive()">
+          <span class="icon">☁️</span>
+          <span>บันทึก Drive</span>
+        </button>
+        <button class="doc-btn-card line" onclick="sendLineToMD()" style="grid-column:1/-1">
+          <span class="icon">📱</span>
+          <span>ส่งให้ MD อนุมัติ (LINE)</span>
+        </button>
+      </div>
+      <div class="drive-saved" id="driveSaved">
+        ✓ บันทึกแล้วใน Drive
+        <b id="drivePath">—</b>
+      </div>
+    </div>
+
+    <div class="success-actions">
+      <button class="btn btn-secondary" onclick="reset()">เริ่มใหม่</button>
+      <button class="btn btn-primary" onclick="alert('Demo: ไปหน้า PO Inbox')">ดูรายการ PO</button>
+    </div>
+  </div>
+
+  <!-- Hidden printable doc -->
+  <div id="poDocStage" aria-hidden="true"></div>
+</div>
+
+<div class="demo-badge">DEMO · P0 · #4</div>
+
+<script>
+  // ─── Mock Data (per spec) ───
+  const SOURCE_RFQ = {
+    id: 'RFQ-2026-0015',
+    sourcePR: 'PR-2026-0042',
+    target: 'แปลง 1 (89/1)',
+    typeShort: 'A ULTRA',
+    requester: 'สมชาย เกตุแก้ว',
+    team: 'โก้',
+    urgency: 'urgent',
+    needDate: '28 พ.ค. 2569',
+    items: [
+      { id: 'i1', name: 'ปูนซีเมนต์ TPI ปอร์ตแลนด์ 50 กก.', qty: 100, unit: 'ถุง' },
+      { id: 'i2', name: 'เหล็กข้ออ้อย DB12', qty: 50, unit: 'เส้น' },
+      { id: 'i3', name: 'ทรายหยาบ', qty: 8, unit: 'คิว' },
+      { id: 'i4', name: 'ลวดผูกเหล็ก', qty: 5, unit: 'กก.' },
+    ],
+    prices: {
+      'i1': { v1: 165, v3: 168, v4: 162, v6: 158, v7: 170 },
+      'i2': { v1: 248, v3: 252, v4: 245, v6: null, v7: 250 },
+      'i3': { v1: 480, v3: 460, v4: 490, v6: null, v7: 450 },
+      'i4': { v1: 65,  v3: 62,  v4: 64,  v6: null, v7: 60  },
+    },
+  };
+  const VENDORS = [
+    { id: 'v1', name: 'SCG Home Solution', short: 'SCG',     deliveryFee: 800,  deliveryDays: 2, rating: 4.8,
+      addr: '99/1 ถ.บางนา-ตราด อ.บางพลี จ.สมุทรปราการ', taxId: '0107536000587', payTerms: 'เครดิต 30 วัน' },
+    { id: 'v3', name: 'Global House',      short: 'Global',  deliveryFee: 500,  deliveryDays: 1, rating: 4.6,
+      addr: '120 หมู่ 4 ต.บางปลา อ.บางพลี จ.สมุทรปราการ', taxId: '0107546000123', payTerms: 'เครดิต 15 วัน' },
+    { id: 'v4', name: 'Mega Home',         short: 'Mega',    deliveryFee: 600,  deliveryDays: 3, rating: 4.3,
+      addr: '88 หมู่ 7 ต.บางบ่อ อ.บางบ่อ จ.สมุทรปราการ', taxId: '0107550000456', payTerms: 'เครดิต 30 วัน' },
+    { id: 'v6', name: 'TPI โรงงานตรง',     short: 'TPI',     deliveryFee: 1200, deliveryDays: 2, rating: 4.9,
+      addr: 'โรงงาน TPI ถ.ปู่เจ้าฯ อ.พระประแดง จ.สมุทรปราการ', taxId: '0107535000111', payTerms: 'เงินสด / โอนก่อนส่ง' },
+    { id: 'v7', name: 'ร้านอุดมศักดิ์',     short: 'อุดมฯ',  deliveryFee: 0,    deliveryDays: 1, rating: 4.7,
+      addr: '45/2 หมู่บ้านวันเวลา ต.บางพลี (ใกล้ไซต์)', taxId: '3-1090-99999-99-0', payTerms: 'เงินสด / 7 วัน' },
+  ];
+
+  // selections: { itemId -> vendorId | null }
+  const selections = {};
+
+  // ─── Helpers ───
+  function escHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function formatNum(n) {
+    const num = Number(n) || 0;
+    return num.toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  }
+  function formatMoney(n) {
+    return '฿' + Math.round(Number(n) || 0).toLocaleString('th-TH');
+  }
+  function vendor(vid) { return VENDORS.find(v => v.id === vid); }
+  function getBestVendor(itemId) {
+    const prices = SOURCE_RFQ.prices[itemId];
+    let best = null, lowest = Infinity;
+    Object.entries(prices).forEach(([vid, p]) => {
+      if (p != null && p < lowest) { lowest = p; best = vid; }
+    });
+    return best;
+  }
+
+  // ─── Compute suggestion ───
+  function computeSuggestion() {
+    // best per item (auto picks)
+    const bestPicks = {};
+    let bestTotal = 0;
+    const bestVendorSet = new Set();
+    SOURCE_RFQ.items.forEach(it => {
+      const bv = getBestVendor(it.id);
+      bestPicks[it.id] = bv;
+      bestTotal += SOURCE_RFQ.prices[it.id][bv] * it.qty;
+      bestVendorSet.add(bv);
+    });
+    // delivery for each unique vendor
+    bestVendorSet.forEach(vid => { bestTotal += vendor(vid).deliveryFee; });
+
+    // single-vendor scenarios (vendor must bid all 4 items)
+    const singleScenarios = [];
+    VENDORS.forEach(v => {
+      let canAll = true, sub = 0;
+      SOURCE_RFQ.items.forEach(it => {
+        const p = SOURCE_RFQ.prices[it.id][v.id];
+        if (p == null) canAll = false;
+        else sub += p * it.qty;
+      });
+      if (canAll) singleScenarios.push({ vid: v.id, total: sub + v.deliveryFee });
+    });
+    singleScenarios.sort((a, b) => a.total - b.total);
+    const bestSingle = singleScenarios[0];
+
+    return { bestPicks, bestTotal, bestVendorSet: [...bestVendorSet], bestSingle };
+  }
+
+  function renderSuggestion() {
+    const s = computeSuggestion();
+    const panel = document.getElementById('suggestionPanel');
+    const vendorList = s.bestVendorSet.map(vid => `<b>${vendor(vid).short}</b>`).join(' + ');
+    let extra = '';
+    if (s.bestSingle) {
+      const diff = s.bestSingle.total - s.bestTotal;
+      const pct = ((diff / s.bestTotal) * 100).toFixed(1);
+      if (diff > 0) {
+        extra = `ถ้ารวมเป็นเจ้าเดียว (${vendor(s.bestSingle.vid).short}) จะ <b>แพงกว่า ${formatMoney(diff)} (+${pct}%)</b> แต่จัดการง่ายกว่า`;
+      } else {
+        extra = `ใช้ ${vendor(s.bestSingle.vid).short} เจ้าเดียวกลับถูกสุด ${formatMoney(-diff)}`;
+      }
+    }
+    panel.innerHTML = `
+      <div class="icon-box">💡</div>
+      <div class="body">
+        <div class="title">แนะนำ: แยกซื้อ ${s.bestVendorSet.length} เจ้า → ${vendorList}</div>
+        <div class="desc">
+          ราคารวมต่ำสุด <b>${formatMoney(s.bestTotal)}</b> (รวมค่าส่ง) — ${extra}
+        </div>
+        <button class="apply-btn" onclick="resetAllToBest()">↻ ใช้คำแนะนำนี้</button>
+      </div>
+    `;
+  }
+
+  // ─── Render comparison table ───
+  function renderTable() {
+    const tbl = document.getElementById('compareTable');
+    // header
+    let html = '<thead><tr>';
+    html += '<th class="item-col">รายการ <small style="font-weight:400;color:rgba(255,255,255,.6)">(qty × หน่วย)</small></th>';
+    VENDORS.forEach(v => {
+      const stars = '★'.repeat(Math.round(v.rating)) + '☆'.repeat(5 - Math.round(v.rating));
+      html += `<th>
+        <div class="vname">${v.short}</div>
+        <div class="vmeta">${v.name}</div>
+        <div class="vmeta">ส่ง ${v.deliveryFee ? formatMoney(v.deliveryFee) : 'ฟรี'} · ${v.deliveryDays} วัน</div>
+        <div class="vrating">${stars} ${v.rating}</div>
+      </th>`;
+    });
+    html += '<th style="min-width:90px">เลือกถูกสุด</th>';
+    html += '</tr></thead>';
+
+    // body
+    html += '<tbody>';
+    SOURCE_RFQ.items.forEach((it, idx) => {
+      html += '<tr>';
+      const best = getBestVendor(it.id);
+      html += `<td class="item-name-cell">
+        ${idx+1}. ${escHtml(it.name)}
+        <span class="qty">${formatNum(it.qty)} ${escHtml(it.unit)}</span>
+      </td>`;
+      VENDORS.forEach(v => {
+        const p = SOURCE_RFQ.prices[it.id][v.id];
+        if (p == null) {
+          html += `<td><div class="price-cell no-bid"><div class="price">ไม่ขาย</div></div></td>`;
+        } else {
+          const cls = ['price-cell'];
+          if (v.id === best) cls.push('best');
+          if (selections[it.id] === v.id) cls.push('selected');
+          const total = p * it.qty;
+          html += `<td><div class="${cls.join(' ')}" onclick="pickPrice('${it.id}','${v.id}')">
+            <div class="price">฿${formatNum(p)}</div>
+            <div class="total">= ${formatMoney(total)}</div>
+          </div></td>`;
+        }
+      });
+      html += `<td><button class="auto-pick-btn" onclick="pickPrice('${it.id}','${best}')">⭐ ${vendor(best).short}</button></td>`;
+      html += '</tr>';
+    });
+    html += '</tbody>';
+
+    // footer (subtotal / delivery / total per vendor)
+    const subs = {}, hasItems = {};
+    VENDORS.forEach(v => { subs[v.id] = 0; hasItems[v.id] = false; });
+    SOURCE_RFQ.items.forEach(it => {
+      const vid = selections[it.id];
+      if (!vid) return;
+      const p = SOURCE_RFQ.prices[it.id][vid];
+      subs[vid] += p * it.qty;
+      hasItems[vid] = true;
+    });
+
+    html += '<tfoot>';
+    // subtotal row
+    html += '<tr class="subtotal"><td style="text-align:left">รวมราคาวัสดุ</td>';
+    VENDORS.forEach(v => {
+      html += `<td>${hasItems[v.id] ? formatMoney(subs[v.id]) : '—'}</td>`;
+    });
+    html += '<td></td></tr>';
+    // delivery row
+    html += '<tr class="delivery"><td style="text-align:left">ค่าจัดส่ง</td>';
+    VENDORS.forEach(v => {
+      const fee = hasItems[v.id] ? v.deliveryFee : 0;
+      html += `<td>${hasItems[v.id] ? (fee ? formatMoney(fee) : 'ฟรี') : '—'}</td>`;
+    });
+    html += '<td></td></tr>';
+    // total row
+    html += '<tr class="total"><td>ยอดรวม PO</td>';
+    VENDORS.forEach(v => {
+      const total = subs[v.id] + (hasItems[v.id] ? v.deliveryFee : 0);
+      const cls = hasItems[v.id] ? 'active' : '';
+      html += `<td class="${cls}">${hasItems[v.id] ? formatMoney(total) : '—'}</td>`;
+    });
+    html += '<td></td></tr>';
+    html += '</tfoot>';
+
+    tbl.innerHTML = html;
+  }
+
+  function pickPrice(itemId, vendorId) {
+    if (!vendorId) return;
+    if (SOURCE_RFQ.prices[itemId][vendorId] == null) return;
+    if (selections[itemId] === vendorId) {
+      delete selections[itemId];
+    } else {
+      selections[itemId] = vendorId;
+    }
+    renderTable();
+    renderPOSummary();
+    updateBottomBar();
+  }
+  function resetAllToBest() {
+    SOURCE_RFQ.items.forEach(it => {
+      selections[it.id] = getBestVendor(it.id);
+    });
+    renderTable();
+    renderPOSummary();
+    updateBottomBar();
+    showToast('เลือกราคาถูกสุดทุกรายการแล้ว', 'success');
+  }
+
+  // ─── PO Summary (group by vendor) ───
+  function getGroupedPOs() {
+    const groups = {};
+    SOURCE_RFQ.items.forEach(it => {
+      const vid = selections[it.id];
+      if (!vid) return;
+      if (!groups[vid]) groups[vid] = { vendor: vendor(vid), items: [], subtotal: 0 };
+      const p = SOURCE_RFQ.prices[it.id][vid];
+      groups[vid].items.push({ ...it, unitPrice: p, lineTotal: p * it.qty });
+      groups[vid].subtotal += p * it.qty;
+    });
+    // assign PO numbers (sequential from 0022)
+    const ordered = Object.values(groups).sort((a,b) => a.vendor.id.localeCompare(b.vendor.id));
+    ordered.forEach((g, i) => {
+      g.poNumber = `PO-2026-${String(22 + i).padStart(4,'0')}`;
+      g.delivery = g.vendor.deliveryFee;
+      g.grandTotal = g.subtotal + g.delivery;
+    });
+    return ordered;
+  }
+
+  function renderPOSummary() {
+    const pos = getGroupedPOs();
+    const c = document.getElementById('poSummary');
+    document.getElementById('poCountLabel').textContent = pos.length ? `(${pos.length} ใบ)` : '(0)';
+    if (pos.length === 0) {
+      c.innerHTML = '<div class="po-summary-empty">ยังไม่ได้เลือกราคา — แตะที่ราคาในตารางข้างบน</div>';
+      document.getElementById('poSummaryHint').textContent = 'เลือกราคาในตารางข้างบนเพื่อสร้าง PO';
+      return;
+    }
+    document.getElementById('poSummaryHint').textContent = `จะออก ${pos.length} ใบ (1 ใบ/vendor)`;
+    c.innerHTML = pos.map((g) => `
+      <div class="po-vendor-card">
+        <div class="po-vendor-head">
+          <div>
+            <div class="po-vendor-name">${escHtml(g.vendor.name)}</div>
+            <div class="po-vendor-meta">ส่งภายใน ${g.vendor.deliveryDays} วัน · ★ ${g.vendor.rating}</div>
+          </div>
+          <div class="po-vendor-num">${g.poNumber}</div>
+        </div>
+        <div class="po-vendor-items">
+          ${g.items.map(it => `
+            <div class="row">
+              <span>${escHtml(it.name.length > 28 ? it.name.slice(0,28) + '…' : it.name)} <small style="color:var(--ink-3)">× ${formatNum(it.qty)} ${escHtml(it.unit)}</small></span>
+              <b>${formatMoney(it.lineTotal)}</b>
+            </div>
+          `).join('')}
+        </div>
+        <div class="po-vendor-totals">
+          <div class="row"><span>รวมวัสดุ</span><span>${formatMoney(g.subtotal)}</span></div>
+          <div class="row"><span>ค่าส่ง</span><span>${g.delivery ? formatMoney(g.delivery) : 'ฟรี'}</span></div>
+          <div class="row grand"><span>ยอดสุทธิ</span><span>${formatMoney(g.grandTotal)}</span></div>
+        </div>
+        <button class="po-vendor-preview-btn" onclick="previewPO('${g.vendor.id}')">👁️ ดูตัวอย่าง PO</button>
+      </div>
+    `).join('');
+  }
+
+  function updateBottomBar() {
+    const pos = getGroupedPOs();
+    const info = document.getElementById('bottomInfo');
+    const btn = document.getElementById('submitBtn');
+    if (pos.length === 0) {
+      info.innerHTML = 'ยังไม่เลือก vendor · เลือกราคาจากตารางก่อน';
+      btn.disabled = true;
+      return;
+    }
+    const grand = pos.reduce((s, p) => s + p.grandTotal, 0);
+    let html = `<b>${pos.length} PO</b> · ยอดรวม <b>${formatMoney(grand)}</b>`;
+    if (pos.length > 1) {
+      html += `<span class="multi-warn">จะออก ${pos.length} ใบ (${pos.length} vendor)</span>`;
+    }
+    info.innerHTML = html;
+    btn.disabled = false;
+  }
+
+  // ─── PO Doc generation ───
+  function buildPODocHTML(group) {
+    const today = new Date();
+    const dateLabel = today.toLocaleDateString('th-TH', { day: '2-digit', month: 'long', year: 'numeric' });
+    const timeLabel = today.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+    const itemRows = group.items.map((it, i) => `
+      <tr>
+        <td class="center" style="width:32px">${i+1}</td>
+        <td>${escHtml(it.name)}</td>
+        <td class="num" style="width:60px">${formatNum(it.qty)}</td>
+        <td class="center" style="width:50px">${escHtml(it.unit)}</td>
+        <td class="num" style="width:80px">฿${formatNum(it.unitPrice)}</td>
+        <td class="num" style="width:90px">${formatMoney(it.lineTotal)}</td>
+      </tr>
+    `).join('');
+    return `
+      <div class="po-doc" id="poDocEl">
+        <div class="po-doc-header">
+          <div class="brand">
+            <div class="logo">WANWELA · ONE VELA</div>
+            <div class="company">บริษัท ทู บิลด์ ดีเวลลอปเมนท์ จำกัด</div>
+            <div class="company-sub">โครงการ วันเวลา · One Vela — Amata Chonburi</div>
+          </div>
+          <div class="title-block">
+            <div class="title-th">ใบสั่งซื้อ</div>
+            <div class="title-en">PURCHASE ORDER</div>
+            <div class="doc-no">${group.poNumber}</div>
+          </div>
+        </div>
+
+        <div class="po-doc-vblock">
+          <div class="box">
+            <b>ผู้ขาย / Vendor</b>
+            <div class="name">${escHtml(group.vendor.name)}</div>
+            <div class="meta">${escHtml(group.vendor.addr)}</div>
+            <div class="meta">เลขผู้เสียภาษี: ${escHtml(group.vendor.taxId)}</div>
+            <div class="meta">เครดิต: ${escHtml(group.vendor.payTerms)}</div>
+          </div>
+          <div class="box">
+            <b>ส่งของที่ / Ship to</b>
+            <div class="name">${escHtml(SOURCE_RFQ.target)}</div>
+            <div class="meta">โครงการ วันเวลา (One Vela) — Amata Chonburi</div>
+            <div class="meta">ผู้รับ: ${escHtml(SOURCE_RFQ.requester)} (ทีม${escHtml(SOURCE_RFQ.team)})</div>
+            <div class="meta">วันต้องการใช้: <b>${escHtml(SOURCE_RFQ.needDate)}</b></div>
+            <div class="meta">อ้างอิง PR: ${escHtml(SOURCE_RFQ.sourcePR)} · RFQ: ${escHtml(SOURCE_RFQ.id)}</div>
+          </div>
+        </div>
+
+        <table class="po-doc-items">
+          <thead>
+            <tr>
+              <th class="center">#</th>
+              <th>รายการสินค้า / วัสดุ</th>
+              <th class="num">จำนวน</th>
+              <th class="center">หน่วย</th>
+              <th class="num">ราคา/หน่วย</th>
+              <th class="num">รวม</th>
+            </tr>
+          </thead>
+          <tbody>${itemRows}</tbody>
+        </table>
+
+        <table class="po-doc-totals">
+          <tr><td class="label">รวมราคาวัสดุ</td><td class="num">${formatMoney(group.subtotal)}</td></tr>
+          <tr><td class="label">ค่าจัดส่ง</td><td class="num">${group.delivery ? formatMoney(group.delivery) : 'ฟรี'}</td></tr>
+          <tr><td class="label">ภาษีมูลค่าเพิ่ม (รวมแล้ว)</td><td class="num">VAT included</td></tr>
+          <tr class="grand"><td class="label" style="color:#fff">ยอดสุทธิ / Grand Total</td><td class="num">${formatMoney(group.grandTotal)}</td></tr>
+        </table>
+
+        <div class="po-doc-terms">
+          <b>เงื่อนไข / Terms &amp; Conditions</b>
+          <ul>
+            <li>ราคารวมภาษีมูลค่าเพิ่ม 7% แล้ว · กำหนดส่ง ${group.vendor.deliveryDays} วันทำการนับจากวันออกใบสั่งซื้อ</li>
+            <li>การชำระเงิน: ${escHtml(group.vendor.payTerms)} · โอนเข้าบัญชีในนามนิติบุคคลผู้ขายเท่านั้น</li>
+            <li>ผู้ขายต้องส่งใบกำกับภาษีเต็มรูปทุกครั้งที่ส่งของ · ใบรับของต้องเซ็นโดยผู้รับที่หน้างาน</li>
+            <li>หากของไม่ตรงสเปก/ชำรุด ผู้ซื้อมีสิทธิ์ปฏิเสธรับและคืนค่าใช้จ่าย</li>
+          </ul>
+        </div>
+
+        <div class="po-doc-signs">
+          <div class="sign-box">
+            <div class="sign-name">( เจนจิรา )</div>
+            <div class="sign-role">ผู้สั่งซื้อ / แอดมินจัดซื้อ</div>
+            <div class="sign-date">วันที่ ........................</div>
+          </div>
+          <div class="sign-box">
+            <div class="sign-name">( คุณไอซ์ )</div>
+            <div class="sign-role">ผู้อนุมัติ / กรรมการผู้จัดการ</div>
+            <div class="sign-date">วันที่ ........................</div>
+          </div>
+          <div class="sign-box">
+            <div class="sign-name">( .................................. )</div>
+            <div class="sign-role">ผู้รับของ / โฟร์แมน</div>
+            <div class="sign-date">วันที่ ........................</div>
+          </div>
+        </div>
+
+        <div class="po-doc-footer">
+          เอกสารนี้สร้างจากระบบ One Vela ERP · ${dateLabel} ${timeLabel} น. · เลขอ้างอิง ${group.poNumber}
+        </div>
+      </div>
+    `;
+  }
+
+  let currentPreviewVendor = null;
+  function previewPO(vendorId) {
+    const pos = getGroupedPOs();
+    const group = pos.find(g => g.vendor.id === vendorId);
+    if (!group) return;
+    currentPreviewVendor = vendorId;
+    document.getElementById('docModalTitle').textContent = `📄 ตัวอย่าง ${group.poNumber} · ${group.vendor.name}`;
+    document.getElementById('poDocPreview').innerHTML = buildPODocHTML(group);
+    document.getElementById('docModal').dataset.show = '1';
+  }
+  function closeDocModal() {
+    document.getElementById('docModal').dataset.show = '0';
+  }
+
+  async function downloadPOPDF(group) {
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    const stage = document.getElementById('poDocStage');
+    stage.innerHTML = buildPODocHTML(group);
+    const el = stage.querySelector('.po-doc');
+    el.classList.add('pdf-mode');
+    try {
+      await html2pdf().set({
+        margin: 0,
+        filename: `${group.poNumber}.pdf`,
+        image: { type: 'jpeg', quality: 0.96 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      }).from(el).save();
+    } finally {
+      stage.innerHTML = '';
+    }
+  }
+  async function downloadCurrentPO() {
+    const pos = getGroupedPOs();
+    const group = pos.find(g => g.vendor.id === currentPreviewVendor);
+    if (!group) return;
+    showToast('⏳ กำลังสร้าง PDF...');
+    await downloadPOPDF(group);
+    showToast('✓ ดาวน์โหลด PDF แล้ว', 'success');
+  }
+  async function downloadAllPDFs() {
+    const pos = getGroupedPOs();
+    showToast('⏳ กำลังสร้าง PDF...');
+    for (const g of pos) {
+      await downloadPOPDF(g);
+    }
+    showToast(`✓ ดาวน์โหลด ${pos.length} ไฟล์แล้ว`, 'success');
+  }
+  async function saveToDrive() {
+    showToast('⏳ กำลังอัปโหลดไป Google Drive...');
+    await new Promise(r => setTimeout(r, 1200));
+    const pos = getGroupedPOs();
+    document.getElementById('drivePath').textContent =
+      pos.map(g => `One Vela Sales Files / เอกสารจัดซื้อ / PO / ${g.poNumber}.pdf`).join('\n');
+    document.getElementById('driveSaved').dataset.show = '1';
+    showToast('✓ บันทึก Drive แล้ว', 'success');
+  }
+  function sendLineToMD() {
+    showToast('📱 ส่ง LINE แจ้ง MD แล้ว → คุณไอซ์', 'success');
+  }
+
+  // ─── Toast ───
+  function showToast(msg, kind = '') {
+    const t = document.getElementById('toast');
+    t.className = `toast ${kind}`;
+    t.textContent = msg;
+    t.dataset.show = '1';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.dataset.show = '0', 2200);
+  }
+
+  // ─── Submit / success ───
+  function submitPOs() {
+    const pos = getGroupedPOs();
+    if (pos.length === 0) {
+      showToast('เลือกราคาก่อน', 'error');
+      return;
+    }
+    // missing items check
+    const missing = SOURCE_RFQ.items.filter(it => !selections[it.id]);
+    if (missing.length > 0) {
+      const ok = confirm(`ยังมี ${missing.length} รายการที่ยังไม่ได้เลือก vendor:\n\n${missing.map(it => '• ' + it.name).join('\n')}\n\nต้องการส่ง PO โดยข้ามรายการเหล่านี้ใช่ไหม?`);
+      if (!ok) return;
+    }
+    // build success grid
+    const grid = document.getElementById('poNumGrid');
+    grid.innerHTML = pos.map(g => `
+      <div class="po-num-card">
+        <div class="po-num-label">ใบสั่งซื้อ</div>
+        <div class="po-num-val">${g.poNumber}</div>
+        <div class="po-num-vendor">${escHtml(g.vendor.name)}</div>
+        <div class="po-num-amt">${formatMoney(g.grandTotal)}</div>
+        <div class="po-num-status">⏳ รอ MD อนุมัติ</div>
+      </div>
+    `).join('');
+    document.getElementById('successSub').textContent =
+      `${pos.length} ใบสั่งซื้อ · มูลค่ารวม ${formatMoney(pos.reduce((s,p)=>s+p.grandTotal,0))} · ส่ง MD อนุมัติแล้ว`;
+    document.getElementById('successScreen').dataset.show = '1';
+  }
+  function saveDraft() {
+    showToast('บันทึกร่างแล้ว', 'success');
+  }
+  function reset() {
+    Object.keys(selections).forEach(k => delete selections[k]);
+    document.getElementById('reasoning').value = '';
+    document.getElementById('successScreen').dataset.show = '0';
+    document.getElementById('driveSaved').dataset.show = '0';
+    renderAll();
+  }
+
+  // ─── Init ───
+  function renderAll() {
+    renderSuggestion();
+    renderTable();
+    renderPOSummary();
+    updateBottomBar();
+  }
+  // Default: pre-select best for each item
+  SOURCE_RFQ.items.forEach(it => { selections[it.id] = getBestVendor(it.id); });
+  renderAll();
+</script>
+
+</body>
+</html>

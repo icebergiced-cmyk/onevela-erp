@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#1f2937" />
+<title>Dashboard ต้นทุน · วันเวลา ERP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root {
+    --bg: #f5f3ee; --card: #ffffff;
+    --ink: #1f2937; --ink-2: #4b5563; --ink-3: #9ca3af; --ink-4: #d1d5db;
+    --line: #e5e3dc; --line-2: #d6d3c8;
+    --primary: #1f2937; --primary-soft: #374151;
+    --accent: #b45309; --accent-soft: #fef3c7;
+    --green: #16a34a; --green-soft: #dcfce7;
+    --red: #dc2626; --red-soft: #fee2e2;
+    --yellow: #ca8a04; --yellow-soft: #fef9c3;
+    --blue: #2563eb; --blue-soft: #dbeafe;
+    --purple: #7c3aed; --purple-soft: #ede9fe;
+    --radius: 14px; --radius-sm: 10px;
+    --shadow: 0 1px 2px rgba(17,24,39,.04), 0 8px 24px rgba(17,24,39,.06);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: var(--bg);
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* Header */
+  .header {
+    background: var(--primary);
+    color: #fff;
+    padding: 18px 26px 22px;
+    position: sticky; top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 0 rgba(0,0,0,.04);
+  }
+  .header-brand {
+    font-size: 11px;
+    color: rgba(255,255,255,.55);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .header-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .header-title { font-weight: 700; font-size: 22px; flex: 1; }
+  .header-sub { font-size: 13px; color: rgba(255,255,255,.65); margin-top: 2px; letter-spacing: .3px; }
+  .header-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  /* Top filter bar (sticky-ish) */
+  .filterbar {
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    padding: 12px 26px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    position: sticky;
+    top: 78px;
+    z-index: 9;
+  }
+  .filterbar-label {
+    font-size: 12px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-right: 4px;
+  }
+  .filter-pill {
+    padding: 6px 12px;
+    border-radius: 18px;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-2);
+    cursor: pointer;
+    transition: all .12s;
+  }
+  .filter-pill[data-on="1"] {
+    background: var(--ink); color: #fff;
+    border-color: var(--ink);
+  }
+  .filter-pill:hover:not([data-on="1"]) { border-color: var(--ink-3); }
+  .filterbar-spacer { flex: 1; }
+  .export-btn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: #fff;
+    border: 1.5px solid var(--line-2);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .export-btn:hover { background: #fafaf7; }
+  .export-btn.primary {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+  .export-btn.primary:hover { background: var(--primary-soft); }
+
+  /* Section */
+  .section { padding: 20px 26px 0; }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 16px;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+  .card.dark {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    color: #fff;
+  }
+  .card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+    gap: 10px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 700;
+    color: var(--ink-2);
+    text-transform: uppercase;
+    letter-spacing: .8px;
+  }
+  .card.dark .card-title { color: rgba(255,255,255,.65); }
+  .card-hint { font-size: 11px; color: var(--ink-3); }
+
+  /* KPI strip */
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 1080px) {
+    .kpi-strip { grid-template-columns: repeat(3, 1fr); }
+    .grid-2 { grid-template-columns: 1fr; }
+    .grid-3 { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+  }
+  .kpi {
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    padding: 14px 14px 14px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent);
+  }
+  .kpi.green::before { background: var(--green); }
+  .kpi.blue::before { background: var(--blue); }
+  .kpi.purple::before { background: var(--purple); }
+  .kpi.red::before { background: var(--red); }
+  .kpi.yellow::before { background: var(--yellow); }
+  .kpi-label {
+    font-size: 11px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    margin-bottom: 4px;
+  }
+  .kpi-val {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .kpi-val .unit { font-size: 13px; font-weight: 500; color: var(--ink-3); margin-left: 3px; }
+  .kpi-sub {
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+  .kpi-sub b { color: var(--ink-2); font-weight: 600; }
+  .kpi-bar {
+    margin-top: 8px;
+    height: 5px;
+    border-radius: 3px;
+    background: #f3f4f6;
+    overflow: hidden;
+  }
+  .kpi-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width .4s;
+  }
+  .kpi.green .kpi-bar-fill { background: var(--green); }
+  .kpi.blue .kpi-bar-fill { background: var(--blue); }
+
+  /* Top 20 plots table */
+  .plots-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .plots-table thead th {
+    background: #fafaf7;
+    padding: 9px 10px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--ink-2);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    border-bottom: 1.5px solid var(--line);
+  }
+  .plots-table thead th.num { text-align: right; }
+  .plots-table thead th.center { text-align: center; }
+  .plots-table tbody td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+  }
+  .plots-table tbody td.num { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .plots-table tbody tr:hover { background: #fafaf7; cursor: pointer; }
+  .plots-table .plot-badge {
+    display: inline-block;
+    background: var(--accent-soft); color: var(--accent);
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 5px;
+    font-size: 11px;
+  }
+  .plots-table .plot-badge.B { background: var(--blue-soft); color: var(--blue); }
+  .plots-table .plot-badge.C { background: #fce7f3; color: #be185d; }
+  .plots-table .plot-badge.D { background: var(--purple-soft); color: var(--purple); }
+  .progress-bar {
+    height: 8px;
+    width: 90px;
+    border-radius: 4px;
+    background: #f3f4f6;
+    overflow: hidden;
+    display: inline-block;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 4px;
+  }
+  .progress-fill.warn { background: var(--yellow); }
+  .progress-fill.over { background: var(--red); }
+  .status-tag {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 5px;
+    font-size: 10.5px;
+    font-weight: 600;
+  }
+  .status-tag.building { background: var(--blue-soft); color: var(--blue); }
+  .status-tag.transferred { background: var(--green-soft); color: var(--green); }
+  .status-tag.idle { background: #f3f4f6; color: var(--ink-3); }
+  .margin-tag {
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 5px;
+    font-size: 11.5px;
+    display: inline-block;
+  }
+  .margin-tag.good { background: var(--green-soft); color: var(--green); }
+  .margin-tag.mid { background: var(--yellow-soft); color: var(--yellow); }
+  .margin-tag.bad { background: var(--red-soft); color: var(--red); }
+
+  /* Donut chart */
+  .donut-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .donut-svg { width: 200px; height: 200px; }
+  .donut-center {
+    position: relative;
+    width: 200px; height: 200px;
+  }
+  .donut-center-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .donut-center-val {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--ink);
+  }
+  .donut-center-label {
+    font-size: 11px;
+    color: var(--ink-3);
+    margin-top: 2px;
+  }
+  .donut-legend {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .donut-legend-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    padding: 4px 0;
+    border-bottom: 1px dotted var(--line);
+  }
+  .donut-legend-row:last-child { border-bottom: none; }
+  .donut-dot {
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .donut-legend-name { flex: 1; }
+  .donut-legend-val { font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .donut-legend-pct {
+    color: var(--ink-3);
+    font-size: 11px;
+    font-weight: 500;
+    min-width: 38px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Vendor list */
+  .vendor-row {
+    padding: 11px 0;
+    border-bottom: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 12px;
+    align-items: center;
+  }
+  .vendor-row:last-child { border-bottom: none; }
+  .vendor-name { font-weight: 600; font-size: 14px; }
+  .vendor-meta {
+    color: var(--ink-3);
+    font-size: 11.5px;
+    margin-top: 2px;
+  }
+  .vendor-spend {
+    font-weight: 700;
+    font-size: 14px;
+    text-align: right;
+    color: var(--accent);
+  }
+  .vendor-spend .small { display: block; font-size: 10.5px; color: var(--ink-3); font-weight: 500; }
+  .vendor-ontime {
+    text-align: center;
+    font-size: 12px;
+    background: var(--green-soft);
+    color: var(--green);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    min-width: 56px;
+  }
+  .vendor-ontime.mid { background: var(--yellow-soft); color: var(--yellow); }
+  .vendor-ontime.low { background: var(--red-soft); color: var(--red); }
+
+  /* Issue / Activity */
+  .activity-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+  }
+  .activity-row:last-child { border-bottom: none; }
+  .activity-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    font-weight: 700;
+  }
+  .activity-info { line-height: 1.3; }
+  .activity-title { font-weight: 600; font-size: 13.5px; }
+  .activity-sub { font-size: 11.5px; color: var(--ink-3); margin-top: 2px; }
+  .activity-cost {
+    text-align: right;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--accent);
+  }
+  .activity-cost .small { display: block; font-size: 10.5px; color: var(--ink-3); font-weight: 500; }
+
+  /* Alerts */
+  .alert-row {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+  }
+  .alert-row:last-child { border-bottom: none; }
+  .alert-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--red-soft);
+    color: var(--red);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .alert-icon.yellow { background: var(--yellow-soft); color: var(--yellow); }
+  .alert-icon.blue { background: var(--blue-soft); color: var(--blue); }
+  .alert-title { font-weight: 600; font-size: 13.5px; }
+  .alert-sub { font-size: 11.5px; color: var(--ink-3); margin-top: 2px; }
+  .alert-sub b { color: var(--ink-2); font-weight: 600; }
+
+  /* Drawer */
+  .drawer-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(17,24,39,.5);
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s;
+  }
+  .drawer-bg[data-open="1"] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .drawer {
+    position: fixed;
+    top: 0; bottom: 0;
+    right: 0;
+    width: 440px;
+    max-width: 100%;
+    background: #fff;
+    z-index: 51;
+    transform: translateX(100%);
+    transition: transform .25s cubic-bezier(.2,.8,.2,1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .drawer[data-open="1"] { transform: translateX(0); }
+  .drawer-head {
+    background: var(--primary);
+    color: #fff;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .drawer-title { font-weight: 700; font-size: 17px; }
+  .drawer-close {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.1);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+  }
+  .drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+  }
+  .drawer-sub {
+    color: var(--ink-2);
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .drawer-stat {
+    display: flex; justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 13.5px;
+  }
+  .drawer-stat span { color: var(--ink-3); }
+  .drawer-stat b { color: var(--ink); font-weight: 600; }
+  .drawer-section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--ink-3);
+    font-weight: 700;
+    margin: 18px 0 8px;
+  }
+  .breakdown-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+  }
+  .breakdown-name { font-size: 13px; }
+  .breakdown-bar {
+    grid-column: 1 / -1;
+    height: 6px;
+    border-radius: 3px;
+    background: #f3f4f6;
+    overflow: hidden;
+    margin-top: 2px;
+  }
+  .breakdown-fill {
+    height: 100%; border-radius: 3px;
+  }
+  .breakdown-val { font-weight: 700; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  .breakdown-pct { font-size: 11px; color: var(--ink-3); min-width: 38px; text-align: right; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 100;
+    box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    opacity: 0;
+    transition: all .25s;
+    pointer-events: none;
+  }
+  .toast[data-show="1"] {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .toast.success { background: var(--green); }
+
+  /* Demo badge */
+  .demo-badge {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,.6);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    z-index: 999;
+  }
+
+  .footer {
+    text-align: center;
+    color: var(--ink-3);
+    font-size: 11px;
+    padding: 24px;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-brand">WANWELA · TWO BUILD</div>
+    <div class="header-row">
+      <div style="flex:1">
+        <div class="header-title">📊 Dashboard ต้นทุน · โครงการวันเวลา</div>
+        <div class="header-sub">MD · ภาพรวมต้นทุนรายแปลง · 483 แปลง · อัปเดต 25 พ.ค. 2569 09:42</div>
+      </div>
+      <div class="header-avatar">ไอ</div>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filterbar">
+    <span class="filterbar-label">ช่วงเวลา:</span>
+    <button class="filter-pill" onclick="setDate('7d')">7 วัน</button>
+    <button class="filter-pill" onclick="setDate('30d')">30 วัน</button>
+    <button class="filter-pill" data-on="1" onclick="setDate('ytd')">YTD (ม.ค.-พ.ค.)</button>
+    <button class="filter-pill" onclick="setDate('all')">ทั้งหมด</button>
+    <span class="filterbar-label" style="margin-left:14px">โครงการ:</span>
+    <button class="filter-pill" data-on="1">วันเวลา</button>
+    <div class="filterbar-spacer"></div>
+    <button class="export-btn" onclick="exportExcel()">
+      <span>📥</span> Excel
+    </button>
+    <button class="export-btn primary" onclick="exportPDF()">
+      <span>📄</span> PDF Report
+    </button>
+  </div>
+
+  <!-- KPI strip -->
+  <div class="section">
+    <div class="kpi-strip">
+      <div class="kpi">
+        <div class="kpi-label">ต้นทุนสะสมโครงการ</div>
+        <div class="kpi-val">฿ 285.4<span class="unit">M</span></div>
+        <div class="kpi-sub">จาก ฿1,825M งบ · <b>15.6%</b></div>
+        <div class="kpi-bar"><div class="kpi-bar-fill" style="width:15.6%"></div></div>
+      </div>
+      <div class="kpi green">
+        <div class="kpi-label">บ้านโอนแล้ว</div>
+        <div class="kpi-val">82<span class="unit">/ 483</span></div>
+        <div class="kpi-sub">รายได้ ฿310M · <b>17.0%</b></div>
+        <div class="kpi-bar"><div class="kpi-bar-fill" style="width:17%"></div></div>
+      </div>
+      <div class="kpi blue">
+        <div class="kpi-label">กำลังก่อสร้าง</div>
+        <div class="kpi-val">142<span class="unit">/ 483</span></div>
+        <div class="kpi-sub">เริ่มก่อสร้างรวม <b>224</b> หลัง</div>
+        <div class="kpi-bar"><div class="kpi-bar-fill" style="width:29.4%"></div></div>
+      </div>
+      <div class="kpi purple">
+        <div class="kpi-label">มูลค่าสต๊อกคงคลัง</div>
+        <div class="kpi-val">฿ 4.82<span class="unit">M</span></div>
+        <div class="kpi-sub">14 SKU · <b>32 ลอต</b> ในคลัง</div>
+      </div>
+      <div class="kpi yellow">
+        <div class="kpi-label">AR · เงินค้างรับ</div>
+        <div class="kpi-val">฿ 18.2<span class="unit">M</span></div>
+        <div class="kpi-sub">23 ราย · <b>ค้าง > 30 วัน 3 ราย</b></div>
+      </div>
+      <div class="kpi red">
+        <div class="kpi-label">AP · เงินค้างจ่าย</div>
+        <div class="kpi-val">฿ 12.6<span class="unit">M</span></div>
+        <div class="kpi-sub">18 PO · ครบกำหนด <b>5 PO สัปดาห์นี้</b></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 1: Top plots + Cost breakdown donut -->
+  <div class="section">
+    <div class="grid-2">
+      <!-- Top plots table -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">ต้นทุนรายแปลง · Top 20</div>
+            <div class="card-hint" style="margin-top:3px">เรียงตามต้นทุนสะสม · คลิกเพื่อดู breakdown</div>
+          </div>
+        </div>
+        <!-- Filter chips -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+          <button class="filter-pill" data-on="1" onclick="setPlotFilter('ALL')">ทั้งหมด</button>
+          <button class="filter-pill" onclick="setPlotFilter('A')">Type A</button>
+          <button class="filter-pill" onclick="setPlotFilter('B')">Type B</button>
+          <button class="filter-pill" onclick="setPlotFilter('C')">Type C</button>
+          <button class="filter-pill" onclick="setPlotFilter('D')">Type D</button>
+          <button class="filter-pill" onclick="setPlotFilter('building')">กำลังก่อสร้าง</button>
+          <button class="filter-pill" onclick="setPlotFilter('transferred')">โอนแล้ว</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="plots-table" id="plotsTable">
+            <thead>
+              <tr>
+                <th>แปลง</th>
+                <th>ประเภท</th>
+                <th>สถานะ</th>
+                <th class="num">ต้นทุน</th>
+                <th class="num">งบ</th>
+                <th>% ใช้</th>
+                <th class="center">Margin</th>
+              </tr>
+            </thead>
+            <tbody id="plotsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Cost breakdown donut -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">ต้นทุนแยกหมวด (YTD)</div>
+            <div class="card-hint" style="margin-top:3px">รวม ฿285.4M</div>
+          </div>
+        </div>
+        <div class="donut-wrap">
+          <div class="donut-center">
+            <svg class="donut-svg" id="donutSvg" viewBox="0 0 36 36"></svg>
+            <div class="donut-center-text">
+              <div class="donut-center-val">฿285.4M</div>
+              <div class="donut-center-label">YTD รวม</div>
+            </div>
+          </div>
+          <div class="donut-legend" id="donutLegend"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Vendors / Issues / Alerts -->
+  <div class="section">
+    <div class="grid-3">
+      <!-- Vendors -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Top Vendors · ยอดซื้อ</div>
+            <div class="card-hint" style="margin-top:3px">5 อันดับสูงสุด</div>
+          </div>
+        </div>
+        <div id="vendorList"></div>
+      </div>
+
+      <!-- Recent issues -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">การเบิกล่าสุด · ISS</div>
+            <div class="card-hint" style="margin-top:3px">10 รายการล่าสุด</div>
+          </div>
+        </div>
+        <div id="issueList"></div>
+      </div>
+
+      <!-- Alerts -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">⚠ แจ้งเตือน</div>
+            <div class="card-hint" style="margin-top:3px">ต้องการความสนใจ</div>
+          </div>
+        </div>
+        <div id="alertList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    WANWELA ERP · บริษัท ทู บิลด์ ดีเวลลอปเมนท์ จำกัด · Demo P0 · #9
+  </div>
+
+  <!-- Drawer (cost detail per plot) -->
+  <div class="drawer-bg" id="drawerBg" onclick="closeDrawer()"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-head">
+      <div>
+        <div class="drawer-title" id="drawerTitle">แปลง #</div>
+        <div style="font-size:11.5px;color:rgba(255,255,255,.65);margin-top:2px" id="drawerSubtitle">—</div>
+      </div>
+      <div class="drawer-close" onclick="closeDrawer()">✕</div>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">Saved</div>
+
+</div>
+
+<div class="demo-badge">DEMO · P0 · #9</div>
+
+<script>
+  // ─── Mock data ───
+  const CATEGORIES = [
+    { name: 'ปูน / มวลรวม', value: 79.91, color: '#b45309' },
+    { name: 'เหล็ก',         value: 62.79, color: '#4b5563' },
+    { name: 'ค่าแรง',         value: 54.23, color: '#1f2937' },
+    { name: 'สุขภัณฑ์',       value: 22.83, color: '#7c3aed' },
+    { name: 'กระเบื้อง',      value: 19.98, color: '#16a34a' },
+    { name: 'สี / เคมี',       value: 14.27, color: '#2563eb' },
+    { name: 'ไฟฟ้า',          value: 11.42, color: '#ca8a04' },
+    { name: 'อื่นๆ',           value: 19.97, color: '#9ca3af' },
+  ];
+
+  const PLOTS = [
+    // Building (~140) + transferred (~82) — show top 20 by cost
+    { plot: 2,   type: 'A', status: 'transferred', cost: 4180000, budget: 4200000, houseNo: '89/2',  cName: 'คุณละมัย' },
+    { plot: 1,   type: 'A', status: 'transferred', cost: 4156000, budget: 4200000, houseNo: '89/1',  cName: 'นางสาว ก' },
+    { plot: 18,  type: 'A', status: 'transferred', cost: 4198000, budget: 4200000, houseNo: '89/18', cName: 'นาย ช' },
+    { plot: 25,  type: 'A', status: 'transferred', cost: 4205000, budget: 4200000, houseNo: '89/25', cName: 'คุณ ส' },
+    { plot: 31,  type: 'A', status: 'building',    cost: 3920000, budget: 4200000, houseNo: '89/31', cName: '' },
+    { plot: 42,  type: 'A', status: 'building',    cost: 3680000, budget: 4200000, houseNo: '89/42', cName: 'นาย ม' },
+    { plot: 58,  type: 'A', status: 'building',    cost: 3540000, budget: 4200000, houseNo: '89/58', cName: '' },
+    { plot: 67,  type: 'A', status: 'building',    cost: 3410000, budget: 4200000, houseNo: '89/67', cName: 'คุณ ป' },
+    { plot: 73,  type: 'A', status: 'building',    cost: 4310000, budget: 4200000, houseNo: '89/73', cName: '' }, // over budget
+    { plot: 88,  type: 'A', status: 'building',    cost: 3950000, budget: 4200000, houseNo: '89/88', cName: 'นาง ว' },
+    { plot: 105, type: 'B', status: 'transferred', cost: 2780000, budget: 2800000, houseNo: '90/5',  cName: 'คุณ ฉ' },
+    { plot: 112, type: 'B', status: 'building',    cost: 2640000, budget: 2800000, houseNo: '90/12', cName: '' },
+    { plot: 124, type: 'B', status: 'building',    cost: 2895000, budget: 2800000, houseNo: '90/24', cName: 'นาย น' }, // over
+    { plot: 138, type: 'B', status: 'building',    cost: 2510000, budget: 2800000, houseNo: '90/38', cName: '' },
+    { plot: 205, type: 'C', status: 'building',    cost: 2390000, budget: 2500000, houseNo: '91/5',  cName: 'คุณ ก' },
+    { plot: 218, type: 'C', status: 'building',    cost: 2455000, budget: 2500000, houseNo: '91/18', cName: '' },
+    { plot: 231, type: 'C', status: 'transferred', cost: 2495000, budget: 2500000, houseNo: '91/31', cName: 'คุณ ล' },
+    { plot: 304, type: 'D', status: 'building',    cost: 2280000, budget: 2300000, houseNo: '92/4',  cName: '' },
+    { plot: 312, type: 'D', status: 'building',    cost: 2245000, budget: 2300000, houseNo: '92/12', cName: 'คุณ บ' },
+    { plot: 325, type: 'D', status: 'transferred', cost: 2290000, budget: 2300000, houseNo: '92/25', cName: 'นาย ก' },
+  ];
+
+  const VENDORS = [
+    { name: 'TPI โพลีน (ปูน TPI)',     spend: 38420000, orders: 124, lead: 1.2, ontime: 98 },
+    { name: 'Global House สาขาราชบุรี',  spend: 32140000, orders: 89,  lead: 2.1, ontime: 92 },
+    { name: 'หจก. ทรายดี ราชบุรี',      spend: 18820000, orders: 156, lead: 0.8, ontime: 96 },
+    { name: 'Boonthavorn (กระเบื้อง)',  spend: 14250000, orders: 42,  lead: 3.5, ontime: 86 },
+    { name: 'COTTO Center (สุขภัณฑ์)',  spend: 11680000, orders: 38,  lead: 4.2, ontime: 78 },
+  ];
+
+  const ISSUES = [
+    { no:'ISS-2026-0033', plot:1,   houseNo:'89/1',  cost: 6670,    items: 1, time: '5 นาทีก่อน' },
+    { no:'ISS-2026-0032', plot:73,  houseNo:'89/73', cost: 124800,  items: 8, time: '18 นาทีก่อน' },
+    { no:'ISS-2026-0031', plot:124, houseNo:'90/24', cost: 89200,   items: 5, time: '42 นาทีก่อน' },
+    { no:'ISS-2026-0030', plot:42,  houseNo:'89/42', cost: 248500,  items: 12, time: '1 ชม.ก่อน' },
+    { no:'ISS-2026-0029', plot:88,  houseNo:'89/88', cost: 67340,   items: 4, time: '2 ชม.ก่อน' },
+    { no:'ISS-2026-0028', plot:218, houseNo:'91/18', cost: 156200,  items: 9, time: '3 ชม.ก่อน' },
+    { no:'ISS-2026-0027', plot:58,  houseNo:'89/58', cost: 78900,   items: 6, time: '4 ชม.ก่อน' },
+    { no:'ISS-2026-0026', plot:312, houseNo:'92/12', cost: 145200,  items: 11, time: 'เมื่อวาน' },
+    { no:'ISS-2026-0025', plot:67,  houseNo:'89/67', cost: 92100,   items: 7, time: 'เมื่อวาน' },
+    { no:'ISS-2026-0024', plot:138, houseNo:'90/38', cost: 53200,   items: 3, time: '2 วันก่อน' },
+  ];
+
+  const ALERTS = [
+    { type:'red', icon:'⚠', title:'แปลง 25 เกินงบ', sub:'ใช้ <b>100.1%</b> · ฿4.205M / ฿4.2M · type A' },
+    { type:'red', icon:'⚠', title:'แปลง 73 เกินงบ', sub:'ใช้ <b>102.6%</b> · ฿4.31M / ฿4.2M · กำลังก่อสร้าง' },
+    { type:'red', icon:'⚠', title:'แปลง 124 เกินงบ', sub:'ใช้ <b>103.4%</b> · ฿2.895M / ฿2.8M · type B' },
+    { type:'yellow', icon:'!', title:'แปลง 18, 231, 325 ใกล้เกินงบ', sub:'ใช้ <b>≥99%</b> · 3 แปลง type A/C/D' },
+    { type:'yellow', icon:'!', title:'ลอต L-128 (ปูน TPI) ใกล้หมด', sub:'เหลือ <b>65 ถุง</b> จาก 150 · ต้องสั่งเพิ่ม' },
+    { type:'blue', icon:'i', title:'PO-2026-0091 ค้าง <b>17 วัน</b>', sub:'Boonthavorn · กระเบื้องเคลือบ ฿285k' },
+    { type:'blue', icon:'i', title:'PR รออนุมัติ <b>4 ใบ</b>', sub:'รวมมูลค่า ฿1.24M · รอแอดมิน A' },
+  ];
+
+  let plotFilter = 'ALL';
+  let currentDrawerPlot = null;
+
+  // ─── Render plots table ───
+  function renderPlots() {
+    let list = PLOTS.slice();
+    if (plotFilter === 'A' || plotFilter === 'B' || plotFilter === 'C' || plotFilter === 'D') {
+      list = list.filter(p => p.type === plotFilter);
+    } else if (plotFilter === 'building') {
+      list = list.filter(p => p.status === 'building');
+    } else if (plotFilter === 'transferred') {
+      list = list.filter(p => p.status === 'transferred');
+    }
+    list.sort((a,b) => b.cost - a.cost);
+    list = list.slice(0, 20);
+    const body = document.getElementById('plotsBody');
+    body.innerHTML = list.map(p => {
+      const pct = (p.cost / p.budget * 100);
+      const cls = pct >= 100 ? 'over' : pct >= 85 ? 'warn' : '';
+      const margin = ((p.budget - p.cost) / p.budget * 100);
+      const mCls = margin >= 5 ? 'good' : margin >= 0 ? 'mid' : 'bad';
+      const sLabel = p.status === 'transferred' ? 'โอนแล้ว' : p.status === 'building' ? 'กำลังก่อสร้าง' : 'ยังไม่เริ่ม';
+      return `
+        <tr onclick='openDrawer(${JSON.stringify(p)})'>
+          <td><b>${p.plot}</b> <span style="color:var(--ink-3);font-size:11.5px">${p.houseNo}</span></td>
+          <td><span class="plot-badge ${p.type}">${p.type}</span></td>
+          <td><span class="status-tag ${p.status}">${sLabel}</span></td>
+          <td class="num">฿${thbShort(p.cost)}</td>
+          <td class="num" style="color:var(--ink-3);font-weight:500">฿${thbShort(p.budget)}</td>
+          <td>
+            <span class="progress-bar"><span class="progress-fill ${cls}" style="width:${Math.min(pct,100).toFixed(1)}%"></span></span>
+            <span style="font-weight:600;font-size:12px">${pct.toFixed(1)}%</span>
+          </td>
+          <td class="center"><span class="margin-tag ${mCls}">${margin >= 0 ? '+' : ''}${margin.toFixed(1)}%</span></td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function setPlotFilter(f) {
+    plotFilter = f;
+    document.querySelectorAll('.card .filter-pill').forEach(el => el.removeAttribute('data-on'));
+    event.target.setAttribute('data-on','1');
+    renderPlots();
+  }
+
+  // ─── Donut chart (SVG) ───
+  function renderDonut() {
+    const total = CATEGORIES.reduce((s,c) => s + c.value, 0);
+    const svg = document.getElementById('donutSvg');
+    let acc = 0;
+    const r = 15.9155;
+    const cx = 18, cy = 18;
+    let paths = '';
+    CATEGORIES.forEach(c => {
+      const pct = c.value / total * 100;
+      paths += `<circle r="${r}" cx="${cx}" cy="${cy}" fill="transparent"
+        stroke="${c.color}" stroke-width="4"
+        stroke-dasharray="${pct.toFixed(2)} ${(100 - pct).toFixed(2)}"
+        stroke-dashoffset="${(25 - acc + 100) % 100}" />`;
+      acc += pct;
+    });
+    svg.innerHTML = `
+      <circle r="${r}" cx="${cx}" cy="${cy}" fill="transparent" stroke="#f3f4f6" stroke-width="4"/>
+      ${paths}
+    `;
+    document.getElementById('donutLegend').innerHTML = CATEGORIES.map(c => {
+      const pct = (c.value / total * 100).toFixed(1);
+      return `
+        <div class="donut-legend-row">
+          <span class="donut-dot" style="background:${c.color}"></span>
+          <span class="donut-legend-name">${c.name}</span>
+          <span class="donut-legend-val">฿${c.value.toFixed(1)}M</span>
+          <span class="donut-legend-pct">${pct}%</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ─── Vendors ───
+  function renderVendors() {
+    const html = VENDORS.map(v => {
+      const cls = v.ontime >= 90 ? '' : v.ontime >= 80 ? 'mid' : 'low';
+      return `
+        <div class="vendor-row">
+          <div>
+            <div class="vendor-name">${v.name}</div>
+            <div class="vendor-meta">${v.orders} ออเดอร์ · lead ${v.lead} วัน</div>
+          </div>
+          <div class="vendor-ontime ${cls}">${v.ontime}%</div>
+          <div class="vendor-spend">
+            ฿${thbShort(v.spend)}
+            <span class="small">รวมยอดซื้อ</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+    document.getElementById('vendorList').innerHTML = html;
+  }
+
+  // ─── Recent issues ───
+  function renderIssues() {
+    const html = ISSUES.map(i => `
+      <div class="activity-row">
+        <div class="activity-icon">${i.plot}</div>
+        <div class="activity-info">
+          <div class="activity-title">${i.no}</div>
+          <div class="activity-sub">แปลง ${i.plot} · ${i.houseNo} · ${i.items} รายการ · ${i.time}</div>
+        </div>
+        <div class="activity-cost">
+          ฿${thbShort(i.cost)}
+          <span class="small">ต้นทุน FIFO</span>
+        </div>
+      </div>
+    `).join('');
+    document.getElementById('issueList').innerHTML = html;
+  }
+
+  // ─── Alerts ───
+  function renderAlerts() {
+    const html = ALERTS.map(a => `
+      <div class="alert-row">
+        <div class="alert-icon ${a.type==='red'?'':a.type}">${a.icon}</div>
+        <div>
+          <div class="alert-title">${a.title}</div>
+          <div class="alert-sub">${a.sub}</div>
+        </div>
+      </div>
+    `).join('');
+    document.getElementById('alertList').innerHTML = html;
+  }
+
+  // ─── Drawer ───
+  function openDrawer(p) {
+    currentDrawerPlot = p;
+    const pct = (p.cost / p.budget * 100);
+    const margin = ((p.budget - p.cost) / p.budget * 100);
+    const sLabel = p.status === 'transferred' ? 'โอนแล้ว' : p.status === 'building' ? 'กำลังก่อสร้าง' : 'ยังไม่เริ่ม';
+    document.getElementById('drawerTitle').textContent = `แปลง ${p.plot} · ${p.houseNo}`;
+    document.getElementById('drawerSubtitle').textContent = `Type ${p.type} · ${sLabel}${p.cName ? ' · ' + p.cName : ''}`;
+    // Generate breakdown (mock — pseudo-proportional to total cost)
+    const totalCost = p.cost;
+    const breakdown = [
+      { name:'ปูน / มวลรวม',   pct:28, color:'#b45309' },
+      { name:'เหล็ก',           pct:22, color:'#4b5563' },
+      { name:'ค่าแรง',           pct:19, color:'#1f2937' },
+      { name:'สุขภัณฑ์',         pct:8,  color:'#7c3aed' },
+      { name:'กระเบื้อง',        pct:7,  color:'#16a34a' },
+      { name:'สี / เคมี',         pct:5,  color:'#2563eb' },
+      { name:'ไฟฟ้า',            pct:4,  color:'#ca8a04' },
+      { name:'อื่นๆ',             pct:7,  color:'#9ca3af' },
+    ];
+    const breakdownHTML = breakdown.map(b => {
+      const val = totalCost * b.pct / 100;
+      return `
+        <div>
+          <div class="breakdown-row">
+            <div class="breakdown-name">${b.name}</div>
+            <div class="breakdown-val">฿${thbShort(val)}</div>
+            <div class="breakdown-pct">${b.pct}%</div>
+          </div>
+          <div class="breakdown-bar"><div class="breakdown-fill" style="width:${b.pct*3.5}%;background:${b.color}"></div></div>
+        </div>
+      `;
+    }).join('');
+    document.getElementById('drawerBody').innerHTML = `
+      <div class="drawer-sub">${p.cName ? 'ผู้ซื้อ ' + p.cName : 'ยังไม่มีผู้ซื้อ'}</div>
+      <div class="drawer-stat"><span>งบประมาณ</span><b>฿${thb(p.budget)}</b></div>
+      <div class="drawer-stat"><span>ต้นทุนสะสม</span><b style="color:var(--accent)">฿${thb(p.cost)}</b></div>
+      <div class="drawer-stat"><span>เปอร์เซ็นต์การใช้</span><b style="color:${pct>=100?'var(--red)':pct>=85?'var(--yellow)':'var(--green)'}">${pct.toFixed(1)}%</b></div>
+      <div class="drawer-stat"><span>Margin คงเหลือ</span><b style="color:${margin>=0?'var(--green)':'var(--red)'}">${margin>=0?'+':''}${margin.toFixed(1)}% · ฿${thb(p.budget - p.cost)}</b></div>
+      <div class="drawer-section-title">Breakdown ต้นทุน</div>
+      ${breakdownHTML}
+      <div class="drawer-section-title">การเบิกล่าสุดสำหรับแปลงนี้</div>
+      ${ISSUES.filter(i => i.plot === p.plot).map(i => `
+        <div class="activity-row">
+          <div class="activity-icon">📋</div>
+          <div class="activity-info">
+            <div class="activity-title">${i.no}</div>
+            <div class="activity-sub">${i.items} รายการ · ${i.time}</div>
+          </div>
+          <div class="activity-cost">฿${thbShort(i.cost)}</div>
+        </div>
+      `).join('') || '<div style="color:var(--ink-3);font-size:13px;padding:10px 0">ไม่มีการเบิกในช่วงนี้</div>'}
+    `;
+    document.getElementById('drawer').setAttribute('data-open','1');
+    document.getElementById('drawerBg').setAttribute('data-open','1');
+  }
+
+  function closeDrawer() {
+    document.getElementById('drawer').removeAttribute('data-open');
+    document.getElementById('drawerBg').removeAttribute('data-open');
+  }
+
+  // ─── Date filter (cosmetic for demo) ───
+  function setDate(d) {
+    document.querySelectorAll('.filterbar .filter-pill').forEach((el, i) => {
+      if (i < 4) el.removeAttribute('data-on');
+    });
+    event.target.setAttribute('data-on','1');
+    showToast('🗓 ปรับช่วงเวลาแล้ว', 'success');
+  }
+
+  // ─── Export ───
+  function exportExcel() {
+    const wb = XLSX.utils.book_new();
+
+    // Sheet 1: KPI
+    const kpi = [
+      ['KPI', 'Value'],
+      ['ต้นทุนสะสมโครงการ (฿M)', 285.4],
+      ['งบประมาณรวม (฿M)', 1825],
+      ['% ใช้งบประมาณ', '15.6%'],
+      ['บ้านโอนแล้ว', 82],
+      ['กำลังก่อสร้าง', 142],
+      ['มูลค่าสต๊อก (฿M)', 4.82],
+      ['AR (฿M)', 18.2],
+      ['AP (฿M)', 12.6],
+    ];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(kpi), 'KPI');
+
+    // Sheet 2: Plots
+    const plotRows = [['plot','type','status','houseNo','cName','cost','budget','pct_used','margin_pct']];
+    PLOTS.forEach(p => {
+      const pct = (p.cost / p.budget * 100).toFixed(1);
+      const margin = ((p.budget - p.cost) / p.budget * 100).toFixed(1);
+      plotRows.push([p.plot, p.type, p.status, p.houseNo, p.cName, p.cost, p.budget, pct, margin]);
+    });
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(plotRows), 'ต้นทุนรายแปลง');
+
+    // Sheet 3: Categories
+    const catRows = [['category','value_M','pct']];
+    const total = CATEGORIES.reduce((s,c)=>s+c.value, 0);
+    CATEGORIES.forEach(c => catRows.push([c.name, c.value, ((c.value/total)*100).toFixed(2)+'%']));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(catRows), 'หมวดต้นทุน');
+
+    // Sheet 4: Vendors
+    const venRows = [['vendor','spend','orders','lead_days','ontime_pct']];
+    VENDORS.forEach(v => venRows.push([v.name, v.spend, v.orders, v.lead, v.ontime]));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(venRows), 'Vendors');
+
+    // Sheet 5: Issues
+    const issRows = [['issue_no','plot','houseNo','items','cost','time']];
+    ISSUES.forEach(i => issRows.push([i.no, i.plot, i.houseNo, i.items, i.cost, i.time]));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(issRows), 'การเบิกล่าสุด');
+
+    XLSX.writeFile(wb, `Dashboard_วันเวลา_${new Date().toISOString().slice(0,10)}.xlsx`);
+    showToast('📊 ดาวน์โหลด Excel แล้ว', 'success');
+  }
+
+  function exportPDF() {
+    showToast('📄 กำลังสร้าง PDF report…', 'success');
+    const el = document.querySelector('.app');
+    html2pdf().set({
+      margin: 5,
+      filename: `Dashboard_วันเวลา_${new Date().toISOString().slice(0,10)}.pdf`,
+      html2canvas: { scale: 1.4, useCORS: true, scrollY: 0 },
+      jsPDF: { unit: 'mm', format: 'a3', orientation: 'portrait' }
+    }).from(el).save();
+  }
+
+  // ─── Utils ───
+  function thb(n) { return Math.round(n).toLocaleString('th-TH'); }
+  function thbShort(n) {
+    if (n >= 1e6) return (n/1e6).toFixed(2) + 'M';
+    if (n >= 1e3) return (n/1e3).toFixed(0) + 'k';
+    return Math.round(n).toLocaleString('th-TH');
+  }
+  function showToast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (type ? ' ' + type : '');
+    t.setAttribute('data-show','1');
+    setTimeout(() => t.removeAttribute('data-show'), 1800);
+  }
+
+  // ─── Init ───
+  renderPlots();
+  renderDonut();
+  renderVendors();
+  renderIssues();
+  renderAlerts();
+</script>
+
+</body>
+</html>

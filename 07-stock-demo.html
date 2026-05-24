@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#1f2937" />
+<title>คลังสต๊อก FIFO · วันเวลา ERP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f3ee; --card: #ffffff;
+    --ink: #1f2937; --ink-2: #4b5563; --ink-3: #9ca3af; --ink-4: #d1d5db;
+    --line: #e5e3dc; --line-2: #d6d3c8;
+    --primary: #1f2937; --primary-soft: #374151;
+    --accent: #b45309; --accent-soft: #fef3c7;
+    --green: #16a34a; --green-soft: #dcfce7;
+    --red: #dc2626; --red-soft: #fee2e2;
+    --yellow: #ca8a04; --yellow-soft: #fef9c3;
+    --blue: #2563eb; --blue-soft: #dbeafe;
+    --radius: 14px; --radius-sm: 10px;
+    --shadow: 0 1px 2px rgba(17,24,39,.04), 0 8px 24px rgba(17,24,39,.06);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: var(--bg);
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+
+  /* Header */
+  .header {
+    background: var(--primary);
+    color: #fff;
+    padding: 14px 22px 14px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .header-brand {
+    font-size: 11px;
+    color: rgba(255,255,255,.55);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .header-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .header-title { font-weight: 600; font-size: 18px; flex: 1; }
+  .header-sub { font-size: 12px; color: rgba(255,255,255,.65); margin-top: 2px; }
+  .me-tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,.08);
+    padding: 6px 12px 6px 6px;
+    border-radius: 24px;
+  }
+  .me-tag .avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--blue);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .me-tag .name { font-size: 13px; color: #fff; }
+  .me-tag .role { font-size: 10px; color: rgba(255,255,255,.6); display: block; line-height: 1; margin-top: 1px; }
+
+  /* Stats strip */
+  .stats {
+    background: var(--primary);
+    color: #fff;
+    padding: 0 18px 16px;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .stats::-webkit-scrollbar { display: none; }
+  .stat {
+    flex: 0 0 auto;
+    background: rgba(255,255,255,.08);
+    border-radius: 12px;
+    padding: 11px 16px;
+    min-width: 130px;
+  }
+  .stat .v {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .stat .l {
+    font-size: 11px;
+    color: rgba(255,255,255,.65);
+    margin-top: 4px;
+    letter-spacing: .5px;
+  }
+  .stat[data-tone="red"] { background: rgba(220,38,38,.15); }
+  .stat[data-tone="red"] .v { color: #fca5a5; }
+  .stat[data-tone="yellow"] { background: rgba(202,138,4,.15); }
+  .stat[data-tone="yellow"] .v { color: #fde68a; }
+  .stat[data-tone="green"] { background: rgba(22,163,74,.15); }
+  .stat[data-tone="green"] .v { color: #86efac; }
+  .stat[data-tone="blue"] { background: rgba(37,99,235,.15); }
+  .stat[data-tone="blue"] .v { color: #93c5fd; }
+  .stat[data-tone="accent"] { background: rgba(180,83,9,.15); }
+  .stat[data-tone="accent"] .v { color: #fcd34d; }
+
+  /* Category bar inline */
+  .stat.cat-bar {
+    min-width: 260px;
+    background: rgba(255,255,255,.05);
+  }
+  .cat-bar-track {
+    display: flex;
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-top: 8px;
+    background: rgba(255,255,255,.06);
+  }
+  .cat-bar-seg {
+    height: 100%;
+    transition: width .25s;
+  }
+  .cat-bar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    font-size: 10px;
+    color: rgba(255,255,255,.7);
+    margin-top: 8px;
+  }
+  .cat-bar-legend .dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    margin-right: 4px;
+    vertical-align: -1px;
+  }
+
+  /* Toolbar */
+  .toolbar {
+    padding: 16px 18px 8px;
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    gap: 10px;
+    align-items: center;
+  }
+  .search-row {
+    position: relative;
+  }
+  .search-input {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    border-radius: 12px;
+    padding: 11px 13px 11px 38px;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .search-input:focus { border-color: var(--primary); }
+  .search-row::before {
+    content: '';
+    position: absolute;
+    left: 12px; top: 50%;
+    width: 16px; height: 16px;
+    transform: translateY(-50%);
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5'%3e%3ccircle cx='11' cy='11' r='7'/%3e%3cpath d='m21 21-4.3-4.3'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+  }
+
+  .sort-select {
+    border: 1.5px solid var(--line);
+    background: #fff;
+    border-radius: 12px;
+    padding: 11px 36px 11px 13px;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    font-weight: 500;
+    color: var(--ink);
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234b5563' stroke-width='2.5'%3e%3cpolyline points='6 9 12 15 18 9'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    cursor: pointer;
+  }
+
+  .view-toggle {
+    display: inline-flex;
+    background: #fff;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    padding: 2px;
+  }
+  .view-toggle button {
+    border: none;
+    background: transparent;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--ink-2);
+    border-radius: 9px;
+    font-weight: 600;
+  }
+  .view-toggle button.active {
+    background: var(--ink);
+    color: #fff;
+  }
+
+  .export-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 11px 16px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .export-btn:hover { background: #c2410c; }
+
+  /* Chips row */
+  .chips-row {
+    padding: 4px 18px 14px;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .chips-row::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: 0 0 auto;
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-2);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .12s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .chip:hover { border-color: var(--ink-3); }
+  .chip[data-on="1"] {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+  .chip .count {
+    font-size: 10px;
+    background: rgba(0,0,0,.08);
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-weight: 700;
+  }
+  .chip[data-on="1"] .count { background: rgba(255,255,255,.2); }
+
+  /* Stock table (desktop) */
+  .stock-wrap {
+    padding: 0 18px;
+  }
+  .stock-table {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .st-head {
+    display: grid;
+    grid-template-columns: 2.6fr 1fr 1.2fr 1fr 0.8fr 1fr 0.9fr;
+    padding: 12px 18px;
+    background: #fafaf7;
+    border-bottom: 1.5px solid var(--line);
+    font-size: 11px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    font-weight: 700;
+    gap: 8px;
+  }
+  .st-head .num { text-align: right; }
+  .st-row {
+    display: grid;
+    grid-template-columns: 2.6fr 1fr 1.2fr 1fr 0.8fr 1fr 0.9fr;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+    cursor: pointer;
+    gap: 8px;
+    transition: background .12s;
+  }
+  .st-row:hover { background: #fafaf7; }
+  .st-row:last-child { border-bottom: none; }
+  .st-row.expanded { background: #fafaf7; }
+
+  .st-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .st-name .twirl {
+    color: var(--ink-3);
+    font-size: 12px;
+    transition: transform .15s;
+    width: 16px;
+    flex-shrink: 0;
+  }
+  .st-row.expanded .twirl { transform: rotate(90deg); }
+  .st-name .cat-badge {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: #f3f4f6;
+    color: var(--ink-2);
+    font-weight: 600;
+    margin-left: 4px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    flex-shrink: 0;
+  }
+  .st-name .item-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .cat-badge[data-c="ปูน"] { background: #f3e8d6; color: #92400e; }
+  .cat-badge[data-c="เหล็ก"] { background: #e5e7eb; color: #374151; }
+  .cat-badge[data-c="อิฐ"] { background: #fee2e2; color: #991b1b; }
+  .cat-badge[data-c="สี"] { background: #dbeafe; color: #1e40af; }
+  .cat-badge[data-c="ไฟฟ้า"] { background: #fef3c7; color: #92400e; }
+  .cat-badge[data-c="กระเบื้อง"] { background: #ede9fe; color: #5b21b6; }
+  .cat-badge[data-c="ทั่วไป"] { background: #dcfce7; color: #166534; }
+  .cat-badge[data-c="สุขภัณฑ์"] { background: #fce7f3; color: #9d174d; }
+  .cat-badge[data-c="ปูน"], .cat-badge[data-c="เหล็ก"], .cat-badge[data-c="อิฐ"],
+  .cat-badge[data-c="สี"], .cat-badge[data-c="ไฟฟ้า"], .cat-badge[data-c="กระเบื้อง"],
+  .cat-badge[data-c="ทั่วไป"], .cat-badge[data-c="สุขภัณฑ์"] {}
+
+  .st-qty, .st-value, .st-avg, .st-lots, .st-recv {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-size: 14px;
+  }
+  .st-qty b { font-weight: 700; font-size: 15px; }
+  .st-qty .u { color: var(--ink-3); font-size: 11px; margin-left: 3px; }
+  .st-value b { font-weight: 700; color: var(--ink); }
+  .st-avg { color: var(--ink-2); font-size: 13px; }
+  .st-lots .pill {
+    display: inline-block;
+    background: var(--blue-soft);
+    color: var(--blue);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .st-lots .pill.low {
+    background: var(--red-soft);
+    color: var(--red);
+  }
+  .st-recv { color: var(--ink-3); font-size: 12px; }
+
+  .st-actions {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-end;
+  }
+  .st-btn {
+    border: 1.5px solid var(--line);
+    background: #fff;
+    border-radius: 8px;
+    padding: 5px 9px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-2);
+    cursor: pointer;
+    transition: all .12s;
+  }
+  .st-btn:hover { border-color: var(--primary); color: var(--ink); }
+  .st-btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .st-btn.primary:hover { background: var(--primary-soft); }
+
+  /* Expanded lots panel */
+  .lots-panel {
+    grid-column: 1 / -1;
+    background: #fff;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    margin: 0 0 8px;
+    overflow: hidden;
+  }
+  .lp-head {
+    background: #fafaf7;
+    padding: 10px 14px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--ink-3);
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .lp-toggle {
+    text-transform: none;
+    letter-spacing: 0;
+    cursor: pointer;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: underline;
+  }
+  .lp-row {
+    display: grid;
+    grid-template-columns: 100px 90px 1.3fr 90px 90px 90px 90px;
+    padding: 9px 14px;
+    border-top: 1px solid var(--line);
+    font-size: 13px;
+    align-items: center;
+    gap: 6px;
+  }
+  .lp-row .col-num { text-align: right; font-variant-numeric: tabular-nums; }
+  .lp-row.consumed { color: var(--ink-3); }
+  .lp-row.consumed .col {
+    text-decoration: line-through;
+  }
+  .lp-row.consumed.hidden { display: none; }
+  .lp-head-row {
+    display: grid;
+    grid-template-columns: 100px 90px 1.3fr 90px 90px 90px 90px;
+    padding: 8px 14px;
+    background: #fff;
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    letter-spacing: .5px;
+    font-weight: 700;
+    border-top: 1px solid var(--line);
+    gap: 6px;
+  }
+  .lp-head-row .col-num { text-align: right; }
+
+  .lot-no {
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 13px;
+  }
+  .lot-date {
+    color: var(--ink-2);
+    font-size: 12px;
+  }
+  .lot-vendor {
+    color: var(--ink-2);
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .lot-qty {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  .lot-remaining {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .lot-remaining.low { color: var(--yellow); }
+  .lot-remaining.empty { color: var(--ink-3); font-weight: 400; }
+
+  .next-out-tag {
+    display: inline-block;
+    background: var(--green);
+    color: #fff;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    vertical-align: middle;
+  }
+
+  /* Grid view */
+  .stock-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  .stock-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: transform .12s, box-shadow .12s;
+    border-top: 3px solid var(--ink-4);
+  }
+  .stock-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(17,24,39,.06), 0 12px 32px rgba(17,24,39,.08);
+  }
+  .stock-card[data-low="1"] { border-top-color: var(--yellow); }
+  .stock-card[data-empty="1"] { border-top-color: var(--red); opacity: .8; }
+  .sc-name {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .sc-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .sc-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .sc-stat .lbl {
+    font-size: 10px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    font-weight: 600;
+  }
+  .sc-stat .val {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .sc-stat .val .u {
+    color: var(--ink-3);
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .sc-foot {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--ink-3);
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+  }
+
+  /* Footer summary */
+  .footer-summary {
+    margin-top: 18px;
+    padding: 14px 18px;
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: 18px;
+    margin-right: 18px;
+  }
+  .fs-stat { display: flex; flex-direction: column; }
+  .fs-stat .l {
+    font-size: 11px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    font-weight: 600;
+  }
+  .fs-stat .v {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-top: 2px;
+  }
+  .fs-ts {
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+
+  /* Empty */
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--ink-3);
+  }
+  .empty-icon {
+    font-size: 48px;
+    margin-bottom: 8px;
+    opacity: .4;
+  }
+
+  /* Drawer (movement history) */
+  .drawer-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(17,24,39,.5);
+    z-index: 80;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s;
+  }
+  .drawer-bg[data-open="1"] { opacity: 1; pointer-events: auto; }
+  .drawer {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: 100%;
+    max-width: 480px;
+    background: #fff;
+    z-index: 81;
+    transform: translateX(100%);
+    transition: transform .3s cubic-bezier(.2,.8,.2,1);
+    display: flex;
+    flex-direction: column;
+  }
+  .drawer[data-open="1"] { transform: translateX(0); }
+  .drawer-head {
+    padding: 16px 18px;
+    background: var(--primary);
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .drawer-head .title { font-weight: 600; font-size: 17px; }
+  .drawer-close {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.1);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+  }
+  .drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 18px;
+  }
+  .mv-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .mv-row:last-child { border-bottom: none; }
+  .mv-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .mv-icon.in { background: var(--green-soft); color: var(--green); }
+  .mv-icon.out { background: var(--accent-soft); color: var(--accent); }
+  .mv-icon.adj { background: var(--blue-soft); color: var(--blue); }
+  .mv-info { flex: 1; line-height: 1.3; }
+  .mv-title { font-weight: 600; font-size: 14px; }
+  .mv-sub { font-size: 12px; color: var(--ink-3); }
+  .mv-qty {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    font-size: 14px;
+    text-align: right;
+  }
+  .mv-qty.in { color: var(--green); }
+  .mv-qty.out { color: var(--accent); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 100;
+    box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    opacity: 0;
+    transition: all .25s;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast[data-show="1"] {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .toast.success { background: var(--green); }
+
+  /* Demo badge */
+  .demo-badge {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,.6);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    z-index: 999;
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 720px) {
+    .toolbar {
+      grid-template-columns: 1fr;
+    }
+    .st-head, .st-row {
+      grid-template-columns: 1.6fr 1fr 0.7fr;
+      font-size: 13px;
+    }
+    .st-head .col-avg, .st-row .st-avg,
+    .st-head .col-lots, .st-row .st-lots,
+    .st-head .col-recv, .st-row .st-recv,
+    .st-head .col-actions, .st-row .st-actions {
+      display: none;
+    }
+    .lp-row, .lp-head-row {
+      grid-template-columns: 80px 70px 1fr 70px;
+      font-size: 12px;
+    }
+    .lp-row .col-vendor, .lp-head-row .col-vendor,
+    .lp-row .col-value, .lp-head-row .col-value,
+    .lp-row .col-price, .lp-head-row .col-price {
+      display: none;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="demo-badge">DEMO · P0 · #7</div>
+
+<div class="app">
+  <div class="header">
+    <div class="header-brand">WANWELA · TWO BUILD</div>
+    <div class="header-row">
+      <div style="flex:1">
+        <div class="header-title">🏪 ร้านวันเวลาค้าวัสดุ · คลังสต๊อก</div>
+        <div class="header-sub">ดูสต๊อกแบบ FIFO · อัปเดต real-time จาก GR/IS</div>
+      </div>
+      <div class="me-tag">
+        <div class="avatar">ผ</div>
+        <div>
+          <div class="name">ทุกคนในทีม</div>
+          <div class="role">view-only</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats strip -->
+  <div class="stats">
+    <div class="stat" data-tone="green">
+      <div class="v" id="statValue">฿0</div>
+      <div class="l">มูลค่าสต๊อกรวม</div>
+    </div>
+    <div class="stat" data-tone="blue">
+      <div class="v" id="statItems">0</div>
+      <div class="l">รายการในคลัง</div>
+    </div>
+    <div class="stat" data-tone="accent">
+      <div class="v" id="statLots">0</div>
+      <div class="l">Lot ที่ใช้งานได้</div>
+    </div>
+    <div class="stat" data-tone="yellow">
+      <div class="v" id="statLow">0</div>
+      <div class="l">Lot ใกล้หมด (&lt;20%)</div>
+    </div>
+    <div class="stat cat-bar">
+      <div class="l" style="font-size:11px; letter-spacing:.5px;">มูลค่าแยกหมวด</div>
+      <div class="cat-bar-track" id="catBarTrack"></div>
+      <div class="cat-bar-legend" id="catBarLegend"></div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-row">
+      <input class="search-input" id="searchInput" placeholder="ค้นหารายการ เช่น ปูน, เหล็ก, กระเบื้อง..." oninput="render()" />
+    </div>
+    <select class="sort-select" id="sortSelect" onchange="render()">
+      <option value="name">เรียงตามชื่อ</option>
+      <option value="value">เรียงตามมูลค่า ↓</option>
+      <option value="low">เรียงตามใกล้หมด</option>
+      <option value="recent">เรียงตามรับล่าสุด</option>
+    </select>
+    <div class="view-toggle">
+      <button class="active" id="viewTable" onclick="setView('table')">📋 ตาราง</button>
+      <button id="viewGrid" onclick="setView('grid')">▦ Grid</button>
+    </div>
+    <button class="export-btn" onclick="exportCSV()">📥 Export CSV</button>
+  </div>
+
+  <!-- Chips row -->
+  <div class="chips-row" id="chipsRow"></div>
+
+  <!-- Stock list -->
+  <div class="stock-wrap" id="stockWrap">
+    <!-- populated by JS -->
+  </div>
+
+  <!-- Footer summary -->
+  <div class="footer-summary">
+    <div class="fs-stat">
+      <div class="l">มูลค่าทั้งคลัง</div>
+      <div class="v" id="fsValue">฿0</div>
+    </div>
+    <div class="fs-stat">
+      <div class="l">Lot active</div>
+      <div class="v" id="fsLots">0</div>
+    </div>
+    <div class="fs-stat">
+      <div class="l">รายการทั้งหมด</div>
+      <div class="v" id="fsItems">0</div>
+    </div>
+    <div class="fs-stat">
+      <div class="l">รับล่าสุด</div>
+      <div class="v" style="font-size:14px;" id="fsLast">-</div>
+    </div>
+    <div class="fs-ts" id="fsTs">อัปเดต: -</div>
+  </div>
+</div>
+
+<!-- Movement drawer -->
+<div class="drawer-bg" id="drawerBg" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div class="title" id="drawerTitle">ประวัติเคลื่อนไหว</div>
+    <div class="drawer-close" onclick="closeDrawer()">✕</div>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ─── Mock data ───
+  const VENDORS = ['SCG Home','HomePro','Global House','Mega Home','Thai Watsadu','TPI ตรง','ร้านอุดมศักดิ์','Jorakay','Index'];
+
+  // Items: each item has category and a list of lots (some consumed)
+  const ITEMS = [
+    {
+      name: 'ปูนซีเมนต์ TPI 50 กก.', cat: 'ปูน', unit: 'ถุง',
+      lots: [
+        { no:'L-2026-0142', date:'2026-05-25', vendor:'TPI ตรง', qtyIn:100, qtyRem:65, price:158 },
+        { no:'L-2026-0128', date:'2026-05-20', vendor:'TPI ตรง', qtyIn:150, qtyRem:0, price:162 },
+        { no:'L-2026-0115', date:'2026-05-12', vendor:'HomePro', qtyIn:80, qtyRem:0, price:165 }
+      ]
+    },
+    {
+      name: 'ปูนซีเมนต์ Insee 50 กก.', cat: 'ปูน', unit: 'ถุง',
+      lots: [
+        { no:'L-2026-0137', date:'2026-05-22', vendor:'SCG Home', qtyIn:50, qtyRem:18, price:172 }
+      ]
+    },
+    {
+      name: 'ปูนกาว Jorakay 20 กก.', cat: 'ปูน', unit: 'ถุง',
+      lots: [
+        { no:'L-2026-0139', date:'2026-05-23', vendor:'Jorakay', qtyIn:60, qtyRem:42, price:195 },
+        { no:'L-2026-0120', date:'2026-05-15', vendor:'HomePro', qtyIn:30, qtyRem:0, price:205 }
+      ]
+    },
+    {
+      name: 'เหล็กข้ออ้อย DB12 (10ม.)', cat: 'เหล็ก', unit: 'เส้น',
+      lots: [
+        { no:'L-2026-0143', date:'2026-05-25', vendor:'ร้านอุดมศักดิ์', qtyIn:50, qtyRem:50, price:245 },
+        { no:'L-2026-0125', date:'2026-05-18', vendor:'ร้านอุดมศักดิ์', qtyIn:80, qtyRem:12, price:248 }
+      ]
+    },
+    {
+      name: 'เหล็กข้ออ้อย DB16 (10ม.)', cat: 'เหล็ก', unit: 'เส้น',
+      lots: [
+        { no:'L-2026-0140', date:'2026-05-24', vendor:'ร้านอุดมศักดิ์', qtyIn:40, qtyRem:32, price:425 },
+        { no:'L-2026-0118', date:'2026-05-14', vendor:'Thai Watsadu', qtyIn:50, qtyRem:0, price:438 }
+      ]
+    },
+    {
+      name: 'เหล็กเส้น RB9 (10ม.)', cat: 'เหล็ก', unit: 'เส้น',
+      lots: [
+        { no:'L-2026-0131', date:'2026-05-21', vendor:'ร้านอุดมศักดิ์', qtyIn:120, qtyRem:54, price:135 }
+      ]
+    },
+    {
+      name: 'ลวดผูกเหล็ก', cat: 'เหล็ก', unit: 'กก.',
+      lots: [
+        { no:'L-2026-0143b', date:'2026-05-25', vendor:'ร้านอุดมศักดิ์', qtyIn:10, qtyRem:10, price:145 }
+      ]
+    },
+    {
+      name: 'อิฐมอญแดง', cat: 'อิฐ', unit: 'ก้อน',
+      lots: [
+        { no:'L-2026-0134', date:'2026-05-22', vendor:'Global House', qtyIn:2000, qtyRem:425, price:3 },
+        { no:'L-2026-0119', date:'2026-05-14', vendor:'Global House', qtyIn:1500, qtyRem:0, price:3.2 }
+      ]
+    },
+    {
+      name: 'อิฐมวลเบา Q-Con 7.5cm', cat: 'อิฐ', unit: 'ก้อน',
+      lots: [
+        { no:'L-2026-0136', date:'2026-05-22', vendor:'SCG Home', qtyIn:500, qtyRem:180, price:32 },
+        { no:'L-2026-0122', date:'2026-05-16', vendor:'Mega Home', qtyIn:300, qtyRem:0, price:33 }
+      ]
+    },
+    {
+      name: 'ทรายหยาบ', cat: 'ทั่วไป', unit: 'คิว',
+      lots: [
+        { no:'L-2026-0143c', date:'2026-05-25', vendor:'ร้านอุดมศักดิ์', qtyIn:5, qtyRem:5, price:950 },
+        { no:'L-2026-0130', date:'2026-05-21', vendor:'ร้านอุดมศักดิ์', qtyIn:8, qtyRem:0.8, price:920 }
+      ]
+    },
+    {
+      name: 'หินคลุก', cat: 'ทั่วไป', unit: 'คิว',
+      lots: [
+        { no:'L-2026-0129', date:'2026-05-20', vendor:'ร้านอุดมศักดิ์', qtyIn:10, qtyRem:3.5, price:780 }
+      ]
+    },
+    {
+      name: 'กระเบื้องเคลือบ 60×60 ขาว', cat: 'กระเบื้อง', unit: 'กล่อง',
+      lots: [
+        { no:'L-2026-0141', date:'2026-05-24', vendor:'SCG Home', qtyIn:50, qtyRem:50, price:175 },
+        { no:'L-2026-0123', date:'2026-05-17', vendor:'SCG Home', qtyIn:50, qtyRem:18, price:180 },
+        { no:'L-2026-0107', date:'2026-05-08', vendor:'HomePro', qtyIn:30, qtyRem:0, price:185 }
+      ]
+    },
+    {
+      name: 'กระเบื้องห้องน้ำ 30×60', cat: 'กระเบื้อง', unit: 'กล่อง',
+      lots: [
+        { no:'L-2026-0133', date:'2026-05-22', vendor:'HomePro', qtyIn:40, qtyRem:22, price:145 }
+      ]
+    },
+    {
+      name: 'กระเบื้องลูกฟูก Diamond', cat: 'กระเบื้อง', unit: 'แผ่น',
+      lots: [
+        { no:'L-2026-0124', date:'2026-05-17', vendor:'Mega Home', qtyIn:200, qtyRem:34, price:58 }
+      ]
+    },
+    {
+      name: 'สีน้ำพลาสติก TOA Supershield', cat: 'สี', unit: 'แกลลอน',
+      lots: [
+        { no:'L-2026-0138', date:'2026-05-23', vendor:'HomePro', qtyIn:20, qtyRem:14, price:1850 },
+        { no:'L-2026-0117', date:'2026-05-13', vendor:'HomePro', qtyIn:15, qtyRem:0, price:1880 }
+      ]
+    },
+    {
+      name: 'สีรองพื้นปูนใหม่ TOA', cat: 'สี', unit: 'แกลลอน',
+      lots: [
+        { no:'L-2026-0135', date:'2026-05-22', vendor:'HomePro', qtyIn:12, qtyRem:8, price:1250 }
+      ]
+    },
+    {
+      name: 'สีน้ำมัน Beger', cat: 'สี', unit: 'กระป๋อง',
+      lots: [
+        { no:'L-2026-0126', date:'2026-05-18', vendor:'Thai Watsadu', qtyIn:24, qtyRem:6, price:485 }
+      ]
+    },
+    {
+      name: 'สายไฟ THW 2.5 sqmm (100ม.)', cat: 'ไฟฟ้า', unit: 'ม้วน',
+      lots: [
+        { no:'L-2026-0132', date:'2026-05-21', vendor:'Index', qtyIn:10, qtyRem:6, price:2350 }
+      ]
+    },
+    {
+      name: 'ปลั๊กไฟ + สวิตช์ Panasonic', cat: 'ไฟฟ้า', unit: 'ชุด',
+      lots: [
+        { no:'L-2026-0127', date:'2026-05-19', vendor:'Index', qtyIn:60, qtyRem:24, price:185 },
+        { no:'L-2026-0113', date:'2026-05-10', vendor:'HomePro', qtyIn:40, qtyRem:0, price:192 }
+      ]
+    },
+    {
+      name: 'หลอด LED Bulb 9W (E27)', cat: 'ไฟฟ้า', unit: 'หลอด',
+      lots: [
+        { no:'L-2026-0121', date:'2026-05-16', vendor:'HomePro', qtyIn:80, qtyRem:18, price:75 }
+      ]
+    },
+    {
+      name: 'ชักโครก American Standard', cat: 'สุขภัณฑ์', unit: 'ชุด',
+      lots: [
+        { no:'L-2026-0116', date:'2026-05-13', vendor:'HomePro', qtyIn:8, qtyRem:3, price:3850 }
+      ]
+    },
+    {
+      name: 'อ่างล้างหน้า COTTO', cat: 'สุขภัณฑ์', unit: 'ชุด',
+      lots: [
+        { no:'L-2026-0114', date:'2026-05-11', vendor:'HomePro', qtyIn:10, qtyRem:4, price:1850 }
+      ]
+    },
+    {
+      name: 'น็อต+สกรู คละขนาด', cat: 'ทั่วไป', unit: 'กล่อง',
+      lots: [
+        { no:'L-2026-0112', date:'2026-05-10', vendor:'Thai Watsadu', qtyIn:25, qtyRem:9, price:165 }
+      ]
+    },
+    {
+      name: 'PU โฟม + ซิลิโคน Bostik', cat: 'ทั่วไป', unit: 'หลอด',
+      lots: [
+        { no:'L-2026-0111', date:'2026-05-09', vendor:'HomePro', qtyIn:50, qtyRem:13, price:135 }
+      ]
+    }
+  ];
+
+  // Movement history mock (random for any item)
+  function mockMovements(item) {
+    const evs = [
+      { type:'in', date:'25/05 09:45', title:'รับเข้าจาก '+item.lots[0].vendor, sub:'GR-2026-0008 · L-2026-0142', qty:'+'+item.lots[0].qtyIn+' '+item.unit },
+      { type:'out', date:'24/05 14:20', title:'เบิกออก → แปลง B-12', sub:'IS-2026-0034 · ผู้รับ: ใหญ่', qty:'-25 '+item.unit },
+      { type:'out', date:'24/05 10:05', title:'เบิกออก → แปลง A-08', sub:'IS-2026-0033 · ผู้รับ: โก้', qty:'-12 '+item.unit },
+      { type:'in', date:'20/05 11:30', title:'รับเข้า', sub:'GR-2026-0005 · '+item.lots[item.lots.length-1].no, qty:'+'+item.lots[item.lots.length-1].qtyIn+' '+item.unit },
+      { type:'out', date:'22/05 08:10', title:'เบิกออก → แปลง B-15', sub:'IS-2026-0029 · ผู้รับ: โก้', qty:'-8 '+item.unit },
+      { type:'adj', date:'18/05 16:45', title:'ปรับปรุงสต๊อก', sub:'แตก 2 ชิ้น · บันทึกโดย เจนจิรา', qty:'-2 '+item.unit }
+    ];
+    return evs;
+  }
+
+  // ─── State ───
+  let viewMode = 'table';
+  let activeCat = 'all';
+  let expandedItem = null;
+  let showConsumed = {};
+
+  function fmtMoney(v) {
+    if (v >= 1000000) return '฿' + (v/1000000).toFixed(2) + 'M';
+    if (v >= 1000) return '฿' + Math.round(v/1000) + 'k';
+    return '฿' + Math.round(v).toLocaleString();
+  }
+  function fmtNum(v) {
+    return v.toLocaleString(undefined, { maximumFractionDigits: 1 });
+  }
+
+  function totalRem(item) { return item.lots.reduce((a,l) => a + l.qtyRem, 0); }
+  function totalValue(item) { return item.lots.reduce((a,l) => a + l.qtyRem * l.price, 0); }
+  function totalIn(item) { return item.lots.reduce((a,l) => a + l.qtyIn, 0); }
+  function avgCost(item) {
+    const rem = totalRem(item);
+    if (rem === 0) return 0;
+    return totalValue(item) / rem;
+  }
+  function activeLots(item) { return item.lots.filter(l => l.qtyRem > 0).length; }
+  function lastReceived(item) {
+    return item.lots.slice().sort((a,b) => b.date.localeCompare(a.date))[0].date;
+  }
+  function lowLots(item) {
+    return item.lots.filter(l => l.qtyRem > 0 && l.qtyRem / l.qtyIn < 0.2).length;
+  }
+
+  // ─── Render top stats ───
+  function renderTopStats() {
+    let totVal = 0, totLots = 0, totLow = 0;
+    const catVals = {};
+    ITEMS.forEach(it => {
+      totVal += totalValue(it);
+      totLots += activeLots(it);
+      totLow += lowLots(it);
+      catVals[it.cat] = (catVals[it.cat] || 0) + totalValue(it);
+    });
+    document.getElementById('statValue').textContent = fmtMoney(totVal);
+    document.getElementById('statItems').textContent = ITEMS.length;
+    document.getElementById('statLots').textContent = totLots;
+    document.getElementById('statLow').textContent = totLow;
+
+    // category bar
+    const colors = {
+      'ปูน':'#b45309', 'เหล็ก':'#4b5563', 'อิฐ':'#dc2626', 'สี':'#2563eb',
+      'ไฟฟ้า':'#ca8a04', 'กระเบื้อง':'#7c3aed', 'ทั่วไป':'#16a34a', 'สุขภัณฑ์':'#db2777'
+    };
+    const track = document.getElementById('catBarTrack');
+    const legend = document.getElementById('catBarLegend');
+    track.innerHTML = '';
+    legend.innerHTML = '';
+    const cats = Object.keys(catVals).sort((a,b) => catVals[b] - catVals[a]);
+    cats.forEach(c => {
+      const pct = (catVals[c] / totVal) * 100;
+      const seg = document.createElement('div');
+      seg.className = 'cat-bar-seg';
+      seg.style.width = pct + '%';
+      seg.style.background = colors[c] || '#9ca3af';
+      seg.title = c + ': ' + fmtMoney(catVals[c]);
+      track.appendChild(seg);
+      const li = document.createElement('span');
+      li.innerHTML = '<span class="dot" style="background:'+colors[c]+'"></span>'+c+' '+pct.toFixed(0)+'%';
+      legend.appendChild(li);
+    });
+
+    // footer
+    document.getElementById('fsValue').textContent = fmtMoney(totVal);
+    document.getElementById('fsLots').textContent = totLots;
+    document.getElementById('fsItems').textContent = ITEMS.length;
+    document.getElementById('fsLast').textContent = '25 พ.ค. 09:45';
+    const now = new Date();
+    document.getElementById('fsTs').textContent = 'อัปเดต: ' + now.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}) + ' น.';
+  }
+
+  // ─── Chips ───
+  function renderChips() {
+    const cats = ['ทั้งหมด','ปูน','เหล็ก','อิฐ','สี','ไฟฟ้า','กระเบื้อง','สุขภัณฑ์','ทั่วไป'];
+    const row = document.getElementById('chipsRow');
+    row.innerHTML = '';
+    cats.forEach(c => {
+      const key = c === 'ทั้งหมด' ? 'all' : c;
+      const count = c === 'ทั้งหมด' ? ITEMS.length : ITEMS.filter(it => it.cat === c).length;
+      const chip = document.createElement('div');
+      chip.className = 'chip';
+      chip.setAttribute('data-on', activeCat === key ? '1' : '0');
+      chip.innerHTML = c + ' <span class="count">'+count+'</span>';
+      chip.onclick = () => { activeCat = key; render(); };
+      row.appendChild(chip);
+    });
+  }
+
+  // ─── Get filtered + sorted ───
+  function getList() {
+    const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+    const sort = document.getElementById('sortSelect').value;
+    let list = ITEMS.slice();
+    if (activeCat !== 'all') list = list.filter(it => it.cat === activeCat);
+    if (q) list = list.filter(it => it.name.toLowerCase().includes(q) || it.cat.toLowerCase().includes(q));
+    if (sort === 'value') list.sort((a,b) => totalValue(b) - totalValue(a));
+    else if (sort === 'low') list.sort((a,b) => {
+      const aPct = totalRem(a) / Math.max(1, totalIn(a));
+      const bPct = totalRem(b) / Math.max(1, totalIn(b));
+      return aPct - bPct;
+    });
+    else if (sort === 'recent') list.sort((a,b) => lastReceived(b).localeCompare(lastReceived(a)));
+    else list.sort((a,b) => a.name.localeCompare(b.name, 'th'));
+    return list;
+  }
+
+  // ─── Render ───
+  function render() {
+    renderChips();
+    const wrap = document.getElementById('stockWrap');
+    const list = getList();
+    if (list.length === 0) {
+      wrap.innerHTML = '<div class="empty"><div class="empty-icon">📦</div><div>ไม่พบรายการตามตัวกรอง</div></div>';
+      return;
+    }
+    if (viewMode === 'table') {
+      let html = '<div class="stock-table">';
+      html += '<div class="st-head">' +
+        '<div>รายการ</div>' +
+        '<div class="num">คงเหลือ</div>' +
+        '<div class="num">มูลค่า</div>' +
+        '<div class="num col-avg">avg cost</div>' +
+        '<div class="num col-lots">Lots</div>' +
+        '<div class="num col-recv">รับล่าสุด</div>' +
+        '<div class="num col-actions"></div>' +
+      '</div>';
+      list.forEach((it, idx) => {
+        const rem = totalRem(it);
+        const val = totalValue(it);
+        const avg = avgCost(it);
+        const lots = activeLots(it);
+        const low = lowLots(it);
+        const recv = lastReceived(it);
+        const isExp = expandedItem === it.name;
+        html += '<div class="st-row '+(isExp?'expanded':'')+'" onclick="toggleRow(\''+escapeAttr(it.name)+'\')">' +
+          '<div class="st-name">' +
+            '<span class="twirl">▶</span>' +
+            '<span class="item-label">'+it.name+'</span>' +
+            '<span class="cat-badge" data-c="'+it.cat+'">'+it.cat+'</span>' +
+          '</div>' +
+          '<div class="st-qty"><b>'+fmtNum(rem)+'</b><span class="u">'+it.unit+'</span></div>' +
+          '<div class="st-value"><b>'+fmtMoney(val)+'</b></div>' +
+          '<div class="st-avg col-avg">฿'+fmtNum(avg)+'/'+it.unit+'</div>' +
+          '<div class="st-lots col-lots"><span class="pill '+(low?'low':'')+'">'+lots+(low?' (ใกล้หมด '+low+')':'')+'</span></div>' +
+          '<div class="st-recv col-recv">'+fmtDate(recv)+'</div>' +
+          '<div class="st-actions col-actions" onclick="event.stopPropagation();">' +
+            '<button class="st-btn" onclick="openMovement(\''+escapeAttr(it.name)+'\')">📦 ประวัติ</button>' +
+            '<button class="st-btn primary" onclick="toast(\'ไปหน้าเบิกออก #8\',\'success\')">📤 เบิก →</button>' +
+          '</div>' +
+        '</div>';
+        if (isExp) html += renderLotsPanel(it);
+      });
+      html += '</div>';
+      wrap.innerHTML = html;
+    } else {
+      // grid view
+      let html = '<div class="stock-grid">';
+      list.forEach(it => {
+        const rem = totalRem(it);
+        const val = totalValue(it);
+        const lots = activeLots(it);
+        const low = lowLots(it);
+        const recv = lastReceived(it);
+        const isLow = low > 0;
+        const isEmpty = rem === 0;
+        html += '<div class="stock-card" data-low="'+(isLow?'1':'0')+'" data-empty="'+(isEmpty?'1':'0')+'" onclick="openMovement(\''+escapeAttr(it.name)+'\')">' +
+          '<div class="sc-name">'+it.name+'</div>' +
+          '<div class="sc-meta">' +
+            '<span class="cat-badge" data-c="'+it.cat+'">'+it.cat+'</span>' +
+            (isLow ? '<span class="cat-badge" style="background:var(--yellow-soft);color:var(--yellow)">⚠ ใกล้หมด '+low+'</span>' : '') +
+          '</div>' +
+          '<div class="sc-stats">' +
+            '<div class="sc-stat"><div class="lbl">คงเหลือ</div><div class="val">'+fmtNum(rem)+' <span class="u">'+it.unit+'</span></div></div>' +
+            '<div class="sc-stat"><div class="lbl">มูลค่า</div><div class="val">'+fmtMoney(val)+'</div></div>' +
+          '</div>' +
+          '<div class="sc-foot">' +
+            '<span>'+lots+' lots</span>' +
+            '<span>รับล่าสุด '+fmtDate(recv)+'</span>' +
+          '</div>' +
+        '</div>';
+      });
+      html += '</div>';
+      wrap.innerHTML = html;
+    }
+  }
+
+  function fmtDate(d) {
+    // d = "2026-05-25"
+    const parts = d.split('-');
+    const m = parseInt(parts[1]);
+    const months = ['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    return parseInt(parts[2]) + ' ' + months[m];
+  }
+
+  function renderLotsPanel(item) {
+    // sort lots by date asc (FIFO order = oldest first goes out first)
+    const lots = item.lots.slice().sort((a,b) => a.date.localeCompare(b.date));
+    const firstActive = lots.find(l => l.qtyRem > 0);
+    const hideCons = showConsumed[item.name] !== true;
+    const consumedCount = lots.filter(l => l.qtyRem === 0).length;
+
+    let html = '<div class="lots-panel">';
+    html += '<div class="lp-head">' +
+      '<span>📜 FIFO Lots (เก่าออกก่อน)</span>' +
+      (consumedCount > 0 ? '<span class="lp-toggle" onclick="event.stopPropagation(); toggleConsumed(\''+escapeAttr(item.name)+'\')">'+(hideCons?'แสดง':'ซ่อน')+' lots ที่หมดแล้ว ('+consumedCount+')</span>' : '') +
+    '</div>';
+    html += '<div class="lp-head-row">' +
+      '<div>Lot #</div>' +
+      '<div>วันที่รับ</div>' +
+      '<div class="col-vendor">vendor</div>' +
+      '<div class="col-num">รับเข้า</div>' +
+      '<div class="col-num col-price">ราคา/หน่วย</div>' +
+      '<div class="col-num">คงเหลือ</div>' +
+      '<div class="col-num col-value">มูลค่าคงเหลือ</div>' +
+    '</div>';
+    lots.forEach(l => {
+      const isConsumed = l.qtyRem === 0;
+      if (isConsumed && hideCons) return;
+      const isLow = l.qtyRem > 0 && (l.qtyRem / l.qtyIn) < 0.2;
+      const isFirstActive = l === firstActive;
+      const remClass = isConsumed ? 'empty' : (isLow ? 'low' : '');
+      html += '<div class="lp-row '+(isConsumed?'consumed':'')+'">' +
+        '<div class="col lot-no">'+l.no+(isFirstActive?'<span class="next-out-tag">next out</span>':'')+'</div>' +
+        '<div class="col lot-date">'+fmtDate(l.date)+'</div>' +
+        '<div class="col lot-vendor col-vendor">'+l.vendor+'</div>' +
+        '<div class="col col-num lot-qty">'+fmtNum(l.qtyIn)+' '+item.unit+'</div>' +
+        '<div class="col col-num col-price">฿'+l.price+'</div>' +
+        '<div class="col col-num lot-remaining '+remClass+'">'+fmtNum(l.qtyRem)+' '+item.unit+'</div>' +
+        '<div class="col col-num col-value">'+(isConsumed ? '-' : fmtMoney(l.qtyRem * l.price))+'</div>' +
+      '</div>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function toggleConsumed(name) {
+    showConsumed[name] = !showConsumed[name];
+    render();
+  }
+
+  function toggleRow(name) {
+    expandedItem = expandedItem === name ? null : name;
+    render();
+  }
+
+  function setView(mode) {
+    viewMode = mode;
+    document.getElementById('viewTable').classList.toggle('active', mode === 'table');
+    document.getElementById('viewGrid').classList.toggle('active', mode === 'grid');
+    render();
+  }
+
+  function escapeAttr(s) {
+    return s.replace(/'/g, "\\'").replace(/"/g, '\\"');
+  }
+
+  // ─── Drawer ───
+  function openMovement(name) {
+    const item = ITEMS.find(it => it.name === name);
+    if (!item) return;
+    document.getElementById('drawerTitle').textContent = 'เคลื่อนไหว: ' + item.name;
+    const body = document.getElementById('drawerBody');
+    const movs = mockMovements(item);
+    let html = '';
+    html += '<div style="background:#fafaf7; padding:12px 14px; border-radius:10px; margin-bottom:14px;">' +
+      '<div style="font-size:11px; color:var(--ink-3); text-transform:uppercase; letter-spacing:.5px; font-weight:600;">สรุปปัจจุบัน</div>' +
+      '<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:6px;">' +
+        '<div><div style="font-size:11px; color:var(--ink-3);">คงเหลือ</div><div style="font-size:16px; font-weight:700;">'+fmtNum(totalRem(item))+' '+item.unit+'</div></div>' +
+        '<div><div style="font-size:11px; color:var(--ink-3);">มูลค่า</div><div style="font-size:16px; font-weight:700;">'+fmtMoney(totalValue(item))+'</div></div>' +
+        '<div><div style="font-size:11px; color:var(--ink-3);">Active Lots</div><div style="font-size:16px; font-weight:700;">'+activeLots(item)+'</div></div>' +
+      '</div>' +
+    '</div>';
+    html += '<div style="font-size:11px; color:var(--ink-3); text-transform:uppercase; letter-spacing:.5px; font-weight:600; margin-bottom:8px;">ประวัติเคลื่อนไหว (ล่าสุด)</div>';
+    movs.forEach(m => {
+      const icon = m.type === 'in' ? '↓' : m.type === 'out' ? '↑' : '⟲';
+      html += '<div class="mv-row">' +
+        '<div class="mv-icon '+m.type+'">'+icon+'</div>' +
+        '<div class="mv-info">' +
+          '<div class="mv-title">'+m.title+'</div>' +
+          '<div class="mv-sub">'+m.date+' · '+m.sub+'</div>' +
+        '</div>' +
+        '<div class="mv-qty '+m.type+'">'+m.qty+'</div>' +
+      '</div>';
+    });
+    body.innerHTML = html;
+    document.getElementById('drawerBg').setAttribute('data-open','1');
+    document.getElementById('drawer').setAttribute('data-open','1');
+  }
+  function closeDrawer() {
+    document.getElementById('drawerBg').setAttribute('data-open','0');
+    document.getElementById('drawer').setAttribute('data-open','0');
+  }
+
+  // ─── Export CSV ───
+  function exportCSV() {
+    const list = getList();
+    const rows = [['item','category','unit','total_qty','total_value_thb','avg_cost_thb','lot_count','last_received']];
+    list.forEach(it => {
+      rows.push([
+        it.name, it.cat, it.unit,
+        totalRem(it).toFixed(2),
+        totalValue(it).toFixed(2),
+        avgCost(it).toFixed(2),
+        activeLots(it),
+        lastReceived(it)
+      ]);
+    });
+    const csv = rows.map(r => r.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const ts = new Date().toISOString().slice(0,10);
+    a.download = 'wanwela-stock-'+ts+'.csv';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 100);
+    toast('ดาวน์โหลด CSV แล้ว ('+list.length+' รายการ)','success');
+  }
+
+  // ─── Toast ───
+  function toast(msg, type='') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + type;
+    t.setAttribute('data-show','1');
+    setTimeout(() => t.setAttribute('data-show','0'), 1800);
+  }
+
+  // init
+  renderTopStats();
+  render();
+</script>
+</body>
+</html>

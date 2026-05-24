@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#1f2937" />
+<title>อนุมัติ PO · MD · วันเวลา ERP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f3ee; --card: #ffffff;
+    --ink: #1f2937; --ink-2: #4b5563; --ink-3: #9ca3af; --ink-4: #d1d5db;
+    --line: #e5e3dc; --line-2: #d6d3c8;
+    --primary: #1f2937; --primary-soft: #374151;
+    --accent: #b45309; --accent-soft: #fef3c7;
+    --green: #16a34a; --green-soft: #dcfce7;
+    --red: #dc2626; --red-soft: #fee2e2;
+    --yellow: #ca8a04; --yellow-soft: #fef9c3;
+    --blue: #2563eb; --blue-soft: #dbeafe;
+    --radius: 14px; --radius-sm: 10px;
+    --shadow: 0 1px 2px rgba(17,24,39,.04), 0 8px 24px rgba(17,24,39,.06);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--bg);
+    min-height: 100vh;
+    padding-bottom: 30px;
+    position: relative;
+  }
+
+  /* ─── Header ─── */
+  .header {
+    background: var(--primary);
+    color: #fff;
+    padding: 14px 18px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 0 rgba(0,0,0,.04);
+  }
+  .header-brand {
+    font-size: 11px;
+    color: rgba(255,255,255,.55);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .header-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .header-title {
+    font-weight: 600;
+    font-size: 17px;
+    flex: 1;
+  }
+  .header-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,.65);
+    margin-top: 2px;
+  }
+  .avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .header .avatar { background: #fff; color: var(--primary); }
+
+  /* ─── Stats strip ─── */
+  .stats {
+    background: var(--primary);
+    color: #fff;
+    padding: 0 14px 14px;
+    display: flex;
+    gap: 8px;
+  }
+  .stat {
+    flex: 1;
+    background: rgba(255,255,255,.08);
+    border-radius: 12px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .stat .v {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+  }
+  .stat .l {
+    font-size: 10px;
+    color: rgba(255,255,255,.65);
+    margin-top: 4px;
+    letter-spacing: .4px;
+  }
+  .stat[data-tone="yellow"] { background: rgba(202,138,4,.18); }
+  .stat[data-tone="yellow"] .v { color: #fde68a; }
+  .stat[data-tone="green"] { background: rgba(22,163,74,.18); }
+  .stat[data-tone="green"] .v { color: #86efac; }
+
+  /* ─── Section heading ─── */
+  .section-head {
+    font-size: 12px;
+    color: var(--ink-3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: 16px 18px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* ─── PO Card list ─── */
+  .po-list {
+    padding: 0 14px;
+  }
+  .po-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 14px 16px 14px 18px;
+    margin-bottom: 10px;
+    position: relative;
+    border-left: 4px solid var(--yellow);
+    cursor: pointer;
+    transition: transform .12s, box-shadow .12s;
+  }
+  .po-card:active {
+    transform: scale(.98);
+  }
+  .po-card[data-status="approved"] { border-left-color: var(--green); opacity: .75; }
+  .po-card[data-status="rejected"] { border-left-color: var(--red); opacity: .65; }
+  .po-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .po-id {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ink);
+    letter-spacing: .5px;
+  }
+  .status-badge {
+    background: var(--yellow-soft);
+    color: var(--yellow);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .status-badge.approved { background: var(--green-soft); color: var(--green); }
+  .status-badge.rejected { background: var(--red-soft); color: var(--red); }
+  .status-badge.urgent {
+    background: var(--red-soft);
+    color: var(--red);
+    margin-left: 4px;
+  }
+  .po-vendor {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--ink);
+    margin-bottom: 3px;
+    line-height: 1.3;
+  }
+  .po-amount {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .po-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 12px;
+  }
+  .po-meta .pill {
+    background: #f5f3ee;
+    border-radius: 6px;
+    padding: 3px 8px;
+    color: var(--ink-2);
+  }
+  .po-meta .pill b { color: var(--ink); font-weight: 600; }
+  .po-time {
+    color: var(--ink-3);
+    font-size: 11px;
+    margin-top: 6px;
+  }
+
+  /* ─── Empty state ─── */
+  .empty {
+    padding: 36px 12px;
+    text-align: center;
+    color: var(--ink-3);
+    font-size: 14px;
+  }
+  .empty .icon {
+    font-size: 36px;
+    opacity: .4;
+    margin-bottom: 8px;
+  }
+
+  /* ─── Drawer / Detail view ─── */
+  .drawer-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(17,24,39,.55);
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s;
+  }
+  .drawer-bg[data-open="1"] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .drawer {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    max-width: 480px;
+    background: var(--bg);
+    z-index: 51;
+    transform: translateX(100%);
+    transition: transform .25s cubic-bezier(.2,.8,.2,1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -8px 0 32px rgba(0,0,0,.15);
+  }
+  .drawer[data-open="1"] { transform: translateX(0); }
+  .drawer-head {
+    background: var(--primary);
+    color: #fff;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .drawer-back {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.08);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  .drawer-title {
+    font-weight: 700;
+    font-size: 17px;
+  }
+  .drawer-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,.65);
+    margin-top: 2px;
+  }
+  .drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 14px 110px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-2);
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    margin-bottom: 10px;
+  }
+  .label-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 14px;
+    border-bottom: 1px dotted var(--line);
+  }
+  .label-row:last-child { border-bottom: none; }
+  .label-row span:first-child { color: var(--ink-3); }
+  .label-row span:last-child { font-weight: 600; text-align: right; }
+
+  /* ─── Items table in drawer ─── */
+  .items-tbl {
+    width: 100%;
+    font-size: 13px;
+    border-collapse: collapse;
+  }
+  .items-tbl th, .items-tbl td {
+    padding: 8px 4px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+  }
+  .items-tbl th {
+    font-size: 11px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    font-weight: 600;
+    padding-top: 4px;
+  }
+  .items-tbl td.num { text-align: right; font-weight: 600; }
+  .items-tbl tr:last-child td { border-bottom: none; }
+
+  /* totals */
+  .totals-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 14px;
+  }
+  .totals-row.grand {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--green);
+    border-top: 1.5px solid var(--ink);
+    padding-top: 8px;
+    margin-top: 4px;
+  }
+
+  /* ─── Comparison/budget info ─── */
+  .info-box {
+    background: var(--blue-soft);
+    border-left: 4px solid var(--blue);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: #1e3a8a;
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+  .info-box b { color: #1e40af; }
+  .info-box .icon { font-size: 18px; margin-right: 4px; }
+  .info-box.warn {
+    background: var(--yellow-soft);
+    border-left-color: var(--yellow);
+    color: #854d0e;
+  }
+  .info-box.warn b { color: #713f12; }
+
+  /* budget bar */
+  .budget-bar {
+    height: 8px;
+    background: var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 8px 0 4px;
+  }
+  .budget-bar-fill {
+    height: 100%;
+    background: var(--green);
+    transition: width .3s;
+  }
+  .budget-bar-fill[data-warn="1"] { background: var(--yellow); }
+  .budget-bar-fill[data-warn="2"] { background: var(--red); }
+  .budget-foot {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--ink-2);
+  }
+  .budget-foot b { color: var(--ink); }
+
+  /* reasoning */
+  .reasoning-box {
+    background: #fdfcf9;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--ink-2);
+    line-height: 1.5;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .reasoning-box .who {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .reasoning-box .text { flex: 1; }
+  .reasoning-box .text b { color: var(--ink); font-weight: 600; display: block; margin-bottom: 2px; font-size: 12px; }
+
+  /* ─── Sticky bottom actions in drawer ─── */
+  .drawer-actions {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255,255,255,.97);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--line);
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.4fr;
+    gap: 6px;
+    z-index: 5;
+  }
+  .da-btn {
+    border: none;
+    border-radius: 10px;
+    padding: 12px 8px;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: opacity .15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .da-btn:active { opacity: .8; }
+  .da-btn.reject {
+    background: var(--red-soft);
+    color: var(--red);
+  }
+  .da-btn.revise {
+    background: var(--yellow-soft);
+    color: var(--yellow);
+  }
+  .da-btn.approve {
+    background: var(--green);
+    color: #fff;
+    font-size: 14px;
+  }
+  .da-btn.approve.disabled { background: var(--ink-3); pointer-events: none; }
+
+  /* ─── Modal (reject reason / confirm) ─── */
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(17,24,39,.55);
+    z-index: 60;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-bg[data-open="1"] {
+    display: flex;
+    animation: fadeIn .2s;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .modal {
+    background: #fff;
+    border-radius: 22px 22px 0 0;
+    width: 100%;
+    max-width: 480px;
+    padding: 18px 18px calc(20px + env(safe-area-inset-bottom));
+    animation: slideUp .25s cubic-bezier(.2,.8,.2,1);
+  }
+  .modal .handle {
+    width: 36px;
+    height: 4px;
+    background: var(--line-2);
+    border-radius: 2px;
+    margin: 0 auto 14px;
+  }
+  .modal-title {
+    font-weight: 700;
+    font-size: 17px;
+    margin-bottom: 4px;
+  }
+  .modal-sub {
+    font-size: 13px;
+    color: var(--ink-2);
+    margin-bottom: 14px;
+  }
+  .reason-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .reason-chip {
+    padding: 8px 12px;
+    border-radius: 18px;
+    border: 1.5px solid var(--line);
+    background: #fdfcf9;
+    font-size: 13px;
+    color: var(--ink-2);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .reason-chip[data-on="1"] {
+    background: var(--red);
+    color: #fff;
+    border-color: var(--red);
+  }
+  .reason-chip.revise[data-on="1"] {
+    background: var(--yellow);
+    border-color: var(--yellow);
+  }
+  .textarea {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    background: #fdfcf9;
+    border-radius: 10px;
+    padding: 11px 13px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+    resize: vertical;
+    min-height: 70px;
+  }
+  .textarea:focus {
+    border-color: var(--primary);
+    background: #fff;
+  }
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .btn {
+    border: none;
+    border-radius: 10px;
+    padding: 13px 16px;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: opacity .15s;
+    flex: 1;
+  }
+  .btn:active { opacity: .85; }
+  .btn-secondary {
+    background: #efece4;
+    color: var(--ink);
+  }
+  .btn-danger {
+    background: var(--red);
+    color: #fff;
+  }
+  .btn-warn {
+    background: var(--yellow);
+    color: #fff;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+  }
+  .btn-success {
+    background: var(--green);
+    color: #fff;
+  }
+
+  /* ─── Success animation overlay ─── */
+  .success-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,.96);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .success-overlay[data-show="1"] {
+    display: flex;
+    animation: fadeIn .25s;
+  }
+  .check-circle {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    background: var(--green);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 50px;
+    margin-bottom: 16px;
+    animation: pop .5s cubic-bezier(.2,1.5,.5,1);
+  }
+  @keyframes pop {
+    0% { transform: scale(0); }
+    100% { transform: scale(1); }
+  }
+  .check-circle.red { background: var(--red); }
+  .check-circle.yellow { background: var(--yellow); }
+  .success-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    text-align: center;
+  }
+  .success-sub {
+    color: var(--ink-2);
+    text-align: center;
+    margin-bottom: 16px;
+    padding: 0 20px;
+  }
+  .signature {
+    background: #fff;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 22px;
+    margin-bottom: 14px;
+    font-family: 'Sarabun', cursive;
+    font-style: italic;
+    font-size: 28px;
+    color: var(--ink);
+    transform: rotate(-3deg);
+    animation: pop .6s .2s cubic-bezier(.2,1.5,.5,1) backwards;
+  }
+  .line-notice {
+    background: #06c755;
+    color: #fff;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  /* ─── Toast ─── */
+  .toast {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 250;
+    box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    opacity: 0;
+    transition: all .25s;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast[data-show="1"] {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .toast.success { background: var(--green); }
+  .toast.error { background: var(--red); }
+
+  /* ─── Demo badge ─── */
+  .demo-badge {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,.6);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    z-index: 999;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-brand">WANWELA · TWO BUILD</div>
+    <div class="header-row">
+      <div class="avatar">ไอ</div>
+      <div style="flex:1">
+        <div class="header-title">PO รออนุมัติ</div>
+        <div class="header-sub">คุณไอซ์ · กรรมการผู้จัดการ</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats strip -->
+  <div class="stats">
+    <div class="stat" data-tone="yellow">
+      <div class="v" id="statCount">3</div>
+      <div class="l">PO รออนุมัติ</div>
+    </div>
+    <div class="stat">
+      <div class="v" id="statTotal">฿60.3K</div>
+      <div class="l">มูลค่ารวม</div>
+    </div>
+    <div class="stat" data-tone="green">
+      <div class="v">฿412K</div>
+      <div class="l">งบเดือนนี้เหลือ</div>
+    </div>
+  </div>
+
+  <div class="section-head" id="awaitHead">
+    <span>รออนุมัติ <span id="awaitCount" style="color:var(--ink);">3</span></span>
+    <span style="color:var(--green);font-weight:500;text-transform:none;letter-spacing:0">🟢 ออนไลน์</span>
+  </div>
+
+  <div class="po-list" id="poList"></div>
+
+  <div class="section-head" id="doneHead" style="display:none">
+    <span>เสร็จแล้ววันนี้ <span id="doneCount" style="color:var(--ink);">0</span></span>
+  </div>
+  <div class="po-list" id="poListDone"></div>
+
+  <!-- Detail Drawer -->
+  <div class="drawer-bg" id="drawerBg" onclick="closeDrawer()"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-head">
+      <div class="drawer-back" onclick="closeDrawer()">‹</div>
+      <div style="flex:1">
+        <div class="drawer-title" id="drawerTitle">PO-2026-0022</div>
+        <div class="drawer-sub" id="drawerSub">รออนุมัติ · 12 นาทีที่แล้ว</div>
+      </div>
+    </div>
+    <div class="drawer-body" id="drawerBody">
+      <!-- filled by JS -->
+    </div>
+    <div class="drawer-actions" id="drawerActions">
+      <button class="da-btn reject" onclick="openRejectModal()">❌ ตีกลับ</button>
+      <button class="da-btn revise" onclick="openReviseModal()">✏️ ขอแก้</button>
+      <button class="da-btn approve" onclick="openApproveModal()">✅ อนุมัติ</button>
+    </div>
+  </div>
+
+  <!-- Approve confirm modal -->
+  <div class="modal-bg" id="approveModal" onclick="if(event.target.id==='approveModal')closeModal('approveModal')">
+    <div class="modal">
+      <div class="handle"></div>
+      <div class="modal-title">✅ ยืนยันอนุมัติ PO?</div>
+      <div class="modal-sub" id="approveSub">PO-2026-0022 · TPI โรงงานตรง · ฿20,000</div>
+      <div style="background:var(--green-soft);border-radius:10px;padding:10px 12px;font-size:13px;color:#15803d;margin-bottom:14px">
+        ✓ ระบบจะแจ้ง LINE ให้แอดมินและ vendor อัตโนมัติ
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('approveModal')">ยกเลิก</button>
+        <button class="btn btn-success" onclick="confirmApprove()">✅ อนุมัติเลย</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reject modal -->
+  <div class="modal-bg" id="rejectModal" onclick="if(event.target.id==='rejectModal')closeModal('rejectModal')">
+    <div class="modal">
+      <div class="handle"></div>
+      <div class="modal-title">❌ ตีกลับ PO</div>
+      <div class="modal-sub">แจ้งเหตุผลให้แอดมิน · จะไม่ออก PO ฉบับนี้</div>
+      <div class="reason-chips" id="rejectChips">
+        <button type="button" class="reason-chip" data-reason="ราคาแพงเกินไป">ราคาแพงเกินไป</button>
+        <button type="button" class="reason-chip" data-reason="งบไม่พอ">งบไม่พอ</button>
+        <button type="button" class="reason-chip" data-reason="ขอเปลี่ยน vendor">ขอเปลี่ยน vendor</button>
+        <button type="button" class="reason-chip" data-reason="ของไม่จำเป็น">ของไม่จำเป็น</button>
+        <button type="button" class="reason-chip" data-reason="รอราคาเพิ่ม">รอราคาเพิ่ม</button>
+      </div>
+      <textarea class="textarea" id="rejectNote" placeholder="รายละเอียดเพิ่มเติม (ไม่บังคับ) — เช่น ให้ลอง quote SCG ใหม่ก่อน"></textarea>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('rejectModal')">ยกเลิก</button>
+        <button class="btn btn-danger" onclick="confirmReject()">❌ ตีกลับ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revise modal -->
+  <div class="modal-bg" id="reviseModal" onclick="if(event.target.id==='reviseModal')closeModal('reviseModal')">
+    <div class="modal">
+      <div class="handle"></div>
+      <div class="modal-title">✏️ ขอให้แอดมินแก้ไข</div>
+      <div class="modal-sub">PO จะกลับไปสถานะ "แก้ไข" ที่แอดมิน</div>
+      <div class="reason-chips" id="reviseChips">
+        <button type="button" class="reason-chip revise" data-reason="ขอลดจำนวน">ขอลดจำนวน</button>
+        <button type="button" class="reason-chip revise" data-reason="ขอแยกเป็น 2 งวด">ขอแยกเป็น 2 งวด</button>
+        <button type="button" class="reason-chip revise" data-reason="ขอต่อราคาเพิ่ม">ขอต่อราคาเพิ่ม</button>
+        <button type="button" class="reason-chip revise" data-reason="ขอเอกสารเพิ่ม">ขอเอกสารเพิ่ม</button>
+      </div>
+      <textarea class="textarea" id="reviseNote" placeholder="รายละเอียดที่อยากให้แก้..."></textarea>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('reviseModal')">ยกเลิก</button>
+        <button class="btn btn-warn" onclick="confirmRevise()">✏️ ส่งกลับให้แก้</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success overlay (approve/reject/revise) -->
+  <div class="success-overlay" id="successOverlay">
+    <div class="check-circle" id="successIcon">✓</div>
+    <div class="success-title" id="successTitle">อนุมัติ PO เรียบร้อย</div>
+    <div class="success-sub" id="successSub">PO-2026-0022 · ฿20,000 — ระบบจะแจ้ง vendor และแอดมินผ่าน LINE</div>
+    <div class="signature" id="successSig">~ ไอซ์ ~</div>
+    <div class="line-notice" id="successLine">📱 ส่ง LINE Notify แล้ว · เจนจิรา + TPI ฯ</div>
+    <button class="btn btn-primary" style="max-width:280px" onclick="closeSuccessOverlay()">ดู PO ถัดไป</button>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">Saved</div>
+</div>
+
+<div class="demo-badge">DEMO · P0 · #5</div>
+
+<script>
+  // ─── Mock data ───
+  const SOURCE_RFQ = {
+    target: 'แปลง 1 (89/1)',
+    typeShort: 'A ULTRA',
+    requester: 'สมชาย เกตุแก้ว',
+    team: 'โก้',
+    needDate: '28 พ.ค. 2569',
+    urgency: 'urgent',
+  };
+  const VENDORS = {
+    v6: { name: 'TPI โรงงานตรง', short: 'TPI', deliveryDays: 2, rating: 4.9,
+          addr: 'โรงงาน TPI ถ.ปู่เจ้าฯ พระประแดง', payTerms: 'เงินสด/โอนก่อนส่ง' },
+    v7: { name: 'ร้านอุดมศักดิ์', short: 'อุดมฯ', deliveryDays: 1, rating: 4.7,
+          addr: '45/2 หมู่บ้านวันเวลา (ใกล้ไซต์)', payTerms: 'เงินสด/7 วัน' },
+    v2: { name: 'HomePro', short: 'HomePro', deliveryDays: 2, rating: 4.5,
+          addr: '99/9 ถ.บางนา-ตราด', payTerms: 'เครดิต 30 วัน' },
+  };
+
+  const POS = [
+    {
+      id: 'PO-2026-0022',
+      vendorId: 'v6',
+      sourcePR: 'PR-2026-0042',
+      sourceRFQ: 'RFQ-2026-0015',
+      target: 'แปลง 1 (89/1) · A ULTRA',
+      requester: 'สมชาย เกตุแก้ว (ทีมโก้)',
+      submittedAt: '2026-05-25T10:48',
+      timeAgo: '12 นาทีที่แล้ว',
+      urgency: 'urgent',
+      adminNote: 'เลือก TPI โรงงานตรง ถูกสุดในหมวดปูน (฿158/ถุง) ถูกกว่า SCG ~4% และส่งทัน 2 วันก่อนเทคาน ต้นทุนปูน ลด ~฿700 จากแผน',
+      items: [
+        { name: 'ปูนซีเมนต์ TPI ปอร์ตแลนด์ 50 กก.', qty: 100, unit: 'ถุง', unitPrice: 158, lineTotal: 15800 },
+      ],
+      subtotal: 15800,
+      delivery: 1200,
+      grandTotal: 17000,
+      savingPct: 4.2,
+      savingAmount: 700,
+      budgetCode: 'A-01 ปูน/มวลรวม',
+      budgetTotal: 85000,
+      budgetUsed: 38500,
+      budgetThisPO: 17000,
+      status: 'pending',
+    },
+    {
+      id: 'PO-2026-0023',
+      vendorId: 'v7',
+      sourcePR: 'PR-2026-0042',
+      sourceRFQ: 'RFQ-2026-0015',
+      target: 'แปลง 1 (89/1) · A ULTRA',
+      requester: 'สมชาย เกตุแก้ว (ทีมโก้)',
+      submittedAt: '2026-05-25T10:48',
+      timeAgo: '12 นาทีที่แล้ว',
+      urgency: 'urgent',
+      adminNote: 'เลือกอุดมศักดิ์ เพราะถูกสุดในเหล็ก/ทราย/ลวด + ส่งฟรี (อยู่ใกล้ไซต์ 5 กม.) + รับของได้ใน 1 วัน ทันเทคานพรุ่งนี้',
+      items: [
+        { name: 'เหล็กข้ออ้อย DB12', qty: 50, unit: 'เส้น', unitPrice: 245, lineTotal: 12250 },
+        { name: 'ทรายหยาบ', qty: 8, unit: 'คิว', unitPrice: 450, lineTotal: 3600 },
+        { name: 'ลวดผูกเหล็ก', qty: 5, unit: 'กก.', unitPrice: 60, lineTotal: 300 },
+      ],
+      subtotal: 16150,
+      delivery: 0,
+      grandTotal: 16150,
+      savingPct: 6.8,
+      savingAmount: 1180,
+      budgetCode: 'A-02 เหล็ก/มวลรวม',
+      budgetTotal: 120000,
+      budgetUsed: 52000,
+      budgetThisPO: 16150,
+      status: 'pending',
+    },
+    {
+      id: 'PO-2026-0021',
+      vendorId: 'v2',
+      sourcePR: 'PR-2026-0038',
+      sourceRFQ: 'RFQ-2026-0014',
+      target: 'แปลง 12 (89/12) · B MINUTES',
+      requester: 'ใหญ่ พุ่มวารี (ทีมใหญ่)',
+      submittedAt: '2026-05-25T09:15',
+      timeAgo: '1 ชม.ที่แล้ว',
+      urgency: 'normal',
+      adminNote: 'HomePro มีโปรกระเบื้องตัวนี้ลด 10% เฉพาะเดือนนี้ + จัดส่งทันที ลด 8% จากราคาตลาด',
+      items: [
+        { name: 'กระเบื้องเคลือบ 60x60 ลาย Stone', qty: 80, unit: 'กล่อง', unitPrice: 265, lineTotal: 21200 },
+      ],
+      subtotal: 21200,
+      delivery: 800,
+      grandTotal: 22000,
+      savingPct: 8.0,
+      savingAmount: 1700,
+      budgetCode: 'B-08 กระเบื้อง',
+      budgetTotal: 95000,
+      budgetUsed: 71500,
+      budgetThisPO: 22000,
+      status: 'pending',
+    },
+  ];
+
+  let currentPO = null;
+  let doneToday = [];
+
+  // ─── Helpers ───
+  function escHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function formatMoney(n) {
+    return '฿' + Math.round(Number(n) || 0).toLocaleString('th-TH');
+  }
+  function shortMoney(n) {
+    n = Number(n) || 0;
+    if (n >= 1000000) return '฿' + (n/1000000).toFixed(1) + 'M';
+    if (n >= 1000) return '฿' + (n/1000).toFixed(1) + 'K';
+    return '฿' + n;
+  }
+  function formatNum(n) {
+    return Number(n).toLocaleString('th-TH');
+  }
+
+  // ─── Render list ───
+  function renderList() {
+    const pending = POS.filter(p => p.status === 'pending');
+    const done = POS.filter(p => p.status !== 'pending');
+    const c = document.getElementById('poList');
+    document.getElementById('awaitCount').textContent = pending.length;
+    document.getElementById('statCount').textContent = pending.length;
+    document.getElementById('statTotal').textContent = shortMoney(pending.reduce((s,p)=>s+p.grandTotal,0));
+
+    if (pending.length === 0) {
+      c.innerHTML = `<div class="empty"><div class="icon">📭</div>ไม่มี PO รออนุมัติ</div>`;
+    } else {
+      c.innerHTML = pending.map(p => renderCard(p)).join('');
+    }
+
+    const cd = document.getElementById('poListDone');
+    if (done.length === 0) {
+      document.getElementById('doneHead').style.display = 'none';
+      cd.innerHTML = '';
+    } else {
+      document.getElementById('doneHead').style.display = 'flex';
+      document.getElementById('doneCount').textContent = done.length;
+      cd.innerHTML = done.map(p => renderCard(p)).join('');
+    }
+  }
+  function renderCard(p) {
+    const v = VENDORS[p.vendorId];
+    const statusLabel = p.status === 'pending' ? '⏳ รออนุมัติ'
+                      : p.status === 'approved' ? '✅ อนุมัติแล้ว'
+                      : p.status === 'rejected' ? '❌ ตีกลับ'
+                      : '✏️ ส่งกลับให้แก้';
+    const urgPill = p.urgency === 'urgent' ? '<span class="status-badge urgent">🟡 ด่วน</span>'
+                  : p.urgency === 'critical' ? '<span class="status-badge urgent">🔴 ด่วนมาก</span>' : '';
+    return `
+      <div class="po-card" data-status="${p.status}" onclick="openDrawer('${p.id}')">
+        <div class="po-card-head">
+          <div class="po-id">${p.id}</div>
+          <div>
+            <span class="status-badge ${p.status === 'approved' ? 'approved' : p.status === 'rejected' ? 'rejected' : ''}">${statusLabel}</span>
+            ${p.status === 'pending' ? urgPill : ''}
+          </div>
+        </div>
+        <div class="po-vendor">${escHtml(v.name)} <small style="font-weight:400;color:var(--ink-3);font-size:12px">· ${p.items.length} รายการ</small></div>
+        <div class="po-amount">${formatMoney(p.grandTotal)}</div>
+        <div class="po-meta">
+          <span class="pill">📋 ${p.sourcePR}</span>
+          <span class="pill">📍 ${escHtml(p.target)}</span>
+          <span class="pill">👷 ${escHtml(p.requester.split(' (')[0])}</span>
+        </div>
+        <div class="po-time">⏱ ${p.timeAgo} · ต้องการ ${p.needDate || SOURCE_RFQ.needDate}</div>
+      </div>
+    `;
+  }
+
+  // ─── Drawer ───
+  function openDrawer(poId) {
+    const p = POS.find(x => x.id === poId);
+    if (!p) return;
+    currentPO = p;
+    const v = VENDORS[p.vendorId];
+    document.getElementById('drawerTitle').textContent = p.id;
+    document.getElementById('drawerSub').textContent =
+      (p.status === 'pending' ? 'รออนุมัติ · ' : '') + p.timeAgo;
+
+    const budgetPct = ((p.budgetUsed + p.budgetThisPO) / p.budgetTotal * 100);
+    const budgetWarn = budgetPct >= 95 ? 2 : budgetPct >= 80 ? 1 : 0;
+
+    document.getElementById('drawerBody').innerHTML = `
+      <!-- Vendor & basic info -->
+      <div class="card">
+        <div class="card-title">📦 ผู้ขาย</div>
+        <div style="font-weight:700;font-size:18px;margin-bottom:4px">${escHtml(v.name)}</div>
+        <div style="color:var(--ink-3);font-size:12px;margin-bottom:8px">${escHtml(v.addr)}</div>
+        <div class="label-row"><span>ส่งภายใน</span><span>${v.deliveryDays} วัน</span></div>
+        <div class="label-row"><span>เงื่อนไขชำระ</span><span>${escHtml(v.payTerms)}</span></div>
+        <div class="label-row"><span>เรตติ้ง</span><span>★ ${v.rating}/5.0</span></div>
+      </div>
+
+      <!-- Source -->
+      <div class="card">
+        <div class="card-title">🔗 อ้างอิง</div>
+        <div class="label-row"><span>ใบขอซื้อ (PR)</span><span>${p.sourcePR}</span></div>
+        <div class="label-row"><span>ขอราคา (RFQ)</span><span>${p.sourceRFQ}</span></div>
+        <div class="label-row"><span>เป้าหมาย</span><span style="font-size:13px">${escHtml(p.target)}</span></div>
+        <div class="label-row"><span>ผู้ขอ</span><span style="font-size:13px">${escHtml(p.requester)}</span></div>
+        <div class="label-row"><span>วันต้องการใช้</span><span style="color:${p.urgency === 'urgent' ? 'var(--yellow)' : 'var(--ink)'}">${p.needDate || SOURCE_RFQ.needDate}</span></div>
+      </div>
+
+      <!-- Items -->
+      <div class="card">
+        <div class="card-title">📋 รายการสินค้า (${p.items.length})</div>
+        <table class="items-tbl">
+          <thead><tr><th>รายการ</th><th class="num" style="text-align:right">จำนวน</th><th class="num" style="text-align:right">ราคา</th><th class="num" style="text-align:right">รวม</th></tr></thead>
+          <tbody>
+            ${p.items.map(it => `
+              <tr>
+                <td>${escHtml(it.name)}</td>
+                <td class="num">${formatNum(it.qty)} ${escHtml(it.unit)}</td>
+                <td class="num">${formatMoney(it.unitPrice)}</td>
+                <td class="num" style="color:var(--ink)">${formatMoney(it.lineTotal)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--line)">
+          <div class="totals-row"><span>รวมราคาวัสดุ</span><span>${formatMoney(p.subtotal)}</span></div>
+          <div class="totals-row"><span>ค่าจัดส่ง</span><span>${p.delivery ? formatMoney(p.delivery) : 'ฟรี'}</span></div>
+          <div class="totals-row grand"><span>ยอดสุทธิ</span><span>${formatMoney(p.grandTotal)}</span></div>
+        </div>
+      </div>
+
+      <!-- Comparison info -->
+      <div class="card">
+        <div class="card-title">📊 ราคานี้คุ้มหรือเปล่า?</div>
+        <div class="info-box">
+          <span class="icon">💰</span>
+          ราคานี้ <b>ถูกกว่าคู่แข่ง ~${p.savingPct}%</b>
+          (ประหยัด <b>${formatMoney(p.savingAmount)}</b> จากราคาเฉลี่ย 5 เจ้า)
+        </div>
+        <div class="info-box ${budgetWarn === 2 ? 'warn' : ''}" style="${budgetWarn !== 2 ? 'background:#dcfce7;border-left-color:var(--green);color:#14532d' : ''}">
+          <span class="icon">📈</span>
+          <b>${escHtml(p.budgetCode)}</b> — ใช้ไป ${(p.budgetUsed/p.budgetTotal*100).toFixed(0)}% ก่อน PO นี้
+          <div class="budget-bar">
+            <div class="budget-bar-fill" data-warn="${budgetWarn}" style="width:${Math.min(budgetPct,100)}%"></div>
+          </div>
+          <div class="budget-foot">
+            <span>ใช้แล้ว <b>${formatMoney(p.budgetUsed)}</b> + PO นี้ <b>${formatMoney(p.budgetThisPO)}</b></span>
+            <span>งบ <b>${formatMoney(p.budgetTotal)}</b></span>
+          </div>
+          <div style="margin-top:4px;font-size:12px">
+            ${budgetWarn === 2 ? '⚠ งบใกล้เต็ม — เหลือ ' : 'เหลือ '} <b>${formatMoney(p.budgetTotal - p.budgetUsed - p.budgetThisPO)}</b> หลังออก PO นี้
+          </div>
+        </div>
+      </div>
+
+      <!-- Reasoning -->
+      <div class="card">
+        <div class="card-title">💬 เหตุผลจากแอดมิน</div>
+        <div class="reasoning-box">
+          <div class="who">จจ</div>
+          <div class="text">
+            <b>เจนจิรา · แอดมินจัดซื้อ</b>
+            ${escHtml(p.adminNote)}
+          </div>
+        </div>
+      </div>
+    `;
+
+    // adjust actions visibility for already-decided POs
+    const actions = document.getElementById('drawerActions');
+    if (p.status !== 'pending') {
+      actions.style.display = 'none';
+    } else {
+      actions.style.display = 'grid';
+    }
+
+    document.getElementById('drawerBg').dataset.open = '1';
+    document.getElementById('drawer').dataset.open = '1';
+  }
+  function closeDrawer() {
+    document.getElementById('drawerBg').dataset.open = '0';
+    document.getElementById('drawer').dataset.open = '0';
+    currentPO = null;
+  }
+
+  // ─── Modals ───
+  function openApproveModal() {
+    if (!currentPO) return;
+    const v = VENDORS[currentPO.vendorId];
+    document.getElementById('approveSub').textContent =
+      `${currentPO.id} · ${v.name} · ${formatMoney(currentPO.grandTotal)}`;
+    document.getElementById('approveModal').dataset.open = '1';
+  }
+  function openRejectModal() {
+    document.getElementById('rejectModal').dataset.open = '1';
+    document.querySelectorAll('#rejectChips .reason-chip').forEach(c => c.dataset.on = '0');
+    document.getElementById('rejectNote').value = '';
+  }
+  function openReviseModal() {
+    document.getElementById('reviseModal').dataset.open = '1';
+    document.querySelectorAll('#reviseChips .reason-chip').forEach(c => c.dataset.on = '0');
+    document.getElementById('reviseNote').value = '';
+  }
+  function closeModal(id) {
+    document.getElementById(id).dataset.open = '0';
+  }
+
+  // Reason chip toggling
+  document.querySelectorAll('.reason-chip').forEach(c => {
+    c.onclick = () => {
+      c.dataset.on = c.dataset.on === '1' ? '0' : '1';
+    };
+  });
+
+  // ─── Confirm actions ───
+  function confirmApprove() {
+    if (!currentPO) return;
+    currentPO.status = 'approved';
+    closeModal('approveModal');
+    showSuccessOverlay('approved', currentPO);
+  }
+  function confirmReject() {
+    if (!currentPO) return;
+    const reasons = [...document.querySelectorAll('#rejectChips .reason-chip[data-on="1"]')].map(c => c.dataset.reason);
+    const note = document.getElementById('rejectNote').value.trim();
+    if (reasons.length === 0 && !note) {
+      showToast('เลือกเหตุผลก่อน', 'error');
+      return;
+    }
+    currentPO.status = 'rejected';
+    currentPO.rejectReason = reasons.join(', ') + (note ? ' — ' + note : '');
+    closeModal('rejectModal');
+    showSuccessOverlay('rejected', currentPO);
+  }
+  function confirmRevise() {
+    if (!currentPO) return;
+    const reasons = [...document.querySelectorAll('#reviseChips .reason-chip[data-on="1"]')].map(c => c.dataset.reason);
+    const note = document.getElementById('reviseNote').value.trim();
+    if (reasons.length === 0 && !note) {
+      showToast('ระบุสิ่งที่อยากให้แก้', 'error');
+      return;
+    }
+    currentPO.status = 'revise';
+    currentPO.reviseReason = reasons.join(', ') + (note ? ' — ' + note : '');
+    closeModal('reviseModal');
+    showSuccessOverlay('revise', currentPO);
+  }
+
+  function showSuccessOverlay(kind, p) {
+    const icon = document.getElementById('successIcon');
+    const title = document.getElementById('successTitle');
+    const sub = document.getElementById('successSub');
+    const sig = document.getElementById('successSig');
+    const line = document.getElementById('successLine');
+    const v = VENDORS[p.vendorId];
+
+    icon.className = 'check-circle';
+    sig.style.display = '';
+
+    if (kind === 'approved') {
+      icon.textContent = '✓';
+      title.textContent = '✅ อนุมัติ PO เรียบร้อย';
+      sub.innerHTML = `<b>${p.id}</b> · ${v.name} · <b>${formatMoney(p.grandTotal)}</b><br><span style="font-size:12px">ระบบจะแจ้ง vendor และแอดมินผ่าน LINE</span>`;
+      sig.textContent = '~ ไอซ์ ~';
+      line.style.background = '#06c755';
+      line.innerHTML = `📱 ส่ง LINE Notify แล้ว · เจนจิรา + ${v.short}`;
+    } else if (kind === 'rejected') {
+      icon.classList.add('red');
+      icon.textContent = '✕';
+      title.textContent = '❌ ตีกลับ PO แล้ว';
+      sub.innerHTML = `<b>${p.id}</b><br><span style="font-size:12px;color:var(--red)">เหตุผล: ${escHtml(p.rejectReason)}</span>`;
+      sig.style.display = 'none';
+      line.style.background = '#06c755';
+      line.innerHTML = `📱 แจ้งแอดมินผ่าน LINE แล้ว · เจนจิรา`;
+    } else {
+      icon.classList.add('yellow');
+      icon.textContent = '✎';
+      title.textContent = '✏️ ส่งกลับให้แก้';
+      sub.innerHTML = `<b>${p.id}</b><br><span style="font-size:12px;color:var(--yellow)">${escHtml(p.reviseReason)}</span>`;
+      sig.style.display = 'none';
+      line.style.background = '#06c755';
+      line.innerHTML = `📱 แจ้งเจนจิราให้แก้ไขแล้ว`;
+    }
+    document.getElementById('successOverlay').dataset.show = '1';
+  }
+  function closeSuccessOverlay() {
+    document.getElementById('successOverlay').dataset.show = '0';
+    closeDrawer();
+    renderList();
+    // try to open next pending PO
+    const next = POS.find(p => p.status === 'pending');
+    if (next) {
+      setTimeout(() => openDrawer(next.id), 250);
+    } else {
+      showToast('🎉 อนุมัติครบทุก PO แล้ว!', 'success');
+    }
+  }
+
+  // ─── Toast ───
+  function showToast(msg, kind = '') {
+    const t = document.getElementById('toast');
+    t.className = `toast ${kind}`;
+    t.textContent = msg;
+    t.dataset.show = '1';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.dataset.show = '0', 2200);
+  }
+
+  // ─── Init ───
+  renderList();
+</script>
+
+</body>
+</html>

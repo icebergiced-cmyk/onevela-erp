@@ -1,0 +1,2513 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#1f2937" />
+<title>RFQ · ขอใบเสนอราคา · วันเวลา ERP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  :root {
+    --bg: #f5f3ee; --card: #ffffff;
+    --ink: #1f2937; --ink-2: #4b5563; --ink-3: #9ca3af; --ink-4: #d1d5db;
+    --line: #e5e3dc; --line-2: #d6d3c8;
+    --primary: #1f2937; --primary-soft: #374151;
+    --accent: #b45309; --accent-soft: #fef3c7;
+    --green: #16a34a; --green-soft: #dcfce7;
+    --red: #dc2626; --red-soft: #fee2e2;
+    --yellow: #ca8a04; --yellow-soft: #fef9c3;
+    --blue: #2563eb; --blue-soft: #dbeafe;
+    --line-green: #06c755;
+    --radius: 14px; --radius-sm: 10px;
+    --shadow: 0 1px 2px rgba(17,24,39,.04), 0 8px 24px rgba(17,24,39,.06);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app {
+    max-width: 960px;
+    margin: 0 auto;
+    background: var(--bg);
+    min-height: 100vh;
+    padding-bottom: 120px;
+  }
+
+  /* ─── Header ─── */
+  .header {
+    background: var(--primary);
+    color: #fff;
+    padding: 14px 18px 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .header-brand {
+    font-size: 11px;
+    color: rgba(255,255,255,.55);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .header-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .header-title {
+    font-weight: 600;
+    font-size: 18px;
+    flex: 1;
+  }
+  .header-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,.65);
+    margin-top: 2px;
+  }
+  .me-tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,.08);
+    padding: 6px 12px 6px 6px;
+    border-radius: 24px;
+  }
+  .me-tag .avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .me-tag .name { font-size: 13px; color: #fff; }
+  .me-tag .role {
+    font-size: 10px;
+    color: rgba(255,255,255,.6);
+    display: block;
+    line-height: 1;
+    margin-top: 1px;
+  }
+
+  /* ─── Tabs ─── */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding: 14px 14px 0;
+    margin-top: 12px;
+  }
+  .tab {
+    flex: 1;
+    padding: 11px 14px 13px;
+    border-radius: 12px 12px 0 0;
+    background: rgba(255,255,255,.06);
+    color: rgba(255,255,255,.7);
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all .15s;
+  }
+  .tab:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .tab[data-on="1"] {
+    background: var(--bg);
+    color: var(--ink);
+    border-bottom-color: var(--accent);
+  }
+  .tab .badge {
+    display: inline-block;
+    background: rgba(255,255,255,.18);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 10px;
+    margin-left: 5px;
+  }
+  .tab[data-on="1"] .badge {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  /* ─── Tab content ─── */
+  .tab-pane {
+    display: none;
+    padding: 14px;
+  }
+  .tab-pane[data-on="1"] { display: block; }
+
+  /* ─── Cards ─── */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+  }
+  .card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-2);
+    text-transform: uppercase;
+    letter-spacing: .8px;
+  }
+  .card-hint {
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+
+  /* ─── PR Source Header ─── */
+  .pr-source {
+    background: linear-gradient(135deg, #fef3c7 0%, #fff7ed 100%);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    border-left: 4px solid var(--accent);
+  }
+  .pr-source-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .pr-source-no {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--ink);
+    letter-spacing: .3px;
+  }
+  .pr-source-rfq {
+    background: var(--ink);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 8px;
+    letter-spacing: 1px;
+  }
+  .pr-source-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .pr-source-meta .pill {
+    background: rgba(255,255,255,.7);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+  .pr-source-meta .pill.urgent {
+    background: var(--yellow);
+    color: #fff;
+    font-weight: 600;
+  }
+  .pr-source-meta .pill b { color: var(--ink); }
+
+  /* ─── Item list (checkable) ─── */
+  .item-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: #fdfcf9;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm);
+    margin-bottom: 6px;
+    transition: all .12s;
+  }
+  .item-row[data-on="0"] {
+    opacity: .55;
+    background: #f5f3ee;
+  }
+  .item-checkbox {
+    width: 22px; height: 22px;
+    border: 2px solid var(--line-2);
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: transparent;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: all .12s;
+  }
+  .item-row[data-on="1"] .item-checkbox {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+  }
+  .item-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .item-name {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.3;
+  }
+  .item-qty-edit {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .qty-input {
+    width: 60px;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    border-radius: 6px;
+    padding: 6px 4px;
+    font-family: inherit;
+    font-size: 14px;
+    text-align: center;
+    font-weight: 600;
+    outline: none;
+  }
+  .qty-input:focus { border-color: var(--primary); }
+  .qty-unit {
+    font-size: 12px;
+    color: var(--ink-3);
+    min-width: 30px;
+  }
+  .add-item-btn {
+    width: 100%;
+    border: 1.5px dashed var(--line-2);
+    background: transparent;
+    color: var(--primary);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+  .add-item-btn:hover { background: #fafaf7; }
+
+  /* ─── Category chips ─── */
+  .chips {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+    margin-bottom: 10px;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: 0 0 auto;
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-2);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .12s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .chip:hover { border-color: var(--ink-3); }
+  .chip[data-on="1"] {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+  .chip .count {
+    font-size: 10px;
+    background: rgba(0,0,0,.08);
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-weight: 700;
+  }
+  .chip[data-on="1"] .count { background: rgba(255,255,255,.2); }
+
+  /* ─── Vendor cards ─── */
+  .vendor-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  @media (min-width: 640px) {
+    .vendor-grid { grid-template-columns: 1fr 1fr; }
+  }
+  .vendor-card {
+    background: #fdfcf9;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    cursor: pointer;
+    transition: all .12s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .vendor-card:hover { border-color: var(--ink-3); }
+  .vendor-card[data-on="1"] {
+    border-color: var(--primary);
+    background: #fff;
+    box-shadow: 0 0 0 2px var(--primary), 0 4px 12px rgba(17,24,39,.08);
+  }
+  .vendor-check {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 22px; height: 22px;
+    border: 2px solid var(--line-2);
+    border-radius: 6px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: transparent;
+    font-size: 14px;
+    font-weight: 700;
+    transition: all .12s;
+  }
+  .vendor-card[data-on="1"] .vendor-check {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+  }
+  .vendor-head {
+    padding-right: 28px;
+  }
+  .vendor-name {
+    font-weight: 600;
+    font-size: 14.5px;
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+  .vendor-rating {
+    font-size: 12px;
+    color: var(--ink-2);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .vendor-rating .last {
+    color: var(--ink-3);
+    margin-left: 6px;
+  }
+  .vendor-cats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .vendor-cat {
+    font-size: 10px;
+    background: #f5f3ee;
+    color: var(--ink-2);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+  .vendor-foot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--ink-3);
+    padding-top: 4px;
+    border-top: 1px dashed var(--line);
+  }
+  .vendor-channels {
+    display: inline-flex;
+    gap: 4px;
+    margin-left: auto;
+  }
+  .channel-ico {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+  }
+  .channel-ico.line { background: #dcfce7; color: var(--line-green); font-weight: 700; }
+  .channel-ico.phone { background: #dbeafe; color: var(--blue); }
+  .channel-ico.dim { background: #f3f4f6; color: var(--ink-3); }
+
+  /* ─── Form fields ─── */
+  .field { margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
+  .label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-2);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .label .req { color: var(--red); }
+  .input, .textarea, .select {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    background: #fdfcf9;
+    border-radius: var(--radius-sm);
+    padding: 11px 13px;
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s, background .15s;
+  }
+  .input:focus, .textarea:focus, .select:focus {
+    border-color: var(--primary);
+    background: #fff;
+  }
+  .textarea {
+    resize: vertical;
+    min-height: 70px;
+  }
+  .select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234b5563' stroke-width='2.5'%3e%3cpolyline points='6 9 12 15 18 9'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+  }
+
+  /* ─── Bottom bar ─── */
+  .bottombar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255,255,255,.95);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--line);
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    z-index: 20;
+  }
+  .bottombar-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity .15s, background .15s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn:active { opacity: .85; }
+  .btn-secondary {
+    background: #efece4;
+    color: var(--ink);
+  }
+  .btn-secondary:hover { background: #e7e3d9; }
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--primary-soft); }
+  .btn-primary[disabled] {
+    background: var(--ink-3);
+    cursor: not-allowed;
+  }
+  .btn-line {
+    background: var(--line-green);
+    color: #fff;
+  }
+  .btn-line:hover { background: #05a847; }
+  .btn-line[disabled] {
+    background: var(--ink-3);
+    cursor: not-allowed;
+  }
+  .btn-accent {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-accent:hover { background: #92400e; }
+  .btn-ghost {
+    background: #fff;
+    color: var(--ink);
+    border: 1.5px solid var(--line);
+  }
+  .btn-ghost:hover { border-color: var(--ink-3); }
+
+  /* ─── Modal ─── */
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(17,24,39,.6);
+    z-index: 80;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+  }
+  @media (min-width: 640px) {
+    .modal { align-items: center; padding: 20px; }
+  }
+  .modal[data-show="1"] {
+    display: flex;
+    animation: fadeIn .25s;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .modal-inner {
+    background: #fff;
+    border-radius: 22px 22px 0 0;
+    width: 100%;
+    max-width: 520px;
+    max-height: 92vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp .25s cubic-bezier(.2,.8,.2,1);
+  }
+  @media (min-width: 640px) {
+    .modal-inner { border-radius: 16px; max-height: 86vh; }
+  }
+  @keyframes slideUp {
+    from { transform: translateY(40px); }
+    to { transform: translateY(0); }
+  }
+  .modal-head {
+    padding: 14px 18px;
+    background: var(--primary);
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-head .title { font-weight: 600; font-size: 16px; }
+  .modal-close {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.1);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+  }
+  .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 18px;
+  }
+  .modal-foot {
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--line);
+    background: #fff;
+    display: flex;
+    gap: 8px;
+  }
+  .modal-foot .btn { flex: 1; }
+
+  /* ─── Toast ─── */
+  .toast {
+    position: fixed;
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 200;
+    box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    opacity: 0;
+    transition: all .25s;
+    pointer-events: none;
+    white-space: nowrap;
+    max-width: 90vw;
+  }
+  .toast[data-show="1"] {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .toast.success { background: var(--green); }
+  .toast.error { background: var(--red); }
+  .toast.line { background: var(--line-green); }
+
+  /* ─── Demo badge ─── */
+  .demo-badge {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,.6);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    z-index: 999;
+  }
+
+  /* ─── Doc modal (RFQ preview) ─── */
+  .doc-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.75);
+    z-index: 90;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .doc-modal[data-show="1"] { display: flex; animation: fadeIn .2s; }
+  .doc-modal-inner {
+    background: #fff;
+    border-radius: 16px;
+    max-width: 700px;
+    width: 100%;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .doc-modal-head {
+    padding: 14px 16px;
+    background: var(--primary);
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .doc-modal-head .title { font-weight: 600; font-size: 16px; }
+  .doc-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    background: #e5e3dc;
+    padding: 16px;
+  }
+  .doc-modal-actions {
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    background: #fff;
+    border-top: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+
+  /* ─── RFQ printable doc ─── */
+  .rfq-doc {
+    background: #fff;
+    color: #111;
+    font-family: 'Sarabun', sans-serif;
+    width: 100%;
+    max-width: 100%;
+    padding: 18px 16px;
+    margin: 0 auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    font-size: 12px;
+  }
+  .rfq-doc.pdf-mode {
+    width: 210mm;
+    max-width: 210mm;
+    padding: 16mm 14mm;
+    box-shadow: none;
+    font-size: 13px;
+  }
+  .rfq-doc * { box-sizing: border-box; }
+  .rfq-doc-header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 3px double #111;
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+  }
+  .rfq-doc-header .brand { flex: 1; }
+  .rfq-doc-header .logo {
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: #666;
+    font-weight: 300;
+    margin-bottom: 2px;
+  }
+  .rfq-doc-header .company {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111;
+    line-height: 1.2;
+  }
+  .rfq-doc-header .company-sub {
+    font-size: 11px;
+    color: #555;
+    margin-top: 3px;
+    line-height: 1.4;
+  }
+  .rfq-doc-header .title-block {
+    text-align: right;
+    min-width: 200px;
+  }
+  .rfq-doc-header .title-th {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111;
+    line-height: 1;
+  }
+  .rfq-doc-header .title-en {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: #666;
+    margin-top: 3px;
+  }
+  .rfq-doc-header .doc-no {
+    margin-top: 10px;
+    border: 2px solid #111;
+    padding: 4px 10px;
+    display: inline-block;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
+  .rfq-doc-vendor {
+    background: #fafaf7;
+    border-left: 3px solid var(--accent);
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    font-size: 13px;
+  }
+  .rfq-doc-vendor .row-l { color: #666; font-size: 11px; }
+  .rfq-doc-vendor .row-v { font-weight: 600; font-size: 14px; color: #111; }
+  .rfq-doc-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 24px;
+    margin-bottom: 14px;
+    font-size: 12.5px;
+  }
+  .rfq-doc-meta .meta-row {
+    padding: 4px 0;
+    border-bottom: 1px dotted #ccc;
+  }
+  .rfq-doc-meta .meta-row span {
+    color: #666;
+    font-weight: 500;
+    margin-right: 6px;
+    display: inline-block;
+    min-width: 100px;
+  }
+  .rfq-doc-meta .meta-row b { color: #111; font-weight: 600; }
+  .rfq-doc-items {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 14px;
+    font-size: 12px;
+  }
+  .rfq-doc-items th {
+    background: #1f2937;
+    color: #fff;
+    padding: 7px 6px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+  }
+  .rfq-doc-items th.num { text-align: right; }
+  .rfq-doc-items th.unit { text-align: center; width: 60px; }
+  .rfq-doc-items th.price { text-align: right; width: 90px; }
+  .rfq-doc-items td {
+    padding: 7px 6px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: middle;
+  }
+  .rfq-doc-items td.idx { text-align: center; color: #666; width: 28px; }
+  .rfq-doc-items td.num { text-align: right; font-weight: 600; }
+  .rfq-doc-items td.unit { text-align: center; color: #555; }
+  .rfq-doc-items td.price {
+    text-align: right;
+    color: #999;
+    border-left: 1px dashed #ccc;
+    background: #fafaf7;
+  }
+  .rfq-doc-items tr:nth-child(even) td:not(.price) { background: #fafaf7; }
+  .rfq-doc-note {
+    background: #fafaf7;
+    border-left: 3px solid #1f2937;
+    padding: 10px 12px;
+    margin-bottom: 18px;
+    font-size: 12px;
+    min-height: 50px;
+  }
+  .rfq-doc-note b {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 11px;
+    color: #666;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .rfq-doc-instructions {
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    font-size: 11.5px;
+    color: #92400e;
+    line-height: 1.5;
+  }
+  .rfq-doc-instructions b { color: #78350f; }
+  .rfq-doc-signs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 32px;
+    margin-bottom: 14px;
+    font-size: 11.5px;
+    text-align: center;
+  }
+  .rfq-doc-signs .sign-box {
+    border-top: 1px solid #999;
+    padding-top: 6px;
+    margin-top: 40px;
+  }
+  .rfq-doc-signs .sign-name { color: #555; }
+  .rfq-doc-signs .sign-role {
+    font-weight: 600;
+    color: #111;
+    margin-top: 2px;
+  }
+  .rfq-doc-footer {
+    border-top: 1px solid #ddd;
+    padding-top: 8px;
+    font-size: 10px;
+    color: #999;
+    text-align: center;
+    letter-spacing: .5px;
+  }
+  #rfqDocStage {
+    position: fixed;
+    top: -10000px;
+    left: 0;
+  }
+
+  /* ─── Send progress (LINE modal) ─── */
+  .send-progress-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: #fafaf7;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    font-size: 13px;
+  }
+  .send-progress-row .v-name {
+    flex: 1;
+    font-weight: 500;
+  }
+  .send-progress-row .v-chan {
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+  .send-progress-row .v-stat {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+  .send-progress-row .v-stat.waiting { background: #fef9c3; color: var(--yellow); }
+  .send-progress-row .v-stat.sending { background: #dbeafe; color: var(--blue); }
+  .send-progress-row .v-stat.sent { background: var(--green-soft); color: var(--green); }
+  .send-progress-row .v-stat.fallback { background: #fef3c7; color: var(--accent); }
+
+  /* ─── Success card ─── */
+  .success-card {
+    background: linear-gradient(135deg, #dcfce7 0%, #f0fdf4 100%);
+    border: 1px solid #86efac;
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .success-card .icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--green);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+  .success-card .title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .success-card .rfq-no {
+    font-size: 13px;
+    color: var(--ink-2);
+    margin-bottom: 12px;
+  }
+  .success-card .rfq-no b {
+    background: #fff;
+    padding: 3px 10px;
+    border-radius: 6px;
+    margin-left: 4px;
+    letter-spacing: 1px;
+  }
+  .success-vendors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+  .success-vendor {
+    background: #fff;
+    border: 1px solid #86efac;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--green);
+    font-weight: 600;
+  }
+
+  /* ─── Price matrix table ─── */
+  .matrix-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .matrix {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    min-width: 700px;
+    font-size: 13px;
+  }
+  .matrix th, .matrix td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+  }
+  .matrix thead th {
+    background: #fafaf7;
+    font-weight: 600;
+    color: var(--ink-2);
+    font-size: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  .matrix th.item-col {
+    position: sticky;
+    left: 0;
+    background: #fafaf7;
+    z-index: 3;
+    min-width: 200px;
+    border-right: 1px solid var(--line);
+  }
+  .matrix td.item-col {
+    position: sticky;
+    left: 0;
+    background: #fff;
+    z-index: 1;
+    border-right: 1px solid var(--line);
+    font-weight: 500;
+  }
+  .matrix tr:nth-child(even) td.item-col { background: #fdfcf9; }
+  .matrix tr:nth-child(even) td { background: #fdfcf9; }
+  .matrix th.vendor-col {
+    min-width: 160px;
+    background: #fafaf7;
+    border-left: 1px solid var(--line);
+    padding: 10px 10px;
+  }
+  .matrix td.vendor-cell {
+    border-left: 1px solid var(--line);
+    padding: 4px 6px;
+  }
+  .matrix td.status-col {
+    text-align: center;
+    border-left: 1px solid var(--line);
+    background: #fafaf7;
+  }
+  .matrix tr.total-row {
+    font-weight: 700;
+    background: #f5f3ee;
+  }
+  .matrix tr.total-row td {
+    border-top: 2px solid var(--ink);
+    background: #f5f3ee !important;
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .matrix .item-name {
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+  .matrix .item-qty {
+    font-size: 11px;
+    color: var(--ink-3);
+    margin-top: 2px;
+  }
+  .matrix .vendor-name {
+    font-weight: 600;
+    color: var(--ink);
+    font-size: 13px;
+    line-height: 1.2;
+  }
+  .matrix .vendor-meta {
+    font-size: 10px;
+    color: var(--ink-3);
+    margin-top: 2px;
+    font-weight: 400;
+  }
+  .vendor-tools {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+  .vendor-tool {
+    font-size: 10px;
+    background: #fff;
+    border: 1px solid var(--line);
+    color: var(--ink-2);
+    padding: 3px 6px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .vendor-tool:hover { border-color: var(--primary); color: var(--ink); }
+  .vendor-date-input {
+    font-size: 10px;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 5px;
+    padding: 3px 6px;
+    font-family: inherit;
+    width: 100%;
+    margin-top: 4px;
+    color: var(--ink-2);
+  }
+  .vendor-status {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 5px;
+    margin-top: 4px;
+    display: inline-block;
+  }
+  .vendor-status.pending { background: var(--yellow-soft); color: var(--yellow); }
+  .vendor-status.full { background: var(--green-soft); color: var(--green); }
+  .vendor-status.skip { background: #f3f4f6; color: var(--ink-3); }
+  .price-input {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    background: #fdfcf9;
+    border-radius: 6px;
+    padding: 7px 8px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: right;
+    outline: none;
+    color: var(--ink);
+    transition: all .12s;
+  }
+  .price-input:focus {
+    border-color: var(--primary);
+    background: #fff;
+  }
+  .price-input.best {
+    background: var(--green-soft);
+    border-color: var(--green);
+    color: var(--green);
+    font-weight: 700;
+  }
+  .price-input.skip {
+    background: #f3f4f6;
+    color: var(--ink-3);
+    border-style: dashed;
+  }
+  .price-cell-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .price-line-total {
+    font-size: 10px;
+    color: var(--ink-3);
+    text-align: right;
+  }
+  .price-line-total.best { color: var(--green); font-weight: 700; }
+  .skip-toggle {
+    font-size: 10px;
+    color: var(--ink-3);
+    cursor: pointer;
+    text-align: right;
+    text-decoration: underline;
+  }
+  .skip-toggle:hover { color: var(--red); }
+  .best-vendor-badge {
+    background: var(--green-soft);
+    color: var(--green);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 4px;
+  }
+
+  /* status dot row at top of price matrix */
+  .rfq-summary {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .rfq-summary .info { display: flex; flex-direction: column; gap: 2px; }
+  .rfq-summary .id {
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: .3px;
+  }
+  .rfq-summary .sub {
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+  .rfq-summary .progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .rfq-progress-pill {
+    background: var(--primary);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .rfq-progress-pill.complete { background: var(--green); }
+
+  /* PR selector */
+  .rfq-selector {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .rfq-selector .label {
+    margin-bottom: 0;
+    white-space: nowrap;
+    font-size: 13px;
+  }
+  .rfq-selector select.select {
+    flex: 1;
+    background-color: #fdfcf9;
+  }
+
+  /* ─── Mobile: stack matrix into per-vendor cards ─── */
+  @media (max-width: 720px) {
+    .matrix-wrap.mobile-stack { display: none; }
+    .matrix-mobile { display: block; }
+  }
+  @media (min-width: 721px) {
+    .matrix-mobile { display: none; }
+  }
+  .matrix-mobile {
+    display: none;
+  }
+  .matrix-mobile-vendor {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .matrix-mobile-vendor-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  .matrix-mobile-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  .matrix-mobile-item:last-child { border-bottom: none; }
+  .matrix-mobile-item .name { flex: 1; font-size: 13px; }
+  .matrix-mobile-item .qty { font-size: 11px; color: var(--ink-3); }
+  .matrix-mobile-item .price-input { width: 110px; }
+  .matrix-mobile-foot {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+  }
+
+  /* ─── Print stylesheet ─── */
+  @media print {
+    .header, .tabs, .bottombar, .demo-badge, .modal, .toast, .doc-modal { display: none !important; }
+    .app { padding-bottom: 0; max-width: 100%; }
+    .card, .pr-source { box-shadow: none; border: 1px solid #ddd; }
+    body { background: #fff; }
+    #rfqDocStage {
+      position: static !important;
+      top: 0 !important;
+    }
+    #rfqDocStage .rfq-doc {
+      box-shadow: none !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-brand">WANWELA · TWO BUILD</div>
+    <div class="header-row">
+      <div style="flex:1">
+        <div class="header-title">📨 ขอใบเสนอราคา (RFQ)</div>
+        <div class="header-sub">ส่ง vendor เก็บราคา · เปรียบเทียบก่อนออก PO</div>
+      </div>
+      <div class="me-tag">
+        <div class="avatar">จน</div>
+        <div>
+          <div class="name">เจนจิรา</div>
+          <div class="role">แอดมินจัดซื้อ</div>
+        </div>
+      </div>
+    </div>
+    <div class="tabs">
+      <div class="tab" data-on="1" data-tab="send" onclick="switchTab('send')">📨 ส่งใบขอราคา</div>
+      <div class="tab" data-tab="quotes" onclick="switchTab('quotes')">📥 กรอกราคา <span class="badge" id="tabQuoteBadge">รอ</span></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ TAB 1: SEND RFQ ═══════════════ -->
+  <div class="tab-pane" data-on="1" data-tab="send">
+
+    <!-- Success state (hidden by default) -->
+    <div id="sendSuccess" style="display:none">
+      <div class="success-card">
+        <div class="icon">✓</div>
+        <div class="title">ส่ง RFQ เรียบร้อย</div>
+        <div class="rfq-no">เลข RFQ <b id="successRfqNo">RFQ-2026-0015</b></div>
+        <div class="success-vendors" id="successVendors"></div>
+        <button class="btn btn-primary" onclick="goToQuotesTab()" style="padding:11px 22px">
+          ไปแท็บกรอกราคา →
+        </button>
+        <div style="margin-top:10px">
+          <span class="btn btn-ghost" style="font-size:12px;padding:6px 12px;cursor:pointer" onclick="resetSendForm()">↩ เริ่มใหม่</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Send form -->
+    <div id="sendForm">
+
+      <!-- PR Source -->
+      <div class="pr-source">
+        <div class="pr-source-head">
+          <span class="pr-source-no">📋 ที่มา: PR-2026-0042</span>
+          <span class="pr-source-rfq" id="rfqNoLabel">RFQ-2026-0015</span>
+        </div>
+        <div class="pr-source-meta">
+          <span class="pill urgent">🟡 ด่วน</span>
+          <span class="pill">👷 <b>สมชาย เกตุแก้ว</b> · ทีมโก้</span>
+          <span class="pill">📍 <b>แปลง 1 (89/1)</b> · A ULTRA</span>
+          <span class="pill">📅 ต้องการ <b>28 พ.ค. 2569</b></span>
+          <span class="pill">📦 <b id="prItemCount">4</b> รายการ</span>
+        </div>
+      </div>
+
+      <!-- Items -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">📋 รายการที่ขอราคา <span id="itemSelectedCount" style="color:var(--ink-3);font-weight:400;text-transform:none;letter-spacing:0">(4 จาก 4)</span></div>
+          <div class="card-hint">แตะเพื่อรวม/ไม่รวม</div>
+        </div>
+        <div id="itemList"></div>
+        <button class="add-item-btn" onclick="openCreateItem()">＋ เพิ่มรายการอื่นเข้า RFQ</button>
+      </div>
+
+      <!-- Vendor selection -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">🏪 เลือก Vendor <span id="vendorSelectedCount" style="color:var(--ink-3);font-weight:400;text-transform:none;letter-spacing:0">(0 เจ้า)</span></div>
+          <div class="card-hint">เลือก 2-5 เจ้าเทียบราคา</div>
+        </div>
+        <div class="chips" id="catChips"></div>
+        <div class="vendor-grid" id="vendorGrid"></div>
+        <button class="add-item-btn" onclick="openCreateVendor()" style="margin-top:10px">＋ เพิ่ม Vendor ใหม่</button>
+      </div>
+
+      <!-- Settings -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">⚙️ การส่ง</div>
+        </div>
+        <div class="field">
+          <div class="label">📅 รับใบเสนอราคาภายใน</div>
+          <input type="date" class="input" id="dueDate">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <div class="label">📝 หมายเหตุถึง vendor</div>
+          <textarea class="textarea" id="vendorNote" placeholder="เช่น ราคารวมส่งถึงไซต์งาน, เงื่อนไขชำระ 30 วัน, รบกวนยืนยันสต๊อกด้วยครับ...">ราคารวมส่งถึงไซต์งาน โครงการวันเวลา (ชลบุรี) · เครดิต 30 วัน · กรุณายืนยันสต๊อกพร้อมราคาด้วยครับ ขอบคุณครับ</textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom bar (Tab 1) -->
+    <div class="bottombar" id="sendBar">
+      <div class="bottombar-inner">
+        <button class="btn btn-ghost" onclick="openDocPreview()">📄 ดูตัวอย่าง</button>
+        <button class="btn btn-secondary" onclick="downloadPDF()">💾 PDF</button>
+        <button class="btn btn-secondary" onclick="printRFQ()">🖨️ พิมพ์</button>
+        <button class="btn btn-line" id="sendLineBtn" onclick="openSendLine()" style="flex:1;min-width:140px" disabled>
+          📱 ส่งทาง LINE
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ TAB 2: ENTER QUOTES ═══════════════ -->
+  <div class="tab-pane" data-tab="quotes">
+
+    <!-- RFQ selector -->
+    <div class="rfq-selector">
+      <div class="label">เลือก RFQ:</div>
+      <select class="select" id="rfqSelector" onchange="loadSelectedRFQ()">
+        <option value="RFQ-2026-0015">RFQ-2026-0015 · PR-2026-0042 (ปูน+เหล็ก+ทราย)</option>
+        <option value="RFQ-2026-0014">RFQ-2026-0014 · PR-2026-0038 (กระเบื้อง)</option>
+        <option value="RFQ-2026-0013">RFQ-2026-0013 · PR-2026-0037 (สุขภัณฑ์)</option>
+      </select>
+    </div>
+
+    <!-- RFQ summary -->
+    <div class="rfq-summary">
+      <div class="info">
+        <span class="id" id="quoteRfqId">RFQ-2026-0015</span>
+        <span class="sub" id="quoteRfqSub">ส่ง 25 พ.ค. 2569 · 0 vendor · กำหนดรับ 27 พ.ค.</span>
+      </div>
+      <div class="progress">
+        <span class="rfq-progress-pill" id="quoteProgress">0/0 ครบ</span>
+      </div>
+    </div>
+
+    <!-- Matrix (desktop) -->
+    <div class="matrix-wrap mobile-stack" id="matrixWrap">
+      <table class="matrix" id="matrix">
+        <thead id="matrixHead"></thead>
+        <tbody id="matrixBody"></tbody>
+        <tfoot id="matrixFoot"></tfoot>
+      </table>
+    </div>
+
+    <!-- Matrix (mobile) -->
+    <div class="matrix-mobile" id="matrixMobile"></div>
+
+    <div class="bottombar">
+      <div class="bottombar-inner">
+        <button class="btn btn-secondary" onclick="saveDraft()" style="flex:1;min-width:120px">💾 บันทึกร่าง</button>
+        <button class="btn btn-primary" id="goCompareBtn" onclick="goCompare()" style="flex:2;min-width:200px" disabled>
+          → ไปเทียบราคา / ออก PO (#4)
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: Create Vendor ═══════════════ -->
+<div class="modal" id="vendorModal">
+  <div class="modal-inner" style="max-width:480px">
+    <div class="modal-head">
+      <div class="title">＋ เพิ่ม Vendor ใหม่</div>
+      <div class="modal-close" onclick="closeModal('vendorModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:12px;color:var(--ink-3);margin-bottom:12px">เพิ่มเข้า Master · ใช้ได้กับ RFQ ทุกใบในอนาคต</div>
+      <div class="field">
+        <div class="label">ชื่อร้าน/บริษัท <span class="req">*</span></div>
+        <input type="text" class="input" id="newVendorName" placeholder="เช่น ร้านวัสดุพี่ตู่">
+      </div>
+      <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <div class="label">ผู้ติดต่อ</div>
+          <input type="text" class="input" id="newVendorContact" placeholder="คุณ...">
+        </div>
+        <div>
+          <div class="label">เบอร์โทร</div>
+          <input type="text" class="input" id="newVendorPhone" placeholder="081-xxx-xxxx">
+        </div>
+      </div>
+      <div class="field">
+        <div class="label">LINE ID <span style="color:var(--ink-3);font-weight:400;font-size:11px">(ไม่บังคับ)</span></div>
+        <input type="text" class="input" id="newVendorLine" placeholder="@vendor หรือ ID">
+      </div>
+      <div class="field">
+        <div class="label">หมวดที่ขาย <span class="req">*</span></div>
+        <input type="text" class="input" id="newVendorCats" placeholder="เช่น ปูน, เหล็ก, สี · คั่นด้วย ,">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('vendorModal')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveNewVendor()">＋ สร้างและเลือก</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: Create Item ═══════════════ -->
+<div class="modal" id="itemModal">
+  <div class="modal-inner" style="max-width:480px">
+    <div class="modal-head">
+      <div class="title">＋ เพิ่มรายการเข้า RFQ</div>
+      <div class="modal-close" onclick="closeModal('itemModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:12px;color:var(--ink-3);margin-bottom:12px">เพิ่มรายการนอก PR เข้า RFQ ฉบับนี้ (จะถูกบันทึกเข้า Master วัสดุด้วย)</div>
+      <div class="field">
+        <div class="label">ชื่อสินค้า <span class="req">*</span></div>
+        <input type="text" class="input" id="newItemName" placeholder="เช่น สีน้ำพลาสติก TOA Supershield ขาว 18.925L">
+      </div>
+      <div class="field" style="display:grid;grid-template-columns:2fr 1fr;gap:8px">
+        <div>
+          <div class="label">จำนวน <span class="req">*</span></div>
+          <input type="number" class="input" id="newItemQty" placeholder="เช่น 100">
+        </div>
+        <div>
+          <div class="label">หน่วย <span class="req">*</span></div>
+          <input type="text" class="input" id="newItemUnit" placeholder="ถุง">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('itemModal')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveNewItem()">＋ เพิ่ม</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: Send via LINE ═══════════════ -->
+<div class="modal" id="lineModal">
+  <div class="modal-inner" style="max-width:520px">
+    <div class="modal-head">
+      <div class="title">📱 ส่ง RFQ ทาง LINE</div>
+      <div class="modal-close" onclick="closeModal('lineModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div style="background:#dcfce7;border-left:3px solid var(--line-green);padding:10px 12px;border-radius:8px;font-size:12px;margin-bottom:14px;color:#14532d">
+        <b>ข้อความตัวอย่างที่จะส่งให้ vendor:</b><br>
+        <div style="background:#fff;padding:8px 10px;border-radius:6px;margin-top:6px;color:var(--ink);font-size:12.5px;white-space:pre-line" id="lineMsgPreview"></div>
+      </div>
+      <div style="font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:6px">
+        Vendor ที่จะส่ง <span id="lineVendorCount">0</span> เจ้า:
+      </div>
+      <div id="lineVendorList"></div>
+      <div style="font-size:11px;color:var(--ink-3);margin-top:10px;line-height:1.5">
+        💡 vendor ที่ไม่มี LINE จะถูกบันทึกให้โทรไปขอเอง (จะมีรายการแยกใน "งานต้องโทร")
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="closeModal('lineModal')">ยกเลิก</button>
+      <button class="btn btn-line" id="sendAllBtn" onclick="sendAllLine()">🚀 ส่งทุกคนพร้อมกัน</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ DOC PREVIEW MODAL ═══════════════ -->
+<div class="doc-modal" id="docModal">
+  <div class="doc-modal-inner">
+    <div class="doc-modal-head">
+      <div class="title">📄 ตัวอย่าง RFQ · A4</div>
+      <div class="modal-close" onclick="closeDocPreview()">✕</div>
+    </div>
+    <div class="doc-modal-body" id="docModalBody"></div>
+    <div class="doc-modal-actions">
+      <button class="btn btn-secondary" onclick="closeDocPreview()">ปิด</button>
+      <button class="btn btn-secondary" onclick="printRFQ()">🖨️ พิมพ์</button>
+      <button class="btn btn-primary" onclick="downloadPDF()">💾 PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden A4 stage for PDF generation -->
+<div id="rfqDocStage"></div>
+
+<!-- Toast -->
+<div class="toast" id="toast">—</div>
+
+<div class="demo-badge">DEMO · P0 · #3</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   STATE & MOCK DATA
+   ════════════════════════════════════════════════════════════════ */
+
+const RFQ_NO = 'RFQ-2026-0015';
+const TODAY = new Date(2026, 4, 25);
+
+const SOURCE_PR = {
+  id: 'PR-2026-0042',
+  requester: 'สมชาย เกตุแก้ว', team: 'โก้', urgency: 'urgent',
+  target: 'แปลง 1 (89/1)', typeShort: 'A ULTRA', needDate: '28 พ.ค. 2569',
+  items: [
+    { id: 'i1', name: 'ปูนซีเมนต์ TPI ปอร์ตแลนด์ 50 กก.', qty: 100, unit: 'ถุง', cat: 'ปูน' },
+    { id: 'i2', name: 'เหล็กข้ออ้อย DB12', qty: 50, unit: 'เส้น', cat: 'เหล็ก' },
+    { id: 'i3', name: 'ทรายหยาบ', qty: 8, unit: 'คิว', cat: 'ทราย' },
+    { id: 'i4', name: 'ลวดผูกเหล็ก', qty: 5, unit: 'กก.', cat: 'เหล็ก' },
+  ],
+};
+
+// vendors (localStorage backed)
+const VENDOR_SEED = [
+  { id: 'v1', name: 'SCG Home Solution', contact: 'คุณเจ้าตี๋', phone: '081-xxx-1234', line: '@scghome', cats: ['ปูน','เหล็ก','หลังคา'], rating: 4.8, lastOrderDays: 3 },
+  { id: 'v2', name: 'HomePro (สาขาชลบุรี)', contact: 'คุณนก', phone: '038-xxx-5678', line: '@homeproCB', cats: ['สี','ไฟฟ้า','สุขภัณฑ์','กระเบื้อง'], rating: 4.5, lastOrderDays: 7 },
+  { id: 'v3', name: 'Global House', contact: 'คุณอุ๊', phone: '038-xxx-9012', line: '', cats: ['ปูน','เหล็ก','อิฐ'], rating: 4.6, lastOrderDays: 1 },
+  { id: 'v4', name: 'Mega Home', contact: 'คุณเอ', phone: '081-xxx-3456', line: '@megahome', cats: ['ทุกหมวด'], rating: 4.3, lastOrderDays: 14 },
+  { id: 'v5', name: 'Thai Watsadu', contact: 'คุณบอย', phone: '038-xxx-7890', line: '@thaiwatsadu', cats: ['เหล็ก','สี','ไฟฟ้า'], rating: 4.2, lastOrderDays: 21 },
+  { id: 'v6', name: 'TPI โรงงานตรง', contact: 'คุณนิด (ฝ่ายขาย)', phone: '02-xxx-1111', line: '', cats: ['ปูน'], rating: 4.9, lastOrderDays: 5 },
+  { id: 'v7', name: 'ร้านอุดมศักดิ์', contact: 'เถ้าแก่อุดม', phone: '081-xxx-2468', line: '@udomsak', cats: ['ทุกหมวด','ส่งฟรี <50km'], rating: 4.7, lastOrderDays: 2 },
+  { id: 'v8', name: 'ร้านวัสดุท้องถิ่น', contact: 'เถ้าแก่สมพร', phone: '038-xxx-1357', line: '', cats: ['ปูน','ทราย','หิน'], rating: 4.0, lastOrderDays: 30 },
+  { id: 'v9', name: 'Jorakay (Sika ตัวแทน)', contact: 'คุณเปิ้ล', phone: '02-xxx-2222', line: '@jorakay', cats: ['เคมีก่อสร้าง','สี'], rating: 4.6, lastOrderDays: 45 },
+  { id: 'v10', name: 'Index Living Mall', contact: 'คุณเก๋', phone: '02-xxx-3333', line: '@index', cats: ['สุขภัณฑ์','กระเบื้อง'], rating: 4.4, lastOrderDays: 60 },
+];
+
+const LS_KEYS = { vendors: 'wanwela_vendors_v1', sent: 'wanwela_sent_v1' };
+
+function loadVendors() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(LS_KEYS.vendors) || 'null');
+    if (Array.isArray(stored) && stored.length > 0) return stored;
+  } catch(_) {}
+  return VENDOR_SEED;
+}
+function saveVendors(v) { try { localStorage.setItem(LS_KEYS.vendors, JSON.stringify(v)); } catch(_) {} }
+
+let VENDORS = loadVendors();
+
+// historical price hints for "ใช้ค่าเดิม"
+const PRICE_HIST = {
+  v1: { i1: 165, i2: 280, i3: 380, i4: 95 },
+  v2: { i1: 168, i2: 285, i4: 90 },
+  v3: { i1: 162, i2: 275, i3: 370, i4: 92 },
+  v6: { i1: 158, i2: null, i3: null, i4: null },
+  v7: { i1: 160, i2: 278, i3: 365, i4: 88 },
+};
+
+/* ───── App state ───── */
+const state = {
+  tab: 'send',
+  items: SOURCE_PR.items.map(i => ({ ...i, on: true })),
+  selectedVendors: new Set(),
+  catFilter: 'ทั้งหมด',
+  dueDate: addDays(TODAY, 2),
+  vendorNote: '',
+  sentAt: null,
+  sentVendors: [],
+  // Tab 2 prices: prices[itemId][vendorId] = { value, skip }
+  prices: {},
+  vendorDates: {},
+  vendorStatus: {}, // pending | full | skip
+  draft: false,
+};
+
+function addDays(d, n) {
+  const x = new Date(d.getTime());
+  x.setDate(x.getDate() + n);
+  return x;
+}
+function formatDate(d) {
+  return d.toISOString().slice(0, 10);
+}
+function formatThaiDate(d) {
+  const months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear() + 543}`;
+}
+function fmtBaht(n) {
+  if (n == null || isNaN(n) || n === '') return '—';
+  return '฿' + Number(n).toLocaleString('th-TH', { maximumFractionDigits: 2 });
+}
+
+/* ════════════════════════════════════════════════════════════════
+   TAB SWITCHING
+   ════════════════════════════════════════════════════════════════ */
+function switchTab(t) {
+  state.tab = t;
+  document.querySelectorAll('.tab').forEach(el => {
+    el.dataset.on = (el.dataset.tab === t) ? '1' : '0';
+  });
+  document.querySelectorAll('.tab-pane').forEach(el => {
+    el.dataset.on = (el.dataset.tab === t) ? '1' : '0';
+  });
+  if (t === 'quotes') renderMatrix();
+}
+
+function goToQuotesTab() {
+  switchTab('quotes');
+}
+
+/* ════════════════════════════════════════════════════════════════
+   TAB 1: SEND RFQ — Items
+   ════════════════════════════════════════════════════════════════ */
+
+function renderItems() {
+  const c = document.getElementById('itemList');
+  c.innerHTML = '';
+  state.items.forEach((it, idx) => {
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.dataset.on = it.on ? '1' : '0';
+    row.innerHTML = `
+      <div class="item-checkbox">✓</div>
+      <div class="item-info">
+        <div class="item-name">${it.name}</div>
+      </div>
+      <div class="item-qty-edit">
+        <input type="number" class="qty-input" value="${it.qty}" min="0" data-idx="${idx}">
+        <span class="qty-unit">${it.unit}</span>
+      </div>
+    `;
+    row.querySelector('.item-checkbox').onclick = (e) => {
+      e.stopPropagation();
+      it.on = !it.on;
+      renderItems();
+    };
+    row.onclick = () => {
+      it.on = !it.on;
+      renderItems();
+    };
+    row.querySelector('.qty-input').onclick = (e) => e.stopPropagation();
+    row.querySelector('.qty-input').oninput = (e) => {
+      it.qty = parseFloat(e.target.value) || 0;
+    };
+    c.appendChild(row);
+  });
+  const sel = state.items.filter(i => i.on).length;
+  document.getElementById('itemSelectedCount').textContent = `(${sel} จาก ${state.items.length})`;
+  document.getElementById('prItemCount').textContent = state.items.length;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   TAB 1: SEND RFQ — Categories & Vendors
+   ════════════════════════════════════════════════════════════════ */
+
+const CATS = ['ทั้งหมด','ปูน','เหล็ก','ทราย','สี','ไฟฟ้า','สุขภัณฑ์','กระเบื้อง','ครบทุกหมวด'];
+
+function renderCatChips() {
+  const c = document.getElementById('catChips');
+  c.innerHTML = '';
+  CATS.forEach(cat => {
+    const count = (cat === 'ทั้งหมด')
+      ? VENDORS.length
+      : VENDORS.filter(v => vendorMatchesCat(v, cat)).length;
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.dataset.on = (cat === state.catFilter) ? '1' : '0';
+    chip.innerHTML = `${cat}<span class="count">${count}</span>`;
+    chip.onclick = () => {
+      state.catFilter = cat;
+      renderCatChips();
+      renderVendors();
+    };
+    c.appendChild(chip);
+  });
+}
+
+function vendorMatchesCat(v, cat) {
+  if (cat === 'ทั้งหมด') return true;
+  if (cat === 'ครบทุกหมวด') return v.cats.some(c => c === 'ทุกหมวด');
+  return v.cats.some(c => c.includes(cat)) || v.cats.includes('ทุกหมวด');
+}
+
+function renderVendors() {
+  const grid = document.getElementById('vendorGrid');
+  grid.innerHTML = '';
+  const filtered = VENDORS.filter(v => vendorMatchesCat(v, state.catFilter));
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--ink-3);font-size:13px">ไม่มี vendor ตรงกับหมวดนี้</div>`;
+  }
+  filtered.forEach(v => {
+    const isOn = state.selectedVendors.has(v.id);
+    const card = document.createElement('div');
+    card.className = 'vendor-card';
+    card.dataset.on = isOn ? '1' : '0';
+    const lastTxt = v.lastOrderDays <= 7 ? `🕐 ใช้ล่าสุด ${v.lastOrderDays} วันก่อน`
+                   : v.lastOrderDays <= 30 ? `🕐 ${v.lastOrderDays} วันก่อน`
+                   : `🕐 นานกว่า ${v.lastOrderDays} วัน`;
+    card.innerHTML = `
+      <div class="vendor-check">✓</div>
+      <div class="vendor-head">
+        <div class="vendor-name">${v.name}</div>
+        <div class="vendor-rating">⭐ ${v.rating.toFixed(1)} <span class="last">· ${lastTxt}</span></div>
+      </div>
+      <div class="vendor-cats">${v.cats.map(c => `<span class="vendor-cat">${c}</span>`).join('')}</div>
+      <div class="vendor-foot">
+        <span>${v.contact} · ${v.phone}</span>
+        <span class="vendor-channels">
+          ${v.line ? `<span class="channel-ico line" title="LINE: ${v.line}">L</span>` : `<span class="channel-ico dim" title="ไม่มี LINE">L</span>`}
+          <span class="channel-ico phone" title="โทร: ${v.phone}">☎</span>
+        </span>
+      </div>
+    `;
+    card.onclick = () => toggleVendor(v.id);
+    grid.appendChild(card);
+  });
+  document.getElementById('vendorSelectedCount').textContent =
+    `(${state.selectedVendors.size} เจ้า)`;
+  // enable send button
+  document.getElementById('sendLineBtn').disabled = state.selectedVendors.size < 1;
+}
+
+function toggleVendor(id) {
+  if (state.selectedVendors.has(id)) state.selectedVendors.delete(id);
+  else state.selectedVendors.add(id);
+  renderVendors();
+}
+
+/* ════════════════════════════════════════════════════════════════
+   TAB 1: Create vendor modal
+   ════════════════════════════════════════════════════════════════ */
+function openCreateVendor() { openModal('vendorModal'); }
+function saveNewVendor() {
+  const name = document.getElementById('newVendorName').value.trim();
+  if (!name) { showToast('ใส่ชื่อร้านก่อน', 'error'); return; }
+  const cats = (document.getElementById('newVendorCats').value || '').split(',').map(s=>s.trim()).filter(Boolean);
+  if (cats.length === 0) { showToast('ใส่หมวดที่ขายก่อน', 'error'); return; }
+  const v = {
+    id: 'v' + (Date.now()),
+    name,
+    contact: document.getElementById('newVendorContact').value.trim() || '-',
+    phone: document.getElementById('newVendorPhone').value.trim() || '-',
+    line: document.getElementById('newVendorLine').value.trim(),
+    cats,
+    rating: 0,
+    lastOrderDays: 999,
+  };
+  VENDORS = [v, ...VENDORS];
+  saveVendors(VENDORS);
+  state.selectedVendors.add(v.id);
+  closeModal('vendorModal');
+  document.getElementById('newVendorName').value = '';
+  document.getElementById('newVendorContact').value = '';
+  document.getElementById('newVendorPhone').value = '';
+  document.getElementById('newVendorLine').value = '';
+  document.getElementById('newVendorCats').value = '';
+  renderCatChips();
+  renderVendors();
+  showToast('เพิ่ม ' + v.name + ' แล้ว', 'success');
+}
+
+/* ════════════════════════════════════════════════════════════════
+   TAB 1: Create item modal
+   ════════════════════════════════════════════════════════════════ */
+function openCreateItem() { openModal('itemModal'); }
+function saveNewItem() {
+  const name = document.getElementById('newItemName').value.trim();
+  const qty = parseFloat(document.getElementById('newItemQty').value) || 0;
+  const unit = document.getElementById('newItemUnit').value.trim();
+  if (!name || !qty || !unit) { showToast('กรอกข้อมูลให้ครบ', 'error'); return; }
+  state.items.push({
+    id: 'i_' + Date.now(),
+    name, qty, unit, cat: 'อื่นๆ', on: true,
+  });
+  closeModal('itemModal');
+  document.getElementById('newItemName').value = '';
+  document.getElementById('newItemQty').value = '';
+  document.getElementById('newItemUnit').value = '';
+  renderItems();
+  showToast('เพิ่มรายการแล้ว', 'success');
+}
+
+/* ════════════════════════════════════════════════════════════════
+   TAB 1: Generic modal
+   ════════════════════════════════════════════════════════════════ */
+function openModal(id) { document.getElementById(id).dataset.show = '1'; }
+function closeModal(id) { document.getElementById(id).dataset.show = '0'; }
+
+/* ════════════════════════════════════════════════════════════════
+   TAB 1: Doc preview / PDF / Print
+   ════════════════════════════════════════════════════════════════ */
+
+function generateRFQDocHTML(forVendor = null) {
+  const items = state.items.filter(i => i.on);
+  const dueDate = state.dueDate;
+  const note = document.getElementById('vendorNote').value;
+  const vendorLine = forVendor
+    ? `<div class="rfq-doc-vendor">
+         <div class="row-l">เรียน บริษัท / ร้าน</div>
+         <div class="row-v">${forVendor.name}</div>
+         <div style="font-size:11px;color:#666;margin-top:3px">ผู้ติดต่อ: ${forVendor.contact} · ${forVendor.phone}${forVendor.line ? ' · LINE: '+forVendor.line : ''}</div>
+       </div>`
+    : `<div class="rfq-doc-vendor">
+         <div class="row-l">เรียน บริษัท / ร้าน</div>
+         <div class="row-v">— (ส่งให้หลาย vendor) —</div>
+       </div>`;
+
+  const itemRows = items.map((it, i) => `
+    <tr>
+      <td class="idx">${i+1}</td>
+      <td>${it.name}</td>
+      <td class="num">${it.qty.toLocaleString('th-TH')}</td>
+      <td class="unit">${it.unit}</td>
+      <td class="price">_____________</td>
+      <td class="price">_____________</td>
+    </tr>
+  `).join('');
+
+  return `
+    <div class="rfq-doc">
+      <div class="rfq-doc-header">
+        <div class="brand">
+          <div class="logo">ONE&nbsp;·&nbsp;VELA</div>
+          <div class="company">บจก. ทู บิลด์ ดีเวลลอปเมนท์</div>
+          <div class="company-sub">โครงการ วันเวลา · ชลบุรี<br>โทร 038-xxx-xxxx · LINE: @twobuild</div>
+        </div>
+        <div class="title-block">
+          <div class="title-th">ใบขอใบเสนอราคา</div>
+          <div class="title-en">REQUEST FOR QUOTATION</div>
+          <div class="doc-no">${RFQ_NO}</div>
+        </div>
+      </div>
+
+      ${vendorLine}
+
+      <div class="rfq-doc-meta">
+        <div class="meta-row"><span>วันที่ออก:</span><b>${formatThaiDate(TODAY)}</b></div>
+        <div class="meta-row"><span>ขอใบเสนอภายใน:</span><b>${formatThaiDate(state.dueDate)}</b></div>
+        <div class="meta-row"><span>อ้างอิง PR:</span><b>${SOURCE_PR.id}</b></div>
+        <div class="meta-row"><span>ส่งของวันที่:</span><b>${SOURCE_PR.needDate}</b></div>
+        <div class="meta-row"><span>สถานที่ส่ง:</span><b>โครงการวันเวลา ${SOURCE_PR.target}</b></div>
+        <div class="meta-row"><span>เงื่อนไขชำระ:</span><b>เครดิต 30 วัน</b></div>
+      </div>
+
+      <table class="rfq-doc-items">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>รายการ</th>
+            <th class="num">จำนวน</th>
+            <th class="unit">หน่วย</th>
+            <th class="price">ราคา/หน่วย</th>
+            <th class="price">ราคารวม</th>
+          </tr>
+        </thead>
+        <tbody>${itemRows}</tbody>
+      </table>
+
+      ${note ? `<div class="rfq-doc-note"><b>หมายเหตุ</b>${note.replace(/\n/g,'<br>')}</div>` : ''}
+
+      <div class="rfq-doc-instructions">
+        <b>กรุณากรอกราคาในช่อง "ราคา/หน่วย" และ "ราคารวม"</b> ส่งกลับมาภายใน <b>${formatThaiDate(state.dueDate)}</b><br>
+        • ราคารวมส่ง · ระบุภาษีให้ชัดเจน (รวม VAT หรือยังไม่รวม)<br>
+        • ส่ง LINE @twobuild หรือ Email: admin@twobuild.co.th<br>
+        • กรณีไม่มีสินค้าใดๆ ให้ระบุว่า "ไม่ขาย" ในรายการนั้น
+      </div>
+
+      <div class="rfq-doc-signs">
+        <div>
+          <div class="sign-box">
+            <div class="sign-name">นางสาวเจนจิรา ...</div>
+            <div class="sign-role">แอดมินจัดซื้อ</div>
+          </div>
+        </div>
+        <div>
+          <div class="sign-box">
+            <div class="sign-name">(...........................)</div>
+            <div class="sign-role">ตัวแทน vendor / ผู้เสนอราคา</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rfq-doc-footer">
+        WANWELA ERP · TWO BUILD DEVELOPMENT · ${RFQ_NO} · ออกเมื่อ ${formatThaiDate(TODAY)}
+      </div>
+    </div>
+  `;
+}
+
+function openDocPreview() {
+  if (state.items.filter(i => i.on).length === 0) {
+    showToast('เลือกรายการที่จะขอราคาก่อน', 'error');
+    return;
+  }
+  document.getElementById('docModalBody').innerHTML = generateRFQDocHTML();
+  document.getElementById('docModal').dataset.show = '1';
+}
+function closeDocPreview() {
+  document.getElementById('docModal').dataset.show = '0';
+}
+
+function downloadPDF() {
+  if (state.items.filter(i => i.on).length === 0) {
+    showToast('เลือกรายการที่จะขอราคาก่อน', 'error');
+    return;
+  }
+  showToast('กำลังสร้าง PDF...', '');
+  const stage = document.getElementById('rfqDocStage');
+  stage.innerHTML = generateRFQDocHTML();
+  stage.querySelector('.rfq-doc').classList.add('pdf-mode');
+  const el = stage.querySelector('.rfq-doc');
+  html2pdf().set({
+    margin: 0,
+    filename: `${RFQ_NO}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+  }).from(el).save().then(() => {
+    showToast('ดาวน์โหลด PDF แล้ว', 'success');
+    stage.innerHTML = '';
+  }).catch(err => {
+    console.error(err);
+    showToast('เกิดข้อผิดพลาด ลองใหม่', 'error');
+  });
+}
+
+function printRFQ() {
+  const stage = document.getElementById('rfqDocStage');
+  stage.innerHTML = generateRFQDocHTML();
+  stage.querySelector('.rfq-doc').classList.add('pdf-mode');
+  window.print();
+  setTimeout(() => { stage.innerHTML = ''; }, 500);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   TAB 1: Send via LINE
+   ════════════════════════════════════════════════════════════════ */
+function openSendLine() {
+  if (state.selectedVendors.size === 0) {
+    showToast('เลือก vendor อย่างน้อย 1 เจ้าก่อน', 'error');
+    return;
+  }
+  if (state.items.filter(i => i.on).length === 0) {
+    showToast('เลือกรายการที่จะขอราคาก่อน', 'error');
+    return;
+  }
+  const vendors = [...state.selectedVendors].map(id => VENDORS.find(v => v.id === id)).filter(Boolean);
+  document.getElementById('lineVendorCount').textContent = vendors.length;
+  // message preview
+  const items = state.items.filter(i => i.on);
+  const itemsText = items.map((it, i) => `${i+1}. ${it.name} · ${it.qty} ${it.unit}`).join('\n');
+  const msg =
+`📨 ขอใบเสนอราคา (${RFQ_NO})
+จาก: บจก. ทู บิลด์ ดีเวลลอปเมนท์ (โครงการวันเวลา)
+
+📦 รายการ:
+${itemsText}
+
+📅 ส่งของ: ${SOURCE_PR.needDate}
+🚚 ส่งที่: โครงการวันเวลา ${SOURCE_PR.target}
+⏰ ขอภายใน: ${formatThaiDate(state.dueDate)}
+
+หมายเหตุ: ${document.getElementById('vendorNote').value || '—'}
+
+ตอบกลับมาทาง LINE นี้เลยนะคะ ขอบคุณค่ะ 🙏`;
+  document.getElementById('lineMsgPreview').textContent = msg;
+
+  const c = document.getElementById('lineVendorList');
+  c.innerHTML = '';
+  vendors.forEach(v => {
+    const row = document.createElement('div');
+    row.className = 'send-progress-row';
+    row.dataset.vid = v.id;
+    const hasLine = !!v.line;
+    row.innerHTML = `
+      <div style="flex:1">
+        <div class="v-name">${v.name}</div>
+        <div class="v-chan">${hasLine ? '📱 LINE: ' + v.line : '☎ ไม่มี LINE · โทร ' + v.phone}</div>
+      </div>
+      <span class="v-stat waiting">${hasLine ? 'รอส่ง' : 'จะโทร'}</span>
+    `;
+    c.appendChild(row);
+  });
+
+  openModal('lineModal');
+}
+
+function sendAllLine() {
+  const rows = document.querySelectorAll('#lineVendorList .send-progress-row');
+  const vendors = [...rows].map(r => {
+    const id = r.dataset.vid;
+    return VENDORS.find(v => v.id === id);
+  });
+  const btn = document.getElementById('sendAllBtn');
+  btn.disabled = true;
+  btn.textContent = '📤 กำลังส่ง...';
+
+  rows.forEach((row, idx) => {
+    const v = vendors[idx];
+    const hasLine = !!v.line;
+    const stat = row.querySelector('.v-stat');
+    setTimeout(() => {
+      stat.className = 'v-stat sending';
+      stat.textContent = hasLine ? 'ส่งอยู่...' : 'ติดต่อ...';
+    }, 200 + idx * 300);
+    setTimeout(() => {
+      if (hasLine) {
+        stat.className = 'v-stat sent';
+        stat.textContent = '✓ ส่งแล้ว';
+      } else {
+        stat.className = 'v-stat fallback';
+        stat.textContent = '☎ บันทึก ให้โทร';
+      }
+    }, 700 + idx * 300);
+  });
+
+  const total = vendors.length;
+  setTimeout(() => {
+    btn.textContent = '✓ ส่งครบแล้ว';
+    state.sentAt = new Date();
+    state.sentVendors = vendors.map(v => v.id);
+    showToast(`ส่ง RFQ ${total} เจ้าเรียบร้อย`, 'line');
+    setTimeout(() => {
+      closeModal('lineModal');
+      showSendSuccess();
+      btn.disabled = false;
+      btn.textContent = '🚀 ส่งทุกคนพร้อมกัน';
+    }, 1200);
+  }, 800 + total * 300);
+}
+
+function showSendSuccess() {
+  document.getElementById('sendForm').style.display = 'none';
+  document.getElementById('sendBar').style.display = 'none';
+  document.getElementById('sendSuccess').style.display = 'block';
+  document.getElementById('successRfqNo').textContent = RFQ_NO;
+  const sv = document.getElementById('successVendors');
+  sv.innerHTML = '';
+  state.sentVendors.forEach(id => {
+    const v = VENDORS.find(x => x.id === id);
+    if (!v) return;
+    const span = document.createElement('span');
+    span.className = 'success-vendor';
+    span.textContent = v.name;
+    sv.appendChild(span);
+  });
+  // mark tab quotes badge
+  document.getElementById('tabQuoteBadge').textContent = 'ใหม่';
+  // initialize price grid for the sent vendors
+  initQuotesForSent();
+}
+
+function resetSendForm() {
+  document.getElementById('sendForm').style.display = 'block';
+  document.getElementById('sendBar').style.display = 'block';
+  document.getElementById('sendSuccess').style.display = 'none';
+  state.sentAt = null;
+  state.sentVendors = [];
+}
+
+/* ════════════════════════════════════════════════════════════════
+   TAB 2: Enter quotes
+   ════════════════════════════════════════════════════════════════ */
+
+function initQuotesForSent() {
+  state.prices = {};
+  state.vendorDates = {};
+  state.vendorStatus = {};
+  const items = state.items.filter(i => i.on);
+  items.forEach(it => {
+    state.prices[it.id] = {};
+    state.sentVendors.forEach(vid => {
+      state.prices[it.id][vid] = { value: '', skip: false };
+    });
+  });
+  state.sentVendors.forEach(vid => {
+    state.vendorStatus[vid] = 'pending';
+    state.vendorDates[vid] = '';
+  });
+}
+
+function loadSelectedRFQ() {
+  const v = document.getElementById('rfqSelector').value;
+  if (v === RFQ_NO) {
+    // current
+  } else {
+    showToast(`Demo: เปิด ${v} (mock)`, '');
+  }
+  renderMatrix();
+}
+
+function renderMatrix() {
+  const items = state.items.filter(i => i.on);
+  const vendors = state.sentVendors.map(id => VENDORS.find(v => v.id === id)).filter(Boolean);
+
+  // empty state
+  if (vendors.length === 0) {
+    document.getElementById('matrixWrap').innerHTML = `
+      <div style="padding:40px 20px;text-align:center;color:var(--ink-3)">
+        <div style="font-size:42px;opacity:.4;margin-bottom:8px">📭</div>
+        <div style="font-weight:600;color:var(--ink-2);margin-bottom:4px">ยังไม่มี RFQ ที่ส่งออก</div>
+        <div style="font-size:13px">กลับไปแท็บ "ส่งใบขอราคา" เพื่อสร้าง RFQ ใหม่</div>
+      </div>
+    `;
+    document.getElementById('matrixMobile').innerHTML = '';
+    updateRFQHeaderSummary(0, 0);
+    document.getElementById('goCompareBtn').disabled = true;
+    return;
+  }
+
+  // recompute best-price per row and vendor totals
+  const bests = {};
+  items.forEach(it => {
+    let best = null;
+    let bestV = null;
+    vendors.forEach(v => {
+      const p = state.prices[it.id]?.[v.id];
+      if (p && !p.skip && p.value !== '' && !isNaN(p.value)) {
+        const n = parseFloat(p.value);
+        if (best == null || n < best) { best = n; bestV = v.id; }
+      }
+    });
+    bests[it.id] = bestV;
+  });
+
+  const vendorTotals = {};
+  const vendorCounts = {};
+  vendors.forEach(v => {
+    let t = 0;
+    let cnt = 0;
+    let skipCnt = 0;
+    items.forEach(it => {
+      const p = state.prices[it.id]?.[v.id];
+      if (p) {
+        if (p.skip) skipCnt++;
+        else if (p.value !== '' && !isNaN(p.value)) {
+          t += parseFloat(p.value) * it.qty;
+          cnt++;
+        }
+      }
+    });
+    vendorTotals[v.id] = t;
+    vendorCounts[v.id] = { filled: cnt, skip: skipCnt, total: items.length };
+    // status
+    if (cnt + skipCnt === items.length && items.length > 0) {
+      state.vendorStatus[v.id] = 'full';
+    } else if (cnt > 0 || skipCnt > 0) {
+      state.vendorStatus[v.id] = 'pending';
+    } else {
+      state.vendorStatus[v.id] = 'pending';
+    }
+  });
+
+  // ── desktop matrix ──
+  const head = document.getElementById('matrixHead');
+  const body = document.getElementById('matrixBody');
+  const foot = document.getElementById('matrixFoot');
+
+  let headHTML = '<tr><th class="item-col">รายการ</th>';
+  vendors.forEach(v => {
+    const cnt = vendorCounts[v.id];
+    const statusCls = state.vendorStatus[v.id];
+    const statusTxt = statusCls === 'full' ? `✓ ครบ` : `${cnt.filled+cnt.skip}/${cnt.total}`;
+    const hasHist = PRICE_HIST[v.id] && Object.values(PRICE_HIST[v.id]).some(x => x != null);
+    headHTML += `
+      <th class="vendor-col">
+        <div class="vendor-name">${v.name}</div>
+        <div class="vendor-meta">⭐ ${v.rating.toFixed(1)} · ${v.line || v.phone}</div>
+        <input type="date" class="vendor-date-input" value="${state.vendorDates[v.id] || ''}"
+          placeholder="วันที่ราคาเข้า"
+          onchange="state.vendorDates['${v.id}']=this.value">
+        <div class="vendor-tools">
+          <button class="vendor-tool" onclick="attachQuotation('${v.id}')">📷 แนบ</button>
+          ${hasHist ? `<button class="vendor-tool" onclick="useHistoricalPrices('${v.id}')">💬 ค่าเดิม</button>` : ''}
+          <button class="vendor-tool" onclick="markVendorNoReply('${v.id}')">— ไม่ตอบ</button>
+        </div>
+        <span class="vendor-status ${statusCls}">${statusTxt}</span>
+      </th>
+    `;
+  });
+  headHTML += '<th class="status-col">สถานะ</th></tr>';
+  head.innerHTML = headHTML;
+
+  let bodyHTML = '';
+  items.forEach(it => {
+    bodyHTML += `<tr>
+      <td class="item-col">
+        <div class="item-name">${it.name}</div>
+        <div class="item-qty">${it.qty} ${it.unit}${bests[it.id] ? ` <span class="best-vendor-badge">⭐ ${(VENDORS.find(v=>v.id===bests[it.id]) || {}).name?.split(' ')[0] || ''} ถูกสุด</span>` : ''}</div>
+      </td>`;
+    let filledCnt = 0;
+    let skipCnt = 0;
+    vendors.forEach(v => {
+      const p = state.prices[it.id]?.[v.id] || { value: '', skip: false };
+      const isBest = bests[it.id] === v.id;
+      const cls = p.skip ? 'skip' : (isBest ? 'best' : '');
+      const lineTotal = (p.value !== '' && !isNaN(p.value)) ? parseFloat(p.value) * it.qty : null;
+      if (p.value !== '' && !p.skip) filledCnt++;
+      if (p.skip) skipCnt++;
+      bodyHTML += `
+        <td class="vendor-cell">
+          <div class="price-cell-wrap">
+            <input type="number" class="price-input ${cls}"
+              ${p.skip ? 'disabled' : ''}
+              value="${p.value}"
+              placeholder="${p.skip ? 'ไม่ขาย' : '฿/หน่วย'}"
+              step="0.01"
+              data-iid="${it.id}" data-vid="${v.id}"
+              oninput="updatePrice('${it.id}','${v.id}',this.value)">
+            ${lineTotal !== null ? `<div class="price-line-total ${isBest?'best':''}">${fmtBaht(lineTotal)} รวม</div>` : ''}
+            <div class="skip-toggle" onclick="toggleSkip('${it.id}','${v.id}')">${p.skip ? '↩ ไม่ใช่' : 'ไม่ขาย?'}</div>
+          </div>
+        </td>
+      `;
+    });
+    const rowStatus = filledCnt + skipCnt === vendors.length ? '🟢' : (filledCnt + skipCnt > 0 ? '🟡' : '⚪');
+    const rowLabel = filledCnt + skipCnt === vendors.length ? 'ครบ' : 'รอ';
+    bodyHTML += `<td class="status-col">${rowStatus}<div style="font-size:10px;color:var(--ink-3);margin-top:2px">${filledCnt + skipCnt}/${vendors.length}</div></td>`;
+    bodyHTML += '</tr>';
+  });
+  body.innerHTML = bodyHTML;
+
+  // totals
+  let footHTML = '<tr class="total-row"><td class="item-col">รวมทั้งสิ้น</td>';
+  let lowestTotal = null;
+  let lowestVid = null;
+  vendors.forEach(v => {
+    if (vendorTotals[v.id] > 0 && (lowestTotal == null || vendorTotals[v.id] < lowestTotal)) {
+      lowestTotal = vendorTotals[v.id];
+      lowestVid = v.id;
+    }
+  });
+  vendors.forEach(v => {
+    const t = vendorTotals[v.id];
+    const isLow = v.id === lowestVid && t > 0;
+    footHTML += `<td style="text-align:right;${isLow?'color:var(--green);background:var(--green-soft) !important':''}">
+      ${t > 0 ? fmtBaht(t) : '—'}
+      ${isLow ? '<br><span style="font-size:10px">⭐ ถูกสุด</span>' : ''}
+    </td>`;
+  });
+  footHTML += '<td class="status-col"></td></tr>';
+  foot.innerHTML = footHTML;
+
+  // ── mobile stacked view ──
+  renderMatrixMobile(items, vendors, bests, vendorTotals, vendorCounts);
+
+  // summary
+  const completedVendors = vendors.filter(v => state.vendorStatus[v.id] === 'full').length;
+  updateRFQHeaderSummary(completedVendors, vendors.length);
+
+  // enable go-compare button when at least 2 vendors have ALL filled
+  document.getElementById('goCompareBtn').disabled = completedVendors < 2;
+}
+
+function renderMatrixMobile(items, vendors, bests, vendorTotals, vendorCounts) {
+  const c = document.getElementById('matrixMobile');
+  c.innerHTML = '';
+  vendors.forEach(v => {
+    const card = document.createElement('div');
+    card.className = 'matrix-mobile-vendor';
+    const statusCls = state.vendorStatus[v.id];
+    const cnt = vendorCounts[v.id];
+    const statusTxt = statusCls === 'full' ? '✓ ครบ' : `รอ ${cnt.total - cnt.filled - cnt.skip}/${cnt.total}`;
+    let inner = `
+      <div class="matrix-mobile-vendor-head">
+        <div>
+          <div class="vendor-name" style="font-size:14px">${v.name}</div>
+          <div class="vendor-meta" style="font-size:11px">⭐ ${v.rating.toFixed(1)} · ${v.line || v.phone}</div>
+        </div>
+        <span class="vendor-status ${statusCls}">${statusTxt}</span>
+      </div>
+    `;
+    items.forEach(it => {
+      const p = state.prices[it.id]?.[v.id] || { value: '', skip: false };
+      const isBest = bests[it.id] === v.id;
+      const cls = p.skip ? 'skip' : (isBest ? 'best' : '');
+      inner += `
+        <div class="matrix-mobile-item">
+          <div class="name">${it.name}<div class="qty">${it.qty} ${it.unit}${isBest ? ' · <span style="color:var(--green);font-weight:700">ถูกสุด</span>' : ''}</div></div>
+          <input type="number" class="price-input ${cls}" ${p.skip?'disabled':''} value="${p.value}" placeholder="${p.skip ? 'ไม่ขาย' : '฿/หน่วย'}" step="0.01"
+            oninput="updatePrice('${it.id}','${v.id}',this.value)">
+        </div>
+      `;
+    });
+    inner += `
+      <div class="matrix-mobile-foot">
+        <div>
+          <div class="vendor-tools" style="margin:0">
+            <button class="vendor-tool" onclick="attachQuotation('${v.id}')">📷 แนบ</button>
+            ${PRICE_HIST[v.id] ? `<button class="vendor-tool" onclick="useHistoricalPrices('${v.id}')">💬 ค่าเดิม</button>` : ''}
+            <button class="vendor-tool" onclick="markVendorNoReply('${v.id}')">— ไม่ตอบ</button>
+          </div>
+        </div>
+        <div>${vendorTotals[v.id] > 0 ? fmtBaht(vendorTotals[v.id]) : '—'}</div>
+      </div>
+    `;
+    card.innerHTML = inner;
+    c.appendChild(card);
+  });
+}
+
+function updateRFQHeaderSummary(done, total) {
+  document.getElementById('quoteRfqId').textContent = RFQ_NO;
+  const sent = state.sentAt ? formatThaiDate(state.sentAt) : 'วันนี้';
+  document.getElementById('quoteRfqSub').textContent =
+    `ส่ง ${sent} · ${total} vendor · กำหนดรับ ${formatThaiDate(state.dueDate)}`;
+  const pill = document.getElementById('quoteProgress');
+  pill.textContent = `${done}/${total} ครบ`;
+  pill.className = 'rfq-progress-pill' + (done === total && total > 0 ? ' complete' : '');
+}
+
+function updatePrice(iid, vid, val) {
+  if (!state.prices[iid]) state.prices[iid] = {};
+  if (!state.prices[iid][vid]) state.prices[iid][vid] = { value: '', skip: false };
+  state.prices[iid][vid].value = val;
+  // debounced re-render for highlight updates
+  clearTimeout(window._pTimer);
+  window._pTimer = setTimeout(renderMatrix, 250);
+}
+
+function toggleSkip(iid, vid) {
+  if (!state.prices[iid]) state.prices[iid] = {};
+  if (!state.prices[iid][vid]) state.prices[iid][vid] = { value: '', skip: false };
+  state.prices[iid][vid].skip = !state.prices[iid][vid].skip;
+  if (state.prices[iid][vid].skip) state.prices[iid][vid].value = '';
+  renderMatrix();
+}
+
+function useHistoricalPrices(vid) {
+  const hist = PRICE_HIST[vid];
+  if (!hist) { showToast('ไม่มีราคาเดิมของ vendor นี้', 'error'); return; }
+  const items = state.items.filter(i => i.on);
+  let count = 0;
+  items.forEach(it => {
+    if (hist[it.id] != null) {
+      if (!state.prices[it.id]) state.prices[it.id] = {};
+      state.prices[it.id][vid] = { value: hist[it.id], skip: false };
+      count++;
+    }
+  });
+  showToast(`โหลดราคาเดิม ${count} รายการแล้ว · ตรวจดูก่อนยืนยัน`, 'success');
+  renderMatrix();
+}
+
+function attachQuotation(vid) {
+  const v = VENDORS.find(x => x.id === vid);
+  showToast(`Demo: แนบไฟล์ใบเสนอราคาจาก ${v.name}`, '');
+}
+
+function markVendorNoReply(vid) {
+  const v = VENDORS.find(x => x.id === vid);
+  if (!confirm(`ทำเครื่องหมาย ${v.name} ว่าไม่ตอบ?\n\nระบบจะข้าม vendor นี้และยังเปรียบเทียบเจ้าอื่นได้`)) return;
+  const items = state.items.filter(i => i.on);
+  items.forEach(it => {
+    if (!state.prices[it.id]) state.prices[it.id] = {};
+    state.prices[it.id][vid] = { value: '', skip: true };
+  });
+  state.vendorStatus[vid] = 'skip';
+  showToast(`ทำเครื่องหมาย ${v.name} ไม่ตอบแล้ว`, '');
+  renderMatrix();
+}
+
+function saveDraft() {
+  state.draft = true;
+  showToast('บันทึกร่างแล้ว (Demo)', 'success');
+}
+
+function goCompare() {
+  showToast('Demo: → หน้า #4 เปรียบเทียบราคา / ออก PO', 'success');
+}
+
+/* ════════════════════════════════════════════════════════════════
+   TOAST
+   ════════════════════════════════════════════════════════════════ */
+function showToast(msg, kind = '') {
+  const t = document.getElementById('toast');
+  t.className = `toast ${kind}`;
+  t.textContent = msg;
+  t.dataset.show = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.dataset.show = '0', 2400);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   INIT
+   ════════════════════════════════════════════════════════════════ */
+document.getElementById('dueDate').value = formatDate(state.dueDate);
+document.getElementById('dueDate').addEventListener('change', (e) => {
+  state.dueDate = new Date(e.target.value);
+});
+document.getElementById('rfqNoLabel').textContent = RFQ_NO;
+
+renderItems();
+renderCatChips();
+renderVendors();
+// auto-suggest some vendors based on PR items
+['v1','v3','v6'].forEach(id => state.selectedVendors.add(id));
+renderVendors();
+renderMatrix();
+
+// keyboard: close modals on Esc
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    ['vendorModal','itemModal','lineModal'].forEach(id => closeModal(id));
+    closeDocPreview();
+  }
+});
+</script>
+
+</body>
+</html>

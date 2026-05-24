@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#1f2937" />
+<title>PR Inbox · แอดมินจัดซื้อ · วันเวลา ERP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f3ee;
+    --card: #ffffff;
+    --ink: #1f2937;
+    --ink-2: #4b5563;
+    --ink-3: #9ca3af;
+    --ink-4: #d1d5db;
+    --line: #e5e3dc;
+    --line-2: #d6d3c8;
+    --primary: #1f2937;
+    --primary-soft: #374151;
+    --accent: #b45309;
+    --accent-soft: #fef3c7;
+    --green: #16a34a;
+    --green-soft: #dcfce7;
+    --red: #dc2626;
+    --red-soft: #fee2e2;
+    --yellow: #ca8a04;
+    --yellow-soft: #fef9c3;
+    --blue: #2563eb;
+    --blue-soft: #dbeafe;
+    --purple: #7c3aed;
+    --purple-soft: #ede9fe;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --shadow: 0 1px 2px rgba(17,24,39,.04), 0 8px 24px rgba(17,24,39,.06);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app {
+    max-width: 960px;
+    margin: 0 auto;
+    background: var(--bg);
+    min-height: 100vh;
+    padding-bottom: 120px;
+  }
+
+  /* ─── Header ─── */
+  .header {
+    background: var(--primary);
+    color: #fff;
+    padding: 14px 18px 14px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .header-brand {
+    font-size: 11px;
+    color: rgba(255,255,255,.55);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .header-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .header-title {
+    font-weight: 600;
+    font-size: 18px;
+    flex: 1;
+  }
+  .header-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,.65);
+    margin-top: 2px;
+  }
+  .me-tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,.08);
+    padding: 6px 12px 6px 6px;
+    border-radius: 24px;
+  }
+  .me-tag .avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .me-tag .name {
+    font-size: 13px;
+    color: #fff;
+  }
+  .me-tag .role {
+    font-size: 10px;
+    color: rgba(255,255,255,.6);
+    display: block;
+    line-height: 1;
+    margin-top: 1px;
+  }
+
+  /* ─── Stats strip ─── */
+  .stats {
+    background: var(--primary);
+    color: #fff;
+    padding: 0 14px 14px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .stats::-webkit-scrollbar { display: none; }
+  .stat {
+    flex: 0 0 auto;
+    background: rgba(255,255,255,.08);
+    border-radius: 12px;
+    padding: 10px 14px;
+    min-width: 110px;
+  }
+  .stat .v {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .stat .l {
+    font-size: 11px;
+    color: rgba(255,255,255,.65);
+    margin-top: 4px;
+    letter-spacing: .5px;
+  }
+  .stat[data-tone="red"] { background: rgba(220,38,38,.15); }
+  .stat[data-tone="red"] .v { color: #fca5a5; }
+  .stat[data-tone="yellow"] { background: rgba(202,138,4,.15); }
+  .stat[data-tone="yellow"] .v { color: #fde68a; }
+  .stat[data-tone="green"] { background: rgba(22,163,74,.15); }
+  .stat[data-tone="green"] .v { color: #86efac; }
+  .stat[data-tone="blue"] { background: rgba(37,99,235,.15); }
+  .stat[data-tone="blue"] .v { color: #93c5fd; }
+
+  /* ─── Search + chips ─── */
+  .toolbar {
+    padding: 14px 14px 4px;
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  .search-row {
+    position: relative;
+    margin-bottom: 10px;
+  }
+  .search-input {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    border-radius: 12px;
+    padding: 11px 13px 11px 38px;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .search-input:focus { border-color: var(--primary); }
+  .search-row::before {
+    content: '';
+    position: absolute;
+    left: 12px; top: 50%;
+    width: 16px; height: 16px;
+    transform: translateY(-50%);
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5'%3e%3ccircle cx='11' cy='11' r='7'/%3e%3cpath d='m21 21-4.3-4.3'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+  }
+  .chips {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 6px;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: 0 0 auto;
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-2);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .12s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .chip:hover { border-color: var(--ink-3); }
+  .chip[data-on="1"] {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+  .chip .count {
+    font-size: 10px;
+    background: rgba(0,0,0,.08);
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-weight: 700;
+  }
+  .chip[data-on="1"] .count { background: rgba(255,255,255,.2); }
+  .chip[data-tone="red"][data-on="1"] {
+    background: var(--red); border-color: var(--red);
+  }
+  .chip[data-tone="yellow"][data-on="1"] {
+    background: var(--yellow); border-color: var(--yellow);
+  }
+  .chip[data-tone="green"][data-on="1"] {
+    background: var(--green); border-color: var(--green);
+  }
+  .chip[data-tone="blue"][data-on="1"] {
+    background: var(--blue); border-color: var(--blue);
+  }
+
+  /* ─── Section divider ─── */
+  .section-head {
+    font-size: 12px;
+    color: var(--ink-3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: 16px 18px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .section-head .controls {
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .toggle-link {
+    color: var(--accent);
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: underline;
+    font-weight: 600;
+  }
+
+  /* ─── PR Card ─── */
+  .pr-list {
+    padding: 0 14px;
+  }
+  .pr-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 14px 16px 14px 18px;
+    margin-bottom: 10px;
+    position: relative;
+    border-left: 4px solid var(--ink-4);
+    cursor: pointer;
+    transition: transform .12s, box-shadow .12s;
+  }
+  .pr-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(17,24,39,.06), 0 12px 32px rgba(17,24,39,.08);
+  }
+  .pr-card[data-status="new"]     { border-left-color: var(--blue); }
+  .pr-card[data-status="rfq"]     { border-left-color: var(--accent); }
+  .pr-card[data-status="waiting"] { border-left-color: var(--yellow); }
+  .pr-card[data-status="ready"]   { border-left-color: var(--green); }
+  .pr-card[data-status="done"]    { border-left-color: var(--ink-3); opacity: .75; }
+
+  .pr-card.selected {
+    border-left-width: 4px;
+    box-shadow: 0 0 0 2px var(--primary), 0 8px 24px rgba(17,24,39,.1);
+  }
+
+  .pr-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .pr-head-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .pr-no {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ink);
+    letter-spacing: .3px;
+  }
+  .pr-status {
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .pr-status[data-s="new"]     { background: var(--blue-soft); color: var(--blue); }
+  .pr-status[data-s="rfq"]     { background: var(--accent-soft); color: var(--accent); }
+  .pr-status[data-s="waiting"] { background: var(--yellow-soft); color: var(--yellow); }
+  .pr-status[data-s="ready"]   { background: var(--green-soft); color: var(--green); }
+  .pr-status[data-s="done"]    { background: #f3f4f6; color: var(--ink-2); }
+  .pr-urgency {
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .pr-urgency[data-u="urgent"]   { background: var(--yellow-soft); color: var(--yellow); }
+  .pr-urgency[data-u="critical"] { background: var(--red-soft); color: var(--red); }
+  .pr-time {
+    font-size: 12px;
+    color: var(--ink-3);
+    white-space: nowrap;
+  }
+  .pr-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    color: var(--ink-2);
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+  .pr-meta .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #f5f3ee;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+  .pr-meta .pill b { color: var(--ink); }
+  .pr-meta .team-A { background: #fef3c7; color: #92400e; }
+  .pr-meta .team-B { background: #dbeafe; color: #1e40af; }
+  .pr-meta .type-A { background: #fef3c7; color: #92400e; }
+  .pr-meta .type-B { background: #dbeafe; color: #1e40af; }
+  .pr-meta .type-C { background: #fce7f3; color: #9d174d; }
+  .pr-meta .type-D { background: #ede9fe; color: #5b21b6; }
+  .pr-meta .type-X { background: #f3f4f6; color: var(--ink-2); }
+  .pr-items {
+    font-size: 13px;
+    color: var(--ink);
+    margin-bottom: 10px;
+    line-height: 1.4;
+    background: #fafaf7;
+    padding: 8px 10px;
+    border-radius: 8px;
+  }
+  .pr-items .more {
+    color: var(--ink-3);
+    font-size: 12px;
+  }
+  .pr-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .pr-btn {
+    border: 1.5px solid var(--line);
+    background: #fff;
+    border-radius: 8px;
+    padding: 6px 11px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-2);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all .12s;
+  }
+  .pr-btn:hover {
+    border-color: var(--primary);
+    color: var(--ink);
+  }
+  .pr-btn.primary {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+  .pr-btn.primary:hover { background: var(--primary-soft); }
+  .pr-btn.danger:hover {
+    border-color: var(--red);
+    color: var(--red);
+    background: var(--red-soft);
+  }
+  .pr-checkbox {
+    position: absolute;
+    top: 14px; right: 14px;
+    width: 22px; height: 22px;
+    border: 2px solid var(--line-2);
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  body[data-mode="select"] .pr-checkbox { display: flex; }
+  body[data-mode="select"] .pr-card.selected .pr-checkbox {
+    background: var(--primary);
+    border-color: var(--primary);
+  }
+  body[data-mode="select"] .pr-actions { display: none; }
+
+  /* ─── Bulk action bar ─── */
+  .bulkbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--ink);
+    color: #fff;
+    padding: 14px 16px calc(14px + env(safe-area-inset-bottom));
+    z-index: 20;
+    transform: translateY(120%);
+    transition: transform .25s cubic-bezier(.2,.8,.2,1);
+  }
+  .bulkbar[data-show="1"] { transform: translateY(0); }
+  .bulkbar-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .bulkbar-count {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .bulkbar-count b { font-size: 18px; }
+  .bulkbar .btn {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .bulkbar .btn-light {
+    background: rgba(255,255,255,.12);
+    color: #fff;
+  }
+  .bulkbar .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .bulkbar .btn-primary:hover { background: #c2410c; }
+
+  /* ─── Empty state ─── */
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--ink-3);
+  }
+  .empty-icon {
+    font-size: 48px;
+    margin-bottom: 8px;
+    opacity: .4;
+  }
+
+  /* ─── Detail drawer ─── */
+  .drawer-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(17,24,39,.5);
+    z-index: 80;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s;
+  }
+  .drawer-bg[data-open="1"] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .drawer {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: 100%;
+    max-width: 480px;
+    background: #fff;
+    z-index: 81;
+    transform: translateX(100%);
+    transition: transform .3s cubic-bezier(.2,.8,.2,1);
+    display: flex;
+    flex-direction: column;
+  }
+  .drawer[data-open="1"] { transform: translateX(0); }
+  .drawer-head {
+    padding: 16px 18px;
+    background: var(--primary);
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .drawer-head .title { font-weight: 600; font-size: 17px; }
+  .drawer-close {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.1);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+  }
+  .drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 18px;
+  }
+  .drawer-section {
+    margin-bottom: 18px;
+  }
+  .drawer-section .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .drawer-section .val {
+    font-size: 15px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .drawer-items {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .drawer-items table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .drawer-items th, .drawer-items td {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+  }
+  .drawer-items th {
+    background: #fafaf7;
+    color: var(--ink-3);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    font-weight: 600;
+  }
+  .drawer-items td.num { text-align: right; font-weight: 600; }
+  .drawer-items tr:last-child td { border-bottom: none; }
+  .drawer-foot {
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--line);
+    background: #fff;
+    display: flex;
+    gap: 8px;
+  }
+  .drawer-foot .btn {
+    border: none;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    flex: 1;
+  }
+  .drawer-foot .btn-secondary {
+    background: #f3f4f6;
+    color: var(--ink);
+  }
+  .drawer-foot .btn-primary {
+    background: var(--primary);
+    color: #fff;
+    flex: 2;
+  }
+  .drawer-foot .btn-danger {
+    background: var(--red-soft);
+    color: var(--red);
+    flex: 0 0 50px;
+    font-size: 18px;
+  }
+
+  /* ─── Toast ─── */
+  .toast {
+    position: fixed;
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 200;
+    box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    opacity: 0;
+    transition: all .25s;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast[data-show="1"] {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .toast.success { background: var(--green); }
+  .toast.error { background: var(--red); }
+
+  /* ─── Demo badge ─── */
+  .demo-badge {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,.6);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    z-index: 999;
+  }
+
+  /* ─── Two column grid on wider ─── */
+  @media (min-width: 720px) {
+    .pr-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 0 14px;
+    }
+    .pr-card { margin-bottom: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-brand">WANWELA · TWO BUILD</div>
+    <div class="header-row">
+      <div style="flex:1">
+        <div class="header-title">📥 PR Inbox</div>
+        <div class="header-sub">รายการใบขอซื้อที่ส่งเข้ามา · จัดการทั้งหมดจากที่นี่</div>
+      </div>
+      <div class="me-tag">
+        <div class="avatar">จน</div>
+        <div>
+          <div class="name">เจนจิรา</div>
+          <div class="role">แอดมินจัดซื้อ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat" data-tone="red">
+      <div class="v" id="statCritical">2</div>
+      <div class="l">🔴 ด่วนมาก</div>
+    </div>
+    <div class="stat" data-tone="yellow">
+      <div class="v" id="statUrgent">3</div>
+      <div class="l">🟡 ด่วน</div>
+    </div>
+    <div class="stat" data-tone="blue">
+      <div class="v" id="statNew">5</div>
+      <div class="l">📩 ใหม่</div>
+    </div>
+    <div class="stat">
+      <div class="v" id="statRfq">2</div>
+      <div class="l">📝 กำลังทำ RFQ</div>
+    </div>
+    <div class="stat" data-tone="green">
+      <div class="v" id="statReady">1</div>
+      <div class="l">✅ พร้อมออก PO</div>
+    </div>
+    <div class="stat">
+      <div class="v" id="statValue">฿—</div>
+      <div class="l">มูลค่ารวมประมาณ</div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-row">
+      <input type="text" class="search-input" id="search" placeholder="ค้นหา เลข PR / โฟร์แมน / แปลง / รายการสินค้า..." oninput="renderList()">
+    </div>
+    <div class="chips" id="statusChips"></div>
+  </div>
+
+  <div class="section-head">
+    <span id="resultCount">— รายการ</span>
+    <div class="controls">
+      <span class="toggle-link" id="selectModeBtn" onclick="toggleSelectMode()">☑ โหมดเลือก/รวม</span>
+    </div>
+  </div>
+
+  <!-- PR Cards -->
+  <div class="pr-list" id="prList"></div>
+</div>
+
+<!-- Bulk action bar -->
+<div class="bulkbar" id="bulkBar">
+  <div class="bulkbar-inner">
+    <div class="bulkbar-count">เลือกแล้ว <b id="selCount">0</b> ใบ</div>
+    <button class="btn btn-light" onclick="exitSelectMode()">ยกเลิก</button>
+    <button class="btn btn-primary" onclick="bulkRFQ()">📨 รวมเป็น RFQ เดียว →</button>
+  </div>
+</div>
+
+<!-- Detail Drawer -->
+<div class="drawer-bg" id="drawerBg" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div>
+      <div class="title" id="drawerTitle">PR-2026-0042</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.65);margin-top:2px" id="drawerSub">รายละเอียดใบขอซื้อ</div>
+    </div>
+    <div class="drawer-close" onclick="closeDrawer()">✕</div>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-foot" id="drawerFoot"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">—</div>
+
+<div class="demo-badge">DEMO · P0 · #2</div>
+
+<script>
+  // ─── Mock PR data ───
+  // ในเวอร์ชันจริงจะ fetch จาก API: getActivePRs()
+  const NOW = new Date(2026, 4, 25, 14, 30); // 25 พ.ค. 2569 14:30
+
+  function minsAgo(m) { return new Date(NOW.getTime() - m*60000); }
+  function timeAgo(d) {
+    const min = Math.floor((NOW - d) / 60000);
+    if (min < 1) return 'เมื่อกี้';
+    if (min < 60) return `${min} นาทีที่แล้ว`;
+    const hr = Math.floor(min / 60);
+    if (hr < 24) return `${hr} ชั่วโมงที่แล้ว`;
+    const day = Math.floor(hr / 24);
+    return `${day} วันที่แล้ว`;
+  }
+
+  const PRS = [
+    {
+      id: 'PR-2026-0042',
+      status: 'new', urgency: 'urgent',
+      requester: 'สมชาย เกตุแก้ว', team: 'โก้',
+      target: 'แปลง 1 (89/1)', typeKey: 'A', typeShort: 'A ULTRA',
+      submittedAt: minsAgo(5),
+      needDate: '28 พ.ค. 2569',
+      items: [
+        { name: 'ปูนซีเมนต์ TPI ปอร์ตแลนด์ 50 กก.', qty: 100, unit: 'ถุง' },
+        { name: 'เหล็กข้ออ้อย DB12', qty: 50, unit: 'เส้น' },
+        { name: 'ทรายหยาบ', qty: 8, unit: 'คิว' },
+        { name: 'ลวดผูกเหล็ก', qty: 5, unit: 'กก.' },
+      ],
+      note: 'ขอด่วน ฐานราก B-02 พร้อมเทพรุ่งนี้',
+      estValue: 18500,
+    },
+    {
+      id: 'PR-2026-0041',
+      status: 'new', urgency: 'normal',
+      requester: 'สมชาย เกตุแก้ว', team: 'โก้',
+      target: 'แปลง 2 (89/2)', typeKey: 'A', typeShort: 'A ULTRA',
+      submittedAt: minsAgo(12),
+      needDate: '30 พ.ค. 2569',
+      items: [
+        { name: 'อิฐมวลเบา 7.5x20x60', qty: 800, unit: 'ก้อน' },
+        { name: 'ปูนก่อ TPI', qty: 30, unit: 'ถุง' },
+      ],
+      note: '',
+      estValue: 8400,
+    },
+    {
+      id: 'PR-2026-0040',
+      status: 'new', urgency: 'critical',
+      requester: 'ใหญ่ พุ่มวารี', team: 'ใหญ่',
+      target: 'แปลง 100 (90/12)', typeKey: 'B', typeShort: 'B MINUTES',
+      submittedAt: minsAgo(28),
+      needDate: '26 พ.ค. 2569',
+      items: [
+        { name: 'สีน้ำพลาสติก TOA Supershield ขาว 18.925L', qty: 6, unit: 'ถัง' },
+        { name: 'สีรองพื้น TOA 9000', qty: 3, unit: 'ถัง' },
+        { name: 'ลูกกลิ้งสี + แปรง', qty: 1, unit: 'ชุด' },
+      ],
+      note: 'ลูกค้านัดดูบ้านพรุ่งนี้! ต้องเสร็จก่อนเช้า',
+      estValue: 7200,
+    },
+    {
+      id: 'PR-2026-0039',
+      status: 'new', urgency: 'normal',
+      requester: 'ใหญ่ พุ่มวารี', team: 'ใหญ่',
+      target: 'งานถนน / ทางเข้าโครงการ', typeKey: 'X', typeShort: 'ส่วนกลาง',
+      submittedAt: minsAgo(48),
+      needDate: '2 มิ.ย. 2569',
+      items: [
+        { name: 'หินคลุก', qty: 10, unit: 'คิว' },
+        { name: 'หิน 3/4', qty: 5, unit: 'คิว' },
+      ],
+      note: 'งานเทถนนทางเข้าโซน C',
+      estValue: 6500,
+    },
+    {
+      id: 'PR-2026-0038',
+      status: 'rfq', urgency: 'normal',
+      requester: 'สมชาย เกตุแก้ว', team: 'โก้',
+      target: 'แปลง 3 (89/3)', typeKey: 'A', typeShort: 'A ULTRA',
+      submittedAt: minsAgo(95),
+      needDate: '1 มิ.ย. 2569',
+      items: [
+        { name: 'กระเบื้องเคลือบ 60x60', qty: 100, unit: 'แผ่น' },
+        { name: 'ยาแนวกระเบื้อง Jorakay', qty: 10, unit: 'กก.' },
+      ],
+      note: 'เลือกสี Light Grey · พื้นห้องนั่งเล่น',
+      estValue: 22000,
+      rfqSent: ['SCG Home', 'HomePro', 'Global House'],
+    },
+    {
+      id: 'PR-2026-0037',
+      status: 'rfq', urgency: 'urgent',
+      requester: 'ใหญ่ พุ่มวารี', team: 'ใหญ่',
+      target: 'แปลง 200 (91/4)', typeKey: 'C', typeShort: 'C SECOND',
+      submittedAt: minsAgo(140),
+      needDate: '29 พ.ค. 2569',
+      items: [
+        { name: 'สุขภัณฑ์ TOTO ครบชุด', qty: 2, unit: 'ชุด' },
+        { name: 'ก๊อกน้ำซิงค์ COTTO', qty: 4, unit: 'ตัว' },
+      ],
+      note: '',
+      estValue: 35000,
+      rfqSent: ['HomePro', 'Index'],
+    },
+    {
+      id: 'PR-2026-0036',
+      status: 'waiting', urgency: 'normal',
+      requester: 'สมชาย เกตุแก้ว', team: 'โก้',
+      target: 'แปลง 89/2', typeKey: 'A', typeShort: 'A ULTRA',
+      submittedAt: minsAgo(210),
+      needDate: '3 มิ.ย. 2569',
+      items: [
+        { name: 'สายไฟ THW 2.5 sq.mm', qty: 200, unit: 'เมตร' },
+        { name: 'สวิตช์ไฟ Panasonic WEG', qty: 12, unit: 'ตัว' },
+        { name: 'ปลั๊ก Panasonic 3 ตา', qty: 18, unit: 'ตัว' },
+      ],
+      note: '',
+      estValue: 9800,
+      rfqSent: ['HomePro', 'Mega Home', 'Thai Watsadu'],
+      quotesReceived: 3,
+      quotesExpected: 3,
+    },
+    {
+      id: 'PR-2026-0035',
+      status: 'waiting', urgency: 'urgent',
+      requester: 'ใหญ่ พุ่มวารี', team: 'ใหญ่',
+      target: 'งานสโมสร / สวนกลาง', typeKey: 'X', typeShort: 'ส่วนกลาง',
+      submittedAt: minsAgo(265),
+      needDate: '5 มิ.ย. 2569',
+      items: [
+        { name: 'ปูนซีเมนต์ TPI 50 กก.', qty: 200, unit: 'ถุง' },
+        { name: 'ทรายหยาบ', qty: 15, unit: 'คิว' },
+        { name: 'หิน 3/4', qty: 10, unit: 'คิว' },
+      ],
+      note: 'เทพื้นโรงจอดรถสโมสร',
+      estValue: 24500,
+      rfqSent: ['SCG Home', 'TPI ตรง', 'ร้านวัสดุท้องถิ่น'],
+      quotesReceived: 2,
+      quotesExpected: 3,
+    },
+    {
+      id: 'PR-2026-0034',
+      status: 'ready', urgency: 'normal',
+      requester: 'ใหญ่ พุ่มวารี', team: 'ใหญ่',
+      target: 'แปลง 300 (92/1)', typeKey: 'D', typeShort: 'D MOMENT',
+      submittedAt: minsAgo(320),
+      needDate: '7 มิ.ย. 2569',
+      items: [
+        { name: 'ท่อ PVC สีฟ้า 4"', qty: 30, unit: 'เส้น' },
+        { name: 'ข้อต่อ PVC ครบชุด', qty: 1, unit: 'ชุด' },
+      ],
+      note: 'พร้อมออก PO — ราคา HomePro ถูกสุด',
+      estValue: 5400,
+      rfqSent: ['HomePro', 'Mega Home'],
+      quotesReceived: 2,
+      quotesExpected: 2,
+      bestVendor: 'HomePro',
+    },
+    {
+      id: 'PR-2026-0033',
+      status: 'done', urgency: 'normal',
+      requester: 'สมชาย เกตุแก้ว', team: 'โก้',
+      target: 'แปลง 1 (89/1)', typeKey: 'A', typeShort: 'A ULTRA',
+      submittedAt: new Date(2026, 4, 24, 10, 30),
+      needDate: '24 พ.ค. 2569',
+      items: [
+        { name: 'เหล็กข้ออ้อย DB16', qty: 30, unit: 'เส้น' },
+        { name: 'เหล็กข้ออ้อย DB12', qty: 50, unit: 'เส้น' },
+      ],
+      note: '',
+      estValue: 28000,
+      poNumber: 'PO-2026-0021',
+    },
+    {
+      id: 'PR-2026-0032',
+      status: 'done', urgency: 'normal',
+      requester: 'ใหญ่ พุ่มวารี', team: 'ใหญ่',
+      target: 'แปลง 100 (90/12)', typeKey: 'B', typeShort: 'B MINUTES',
+      submittedAt: new Date(2026, 4, 23, 16, 15),
+      needDate: '25 พ.ค. 2569',
+      items: [
+        { name: 'ปูนซีเมนต์ TPI 50 กก.', qty: 60, unit: 'ถุง' },
+      ],
+      note: '',
+      estValue: 9600,
+      poNumber: 'PO-2026-0020',
+    },
+  ];
+
+  // ─── State ───
+  let statusFilter = 'active'; // active | new | rfq | waiting | ready | done | urgent | all
+  let selectMode = false;
+  const selected = new Set();
+
+  // ─── Status meta ───
+  const STATUS = {
+    new:     { label: '📩 ใหม่',          tone: 'blue' },
+    rfq:     { label: '📝 กำลังทำ RFQ',     tone: '' },
+    waiting: { label: '⏳ รอใบเสนอราคา',   tone: 'yellow' },
+    ready:   { label: '✅ พร้อมออก PO',    tone: 'green' },
+    done:    { label: '✔️ ออก PO แล้ว',    tone: '' },
+  };
+
+  // ─── Chips ───
+  function renderChips() {
+    const c = document.getElementById('statusChips');
+    const counts = { all: PRS.length, active: 0, new: 0, rfq: 0, waiting: 0, ready: 0, done: 0, urgent: 0 };
+    PRS.forEach(p => {
+      counts[p.status]++;
+      if (p.status !== 'done') counts.active++;
+      if (p.urgency === 'urgent' || p.urgency === 'critical') counts.urgent++;
+    });
+    const chips = [
+      { k: 'active', label: 'ที่ค้างทั้งหมด', tone: '' },
+      { k: 'urgent', label: '🔥 ด่วน',        tone: 'red' },
+      { k: 'new',    label: '📩 ใหม่',         tone: 'blue' },
+      { k: 'rfq',    label: '📝 RFQ',          tone: '' },
+      { k: 'waiting',label: '⏳ รอราคา',       tone: 'yellow' },
+      { k: 'ready',  label: '✅ พร้อมออก PO', tone: 'green' },
+      { k: 'done',   label: '✔️ เสร็จแล้ว',    tone: '' },
+      { k: 'all',    label: 'ทั้งหมด',         tone: '' },
+    ];
+    c.innerHTML = '';
+    chips.forEach(({k,label,tone}) => {
+      const el = document.createElement('div');
+      el.className = 'chip';
+      el.dataset.on = (k === statusFilter) ? '1' : '0';
+      if (tone) el.dataset.tone = tone;
+      el.innerHTML = `${label}<span class="count">${counts[k]||0}</span>`;
+      el.onclick = () => { statusFilter = k; renderChips(); renderList(); };
+      c.appendChild(el);
+    });
+  }
+
+  // ─── List ───
+  function filterPRs() {
+    const q = (document.getElementById('search').value || '').trim().toLowerCase();
+    return PRS.filter(p => {
+      if (statusFilter === 'active' && p.status === 'done') return false;
+      else if (statusFilter === 'urgent' && p.urgency !== 'urgent' && p.urgency !== 'critical') return false;
+      else if (!['all','active','urgent'].includes(statusFilter) && p.status !== statusFilter) return false;
+      if (!q) return true;
+      const hay = `${p.id} ${p.requester} ${p.team} ${p.target} ${p.items.map(i=>i.name).join(' ')}`.toLowerCase();
+      return hay.includes(q);
+    });
+  }
+
+  function renderList() {
+    const list = filterPRs();
+    document.getElementById('resultCount').textContent = `${list.length} รายการ`;
+    const c = document.getElementById('prList');
+    c.innerHTML = '';
+    if (list.length === 0) {
+      c.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🎉</div>ไม่มีงานค้างในกรองนี้</div>`;
+      return;
+    }
+    list.forEach(p => c.appendChild(renderCard(p)));
+    updateStats();
+  }
+
+  function renderCard(p) {
+    const el = document.createElement('div');
+    el.className = 'pr-card';
+    el.dataset.status = p.status;
+    el.dataset.id = p.id;
+    if (selected.has(p.id)) el.classList.add('selected');
+
+    const firstItems = p.items.slice(0, 2).map(i =>
+      `<b>${i.name}</b> <span style="color:var(--ink-3)">${i.qty} ${i.unit}</span>`
+    ).join(' · ');
+    const moreCount = p.items.length - 2;
+
+    const subInfo = (() => {
+      if (p.status === 'done')        return `<span class="pill">📋 ${p.poNumber}</span>`;
+      if (p.status === 'ready')       return `<span class="pill" style="background:var(--green-soft);color:var(--green)">✓ ${p.bestVendor || ''} ถูกสุด</span>`;
+      if (p.status === 'waiting')     return `<span class="pill" style="background:var(--yellow-soft);color:var(--yellow)">📨 ${p.quotesReceived||0}/${p.quotesExpected||0} ราคา</span>`;
+      if (p.status === 'rfq')         return `<span class="pill">📨 ส่ง ${(p.rfqSent||[]).length} เจ้า</span>`;
+      return '';
+    })();
+
+    const urgencyChip = (p.urgency === 'urgent' || p.urgency === 'critical')
+      ? `<span class="pr-urgency" data-u="${p.urgency}">${p.urgency === 'critical' ? '🔴 ด่วนมาก' : '🟡 ด่วน'}</span>`
+      : '';
+
+    const actions = (() => {
+      if (p.status === 'new')     return `<button class="pr-btn primary" onclick="event.stopPropagation();actStartRFQ('${p.id}')">📨 เริ่มทำ RFQ →</button>
+                                          <button class="pr-btn danger" onclick="event.stopPropagation();actReject('${p.id}')">ตีกลับ</button>`;
+      if (p.status === 'rfq')     return `<button class="pr-btn primary" onclick="event.stopPropagation();actEnterQuotes('${p.id}')">📥 กรอกราคา</button>
+                                          <button class="pr-btn" onclick="event.stopPropagation();actChaseVendor('${p.id}')">💬 ทวงราคา</button>`;
+      if (p.status === 'waiting') return `<button class="pr-btn primary" onclick="event.stopPropagation();actEnterQuotes('${p.id}')">📥 กรอกราคาเพิ่ม</button>
+                                          <button class="pr-btn" onclick="event.stopPropagation();actChaseVendor('${p.id}')">💬 ทวง</button>`;
+      if (p.status === 'ready')   return `<button class="pr-btn primary" onclick="event.stopPropagation();actCreatePO('${p.id}')">📋 ออก PO →</button>
+                                          <button class="pr-btn" onclick="event.stopPropagation();actCompare('${p.id}')">🔍 ดูเทียบราคา</button>`;
+      if (p.status === 'done')    return `<button class="pr-btn" onclick="event.stopPropagation();actViewPO('${p.id}')">📋 ดู ${p.poNumber}</button>`;
+      return '';
+    })();
+
+    el.innerHTML = `
+      <div class="pr-checkbox">✓</div>
+      <div class="pr-head">
+        <div class="pr-head-left">
+          <span class="pr-no">${p.id}</span>
+          <span class="pr-status" data-s="${p.status}">${STATUS[p.status].label}</span>
+          ${urgencyChip}
+        </div>
+        <span class="pr-time">${timeAgo(p.submittedAt)}</span>
+      </div>
+      <div class="pr-meta">
+        <span class="pill team-${p.team === 'โก้' ? 'A' : 'B'}">👷 ${p.requester} · ทีม${p.team}</span>
+        <span class="pill type-${p.typeKey}">📍 ${p.target}</span>
+        <span class="pill">📅 ต้องการ ${p.needDate}</span>
+        ${subInfo}
+      </div>
+      <div class="pr-items">
+        ${firstItems}
+        ${moreCount > 0 ? `<span class="more"> + อีก ${moreCount} รายการ</span>` : ''}
+      </div>
+      <div class="pr-actions">
+        ${actions}
+        <button class="pr-btn" onclick="event.stopPropagation();openDrawer('${p.id}')">📄 ดูเต็ม</button>
+      </div>
+    `;
+    el.onclick = () => {
+      if (selectMode) toggleSelect(p.id, el);
+      else openDrawer(p.id);
+    };
+    return el;
+  }
+
+  function updateStats() {
+    let critical = 0, urgent = 0, newC = 0, rfq = 0, ready = 0, value = 0;
+    PRS.forEach(p => {
+      if (p.status === 'done') return;
+      if (p.urgency === 'critical') critical++;
+      if (p.urgency === 'urgent') urgent++;
+      if (p.status === 'new') newC++;
+      if (p.status === 'rfq' || p.status === 'waiting') rfq++;
+      if (p.status === 'ready') ready++;
+      value += p.estValue || 0;
+    });
+    document.getElementById('statCritical').textContent = critical;
+    document.getElementById('statUrgent').textContent = urgent;
+    document.getElementById('statNew').textContent = newC;
+    document.getElementById('statRfq').textContent = rfq;
+    document.getElementById('statReady').textContent = ready;
+    document.getElementById('statValue').textContent = '฿' + (value/1000).toFixed(0) + 'k';
+  }
+
+  // ─── Selection mode ───
+  function toggleSelectMode() {
+    selectMode = !selectMode;
+    document.body.dataset.mode = selectMode ? 'select' : '';
+    document.getElementById('selectModeBtn').textContent = selectMode ? '✕ ออกจากโหมดเลือก' : '☑ โหมดเลือก/รวม';
+    if (!selectMode) {
+      selected.clear();
+      document.querySelectorAll('.pr-card').forEach(c => c.classList.remove('selected'));
+      document.getElementById('bulkBar').dataset.show = '0';
+    }
+  }
+  function exitSelectMode() { if (selectMode) toggleSelectMode(); }
+  function toggleSelect(id, el) {
+    if (selected.has(id)) {
+      selected.delete(id);
+      el.classList.remove('selected');
+    } else {
+      selected.add(id);
+      el.classList.add('selected');
+    }
+    document.getElementById('selCount').textContent = selected.size;
+    document.getElementById('bulkBar').dataset.show = selected.size > 0 ? '1' : '0';
+  }
+  function bulkRFQ() {
+    if (selected.size === 0) return;
+    if (selected.size < 2) {
+      showToast('เลือกอย่างน้อย 2 ใบเพื่อรวม', 'error');
+      return;
+    }
+    showToast(`Demo: รวม ${selected.size} ใบเป็น RFQ เดียว → ไปหน้า #3`, 'success');
+    setTimeout(() => {
+      exitSelectMode();
+    }, 1200);
+  }
+
+  // ─── Drawer (detail) ───
+  function openDrawer(id) {
+    const p = PRS.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('drawerTitle').textContent = p.id;
+    document.getElementById('drawerSub').textContent = STATUS[p.status].label + ' · ' + timeAgo(p.submittedAt);
+
+    const body = document.getElementById('drawerBody');
+    const urgencyLabel = { normal: '🟢 ปกติ', urgent: '🟡 ด่วน', critical: '🔴 ด่วนมาก' }[p.urgency];
+    const itemRows = p.items.map((it, i) => `
+      <tr>
+        <td style="color:var(--ink-3);width:24px">${i+1}</td>
+        <td>${it.name}</td>
+        <td class="num">${it.qty.toLocaleString('th-TH')}</td>
+        <td style="color:var(--ink-2);width:50px">${it.unit}</td>
+      </tr>
+    `).join('');
+
+    let extra = '';
+    if (p.rfqSent) {
+      extra += `<div class="drawer-section">
+        <div class="label">📨 RFQ ส่งให้</div>
+        <div class="val">${p.rfqSent.map(v => `<span class="pill" style="margin-right:6px;background:#f5f3ee;padding:4px 10px;border-radius:6px;font-size:13px">${v}</span>`).join('')}</div>
+      </div>`;
+    }
+    if (typeof p.quotesReceived === 'number') {
+      extra += `<div class="drawer-section">
+        <div class="label">📥 ราคาที่ได้รับ</div>
+        <div class="val">${p.quotesReceived} / ${p.quotesExpected} เจ้า</div>
+      </div>`;
+    }
+    if (p.bestVendor) {
+      extra += `<div class="drawer-section">
+        <div class="label">⭐ Vendor แนะนำ</div>
+        <div class="val" style="color:var(--green)">${p.bestVendor} (ถูกสุด)</div>
+      </div>`;
+    }
+    if (p.poNumber) {
+      extra += `<div class="drawer-section">
+        <div class="label">📋 เลข PO ที่ออก</div>
+        <div class="val"><b>${p.poNumber}</b></div>
+      </div>`;
+    }
+
+    body.innerHTML = `
+      <div class="drawer-section">
+        <div class="label">ผู้ขอ</div>
+        <div class="val">${p.requester} · ทีม${p.team}</div>
+      </div>
+      <div class="drawer-section">
+        <div class="label">เป้าหมาย</div>
+        <div class="val">${p.target} <span style="color:var(--ink-3);font-size:13px">(${p.typeShort})</span></div>
+      </div>
+      <div class="drawer-section">
+        <div class="label">วันที่ต้องการใช้</div>
+        <div class="val">${p.needDate}</div>
+      </div>
+      <div class="drawer-section">
+        <div class="label">ความเร่งด่วน</div>
+        <div class="val">${urgencyLabel}</div>
+      </div>
+      <div class="drawer-section">
+        <div class="label">รายการที่ขอ (${p.items.length})</div>
+        <div class="drawer-items">
+          <table>
+            <thead>
+              <tr><th>#</th><th>รายการ</th><th class="num">จำนวน</th><th>หน่วย</th></tr>
+            </thead>
+            <tbody>${itemRows}</tbody>
+          </table>
+        </div>
+        <div style="font-size:12px;color:var(--ink-3);margin-top:6px">มูลค่าประมาณการ: <b style="color:var(--ink)">฿${p.estValue.toLocaleString('th-TH')}</b></div>
+      </div>
+      ${p.note ? `<div class="drawer-section">
+        <div class="label">หมายเหตุจากโฟร์แมน</div>
+        <div class="val" style="background:#fafaf7;padding:10px 12px;border-radius:8px;font-size:14px">${p.note}</div>
+      </div>` : ''}
+      ${extra}
+    `;
+
+    // foot actions
+    const foot = document.getElementById('drawerFoot');
+    let primaryBtn = '';
+    if (p.status === 'new')     primaryBtn = `<button class="btn btn-primary" onclick="closeDrawer();actStartRFQ('${p.id}')">📨 เริ่มทำ RFQ →</button>`;
+    if (p.status === 'rfq' || p.status === 'waiting')
+                                 primaryBtn = `<button class="btn btn-primary" onclick="closeDrawer();actEnterQuotes('${p.id}')">📥 กรอกราคา</button>`;
+    if (p.status === 'ready')   primaryBtn = `<button class="btn btn-primary" onclick="closeDrawer();actCreatePO('${p.id}')">📋 ออก PO →</button>`;
+    if (p.status === 'done')    primaryBtn = `<button class="btn btn-primary" onclick="closeDrawer();actViewPO('${p.id}')">📋 ดู ${p.poNumber}</button>`;
+
+    foot.innerHTML = `
+      <button class="btn btn-secondary" onclick="closeDrawer()">ปิด</button>
+      <button class="btn btn-danger" onclick="actReject('${p.id}');closeDrawer()" title="ตีกลับ">✕</button>
+      ${primaryBtn}
+    `;
+
+    document.getElementById('drawerBg').dataset.open = '1';
+    document.getElementById('drawer').dataset.open = '1';
+  }
+  function closeDrawer() {
+    document.getElementById('drawerBg').dataset.open = '0';
+    document.getElementById('drawer').dataset.open = '0';
+  }
+
+  // ─── Actions (demo only — link to other pages) ───
+  function actStartRFQ(id) { showToast(`Demo: → หน้า #3 ทำ RFQ สำหรับ ${id}`, 'success'); }
+  function actEnterQuotes(id) { showToast(`Demo: → หน้ากรอกราคา vendor`, 'success'); }
+  function actChaseVendor(id) { showToast(`Demo: ส่งทวงราคาผ่าน LINE`, 'success'); }
+  function actCreatePO(id) { showToast(`Demo: → หน้า #4 ออก PO สำหรับ ${id}`, 'success'); }
+  function actCompare(id) { showToast(`Demo: ดูตารางเทียบราคา vendor`, 'success'); }
+  function actViewPO(id) { const p = PRS.find(x=>x.id===id); showToast(`Demo: เปิด ${p.poNumber}`, 'success'); }
+  function actReject(id) {
+    if (!confirm(`ตีกลับ ${id}?\n\nระบบจะแจ้งโฟร์แมนผ่าน LINE ให้แก้ไข`)) return;
+    showToast(`ตีกลับ ${id} แล้ว — แจ้งโฟร์แมนแล้ว`, 'error');
+  }
+
+  // ─── Toast ───
+  function showToast(msg, kind = '') {
+    const t = document.getElementById('toast');
+    t.className = `toast ${kind}`;
+    t.textContent = msg;
+    t.dataset.show = '1';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.dataset.show = '0', 2200);
+  }
+
+  // ─── Init ───
+  renderChips();
+  renderList();
+</script>
+
+</body>
+</html>

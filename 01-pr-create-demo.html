@@ -1,0 +1,2259 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#1f2937" />
+<title>ใบขอซื้อ (PR) · วันเวลา ERP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  :root {
+    --bg: #f5f3ee;
+    --card: #ffffff;
+    --ink: #1f2937;
+    --ink-2: #4b5563;
+    --ink-3: #9ca3af;
+    --line: #e5e3dc;
+    --line-2: #d6d3c8;
+    --primary: #1f2937;
+    --primary-soft: #374151;
+    --accent: #b45309;
+    --accent-soft: #fef3c7;
+    --green: #16a34a;
+    --green-soft: #dcfce7;
+    --red: #dc2626;
+    --red-soft: #fee2e2;
+    --yellow: #ca8a04;
+    --yellow-soft: #fef9c3;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --shadow: 0 1px 2px rgba(17,24,39,.04), 0 8px 24px rgba(17,24,39,.06);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--bg);
+    min-height: 100vh;
+    padding-bottom: 110px;
+    position: relative;
+  }
+  /* ─── Header ─── */
+  .header {
+    background: var(--primary);
+    color: #fff;
+    padding: 14px 18px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 0 rgba(0,0,0,.04);
+  }
+  .header-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .back {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,.08);
+    color: #fff;
+    cursor: pointer;
+    font-size: 20px;
+  }
+  .header-title {
+    font-weight: 600;
+    font-size: 17px;
+    flex: 1;
+  }
+  .header-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,.65);
+    margin-top: 2px;
+    letter-spacing: .5px;
+  }
+  .header-brand {
+    font-size: 11px;
+    color: rgba(255,255,255,.55);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+
+  /* ─── Cards ─── */
+  .section {
+    padding: 16px 16px 0;
+  }
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+  }
+  .card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-2);
+    text-transform: uppercase;
+    letter-spacing: .8px;
+  }
+  .card-hint {
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+
+  /* ─── Form fields ─── */
+  .field {
+    margin-bottom: 12px;
+  }
+  .field:last-child {
+    margin-bottom: 0;
+  }
+  .label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-2);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .label .req {
+    color: var(--red);
+  }
+  .input, .textarea, .select {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    background: #fdfcf9;
+    border-radius: var(--radius-sm);
+    padding: 11px 13px;
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s, background .15s;
+  }
+  .input:focus, .textarea:focus, .select:focus {
+    border-color: var(--primary);
+    background: #fff;
+  }
+  .textarea {
+    resize: vertical;
+    min-height: 70px;
+  }
+  .select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234b5563' stroke-width='2.5'%3e%3cpolyline points='6 9 12 15 18 9'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+  }
+
+  /* ─── Foreman identity badge ─── */
+  .me {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: #f9f7f1;
+    border-radius: var(--radius-sm);
+    margin-bottom: 12px;
+  }
+  .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .me-info { flex: 1; line-height: 1.3; }
+  .me-name { font-weight: 600; font-size: 14px; }
+  .me-role { font-size: 11px; color: var(--ink-3); }
+  .me-pr {
+    text-align: right;
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+  .me-pr b {
+    display: block;
+    font-size: 13px;
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* ─── Target button ─── */
+  .target-btn {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    background: #fdfcf9;
+    border-radius: var(--radius-sm);
+    padding: 11px 13px;
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 48px;
+    transition: border-color .15s;
+  }
+  .target-btn:hover, .target-btn:active { border-color: var(--primary); }
+  .target-btn-text {
+    flex: 1;
+    line-height: 1.25;
+  }
+  .target-btn-text.placeholder { color: var(--ink-3); }
+  .target-btn-text b { font-weight: 600; }
+  .target-btn-text .sub {
+    display: block;
+    font-size: 11px;
+    color: var(--ink-3);
+    margin-top: 2px;
+    font-weight: 400;
+  }
+  .target-btn-meta {
+    font-size: 11px;
+    color: var(--ink-2);
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .target-btn-meta:empty { display: none; }
+  .target-btn-chev {
+    color: var(--ink-3);
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  /* ─── Type filter chips inside sheet ─── */
+  .type-chips {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 8px 0 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .type-chips::-webkit-scrollbar { display: none; }
+  .type-chip {
+    flex: 0 0 auto;
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-2);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .12s;
+  }
+  .type-chip[data-on="1"] {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+  .type-chip .count {
+    font-size: 10px;
+    opacity: .7;
+    margin-left: 3px;
+  }
+
+  /* plot list rows */
+  .plot-row .opt-icon {
+    background: #dcfce7;
+    color: var(--green);
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .plot-row[data-type="A"] .opt-icon { background: #fef3c7; color: #b45309; }
+  .plot-row[data-type="B"] .opt-icon { background: #dbeafe; color: #1d4ed8; }
+  .plot-row[data-type="C"] .opt-icon { background: #fce7f3; color: #be185d; }
+  .plot-row[data-type="D"] .opt-icon { background: #ede9fe; color: #7c3aed; }
+  .plot-row[data-type="X"] .opt-icon { background: #f3f4f6; color: var(--ink-2); }
+  .plot-status {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-weight: 600;
+    background: #f3f4f6;
+    color: var(--ink-2);
+  }
+  .plot-status.s-โอนแล้ว { background: var(--green-soft); color: var(--green); }
+  .plot-status.s-จอง { background: var(--yellow-soft); color: var(--yellow); }
+  .plot-status.s-ทำสัญญา { background: #dbeafe; color: #1d4ed8; }
+  .plot-status.s-ว่าง { background: #f3f4f6; color: var(--ink-3); }
+
+  /* ─── Urgency chips ─── */
+  .chips {
+    display: flex;
+    gap: 8px;
+  }
+  .chip {
+    flex: 1;
+    padding: 9px 8px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--line);
+    background: #fdfcf9;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-2);
+    cursor: pointer;
+    transition: all .12s;
+  }
+  .chip[data-on="1"] {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+  .chip[data-color="green"][data-on="1"] {
+    background: var(--green); border-color: var(--green);
+  }
+  .chip[data-color="yellow"][data-on="1"] {
+    background: var(--yellow); border-color: var(--yellow);
+  }
+  .chip[data-color="red"][data-on="1"] {
+    background: var(--red); border-color: var(--red);
+  }
+
+  /* ─── Items list ─── */
+  .items {
+    margin-bottom: 10px;
+  }
+  .item {
+    background: #fdfcf9;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .item-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .item-name {
+    font-weight: 600;
+    font-size: 15px;
+    flex: 1;
+  }
+  .item-name .ph {
+    color: var(--ink-3);
+    font-weight: 400;
+  }
+  .item-del {
+    color: var(--ink-3);
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+  }
+  .item-del:hover {
+    color: var(--red);
+    background: var(--red-soft);
+  }
+  .item-row {
+    display: grid;
+    grid-template-columns: 1fr 80px;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .item-row:last-child { margin-bottom: 0; }
+  .qty-input {
+    text-align: center;
+    font-weight: 600;
+    font-size: 16px;
+  }
+  .unit-input {
+    background: #fdfcf9;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 11px 6px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--ink-2);
+    font-weight: 500;
+    font-family: inherit;
+    width: 100%;
+    outline: none;
+    transition: border-color .15s, background .15s, color .15s;
+  }
+  .unit-input:focus {
+    border-color: var(--primary);
+    background: #fff;
+    color: var(--ink);
+  }
+  .unit-input.custom {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .unit-label {
+    font-size: 10px;
+    color: var(--ink-3);
+    text-align: center;
+    margin-top: 3px;
+    line-height: 1.2;
+  }
+  .item-note {
+    font-size: 13px;
+    padding: 8px 10px;
+    background: #fff;
+    border: 1px dashed var(--line-2);
+    border-radius: 8px;
+    color: var(--ink-2);
+    width: 100%;
+    font-family: inherit;
+  }
+  .item-note::placeholder { color: var(--ink-3); }
+
+  .add-item-btn {
+    width: 100%;
+    border: 1.5px dashed var(--line-2);
+    background: transparent;
+    color: var(--primary);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .add-item-btn:hover { background: #fafaf7; }
+
+  /* ─── Photo upload ─── */
+  .photos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+  }
+  .photo, .photo-add {
+    aspect-ratio: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+  .photo {
+    background-size: cover;
+    background-position: center;
+    background-color: #efece4;
+  }
+  .photo-rm {
+    position: absolute;
+    top: 4px; right: 4px;
+    background: rgba(0,0,0,.6);
+    color: #fff;
+    border-radius: 50%;
+    width: 20px; height: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .photo-add {
+    background: #fdfcf9;
+    border: 1.5px dashed var(--line-2);
+    color: var(--ink-3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 11px;
+    gap: 2px;
+  }
+  .photo-add .icon { font-size: 22px; }
+
+  /* ─── Bottom action bar ─── */
+  .bottombar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255,255,255,.95);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--line);
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    z-index: 20;
+  }
+  .bottombar-inner {
+    max-width: 480px;
+    margin: 0 auto;
+    display: flex;
+    gap: 10px;
+  }
+  .btn {
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 13px 16px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  .btn:active { opacity: .8; }
+  .btn-secondary {
+    background: #efece4;
+    color: var(--ink);
+    flex: 1;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+    flex: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn-primary[disabled] {
+    background: var(--ink-3);
+    cursor: not-allowed;
+  }
+
+  /* ─── Bottom Sheet ─── */
+  .sheet-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(17,24,39,.5);
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s;
+  }
+  .sheet-bg[data-open="1"] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 22px 22px 0 0;
+    z-index: 51;
+    max-height: 85vh;
+    transform: translateY(100%);
+    transition: transform .25s cubic-bezier(.2,.8,.2,1);
+    display: flex;
+    flex-direction: column;
+  }
+  .sheet[data-open="1"] {
+    transform: translateY(0);
+  }
+  .sheet-handle {
+    width: 36px;
+    height: 4px;
+    background: var(--line-2);
+    border-radius: 2px;
+    margin: 8px auto 4px;
+  }
+  .sheet-head {
+    padding: 8px 16px 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .sheet-title {
+    font-weight: 600;
+    font-size: 17px;
+    margin-bottom: 8px;
+  }
+  .sheet-search {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px 10px 36px;
+    font-family: inherit;
+    font-size: 15px;
+    background: #fdfcf9 url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5'%3e%3ccircle cx='11' cy='11' r='7'/%3e%3cpath d='m21 21-4.3-4.3'/%3e%3c/svg%3e") 10px center no-repeat;
+    outline: none;
+  }
+  .sheet-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 16px 16px;
+  }
+  .sheet-cat {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    letter-spacing: 1px;
+    font-weight: 600;
+    padding: 12px 4px 6px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 4px;
+  }
+  .sheet-opt {
+    padding: 11px 4px;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sheet-opt:hover {
+    background: #fafaf7;
+  }
+  .sheet-opt:last-child { border-bottom: none; }
+  .opt-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .opt-icon.house { background: #dcfce7; color: var(--green); }
+  .opt-icon.public { background: #dbeafe; color: #1d4ed8; }
+  .opt-info { flex: 1; line-height: 1.3; }
+  .opt-name { font-weight: 500; font-size: 15px; }
+  .opt-sub { font-size: 12px; color: var(--ink-3); }
+  .opt-unit {
+    font-size: 12px;
+    color: var(--ink-3);
+    background: #efece4;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+
+  /* ─── Toast ─── */
+  .toast {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 100;
+    box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    opacity: 0;
+    transition: all .25s;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast[data-show="1"] {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .toast.success { background: var(--green); }
+  .toast.error { background: var(--red); }
+
+  /* ─── Demo badge ─── */
+  .demo-badge {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,.6);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    z-index: 999;
+  }
+
+  /* ─── Success screen ─── */
+  .success-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 200;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    text-align: center;
+  }
+  .success-screen[data-show="1"] {
+    display: flex;
+    animation: fadeIn .3s;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .check-circle {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: var(--green);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    margin-bottom: 18px;
+    animation: pop .4s cubic-bezier(.2,1.5,.5,1);
+  }
+  @keyframes pop {
+    0% { transform: scale(0); }
+    100% { transform: scale(1); }
+  }
+  .success-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .success-sub {
+    color: var(--ink-2);
+    margin-bottom: 20px;
+  }
+  .pr-num {
+    background: #fff;
+    padding: 16px 24px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 18px;
+  }
+  .pr-num-label {
+    font-size: 12px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .pr-num-val {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-top: 4px;
+    letter-spacing: 2px;
+  }
+  .success-meta {
+    font-size: 13px;
+    color: var(--ink-2);
+    background: #fff;
+    padding: 14px 18px;
+    border-radius: var(--radius);
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 320px;
+    text-align: left;
+  }
+  .success-meta-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+  }
+  .success-meta-row span:first-child { color: var(--ink-3); }
+  .success-actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    max-width: 320px;
+  }
+  .success-actions .btn { flex: 1; }
+
+  /* ─── PDF / Drive card on success screen ─── */
+  .doc-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    width: 100%;
+    max-width: 320px;
+    text-align: left;
+  }
+  .doc-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-2);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .doc-folder {
+    background: #f5f3ee;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+  .doc-folder-label {
+    color: var(--ink-3);
+    font-size: 11px;
+    margin-bottom: 2px;
+  }
+  .doc-folder-path {
+    color: var(--ink);
+    font-weight: 500;
+    word-break: break-all;
+  }
+  .doc-folder-change {
+    color: var(--accent);
+    font-size: 11px;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-top: 4px;
+    display: inline-block;
+  }
+  .doc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .doc-btn {
+    background: #f5f3ee;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 8px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: all .12s;
+  }
+  .doc-btn:hover, .doc-btn:active {
+    background: #fff;
+    border-color: var(--primary);
+  }
+  .doc-btn .icon { font-size: 20px; }
+  .doc-btn.primary {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+  .doc-btn.primary:hover { background: var(--primary-soft); }
+  .doc-btn[disabled] {
+    opacity: .5;
+    cursor: not-allowed;
+  }
+  .drive-saved {
+    background: var(--green-soft);
+    color: #15803d;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    margin-top: 8px;
+    display: none;
+    line-height: 1.4;
+  }
+  .drive-saved[data-show="1"] { display: block; }
+  .drive-saved b { display: block; word-break: break-all; }
+  .drive-saved-link {
+    color: var(--green);
+    text-decoration: underline;
+    font-weight: 600;
+    margin-top: 4px;
+    display: inline-block;
+  }
+
+  /* ─── Document modal (preview + actions) ─── */
+  .doc-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.7);
+    z-index: 300;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .doc-modal[data-show="1"] {
+    display: flex;
+    animation: fadeIn .25s;
+  }
+  .doc-modal-inner {
+    background: #fff;
+    border-radius: 16px;
+    max-width: 480px;
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .doc-modal-head {
+    padding: 14px 16px;
+    background: var(--primary);
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .doc-modal-head .title {
+    font-weight: 600;
+    font-size: 16px;
+  }
+  .doc-modal-close {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.1);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+  }
+  .doc-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    background: #e5e3dc;
+    padding: 16px;
+  }
+  .doc-modal-actions {
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    background: #fff;
+    border-top: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  /* ─── Printable PR Document ─── */
+  .pr-doc {
+    background: #fff;
+    color: #111;
+    font-family: 'Sarabun', sans-serif;
+    width: 100%;
+    max-width: 100%;
+    padding: 18px 16px;
+    margin: 0 auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    font-size: 11px;
+  }
+  /* full-size for PDF generation (A4) */
+  .pr-doc.pdf-mode {
+    width: 210mm;
+    max-width: 210mm;
+    padding: 16mm 14mm;
+    box-shadow: none;
+    font-size: 13px;
+  }
+  .pr-doc * { box-sizing: border-box; }
+  .pr-doc-header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 3px double #111;
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+  }
+  .pr-doc-header .brand {
+    flex: 1;
+  }
+  .pr-doc-header .logo {
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: #666;
+    font-weight: 300;
+    margin-bottom: 2px;
+  }
+  .pr-doc-header .company {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111;
+    line-height: 1.2;
+  }
+  .pr-doc-header .company-sub {
+    font-size: 12px;
+    color: #555;
+    margin-top: 4px;
+  }
+  .pr-doc-header .title-block {
+    text-align: right;
+    min-width: 200px;
+  }
+  .pr-doc-header .title-th {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111;
+    line-height: 1;
+  }
+  .pr-doc-header .title-en {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: #666;
+    margin-top: 3px;
+  }
+  .pr-doc-header .doc-no {
+    margin-top: 10px;
+    border: 2px solid #111;
+    padding: 4px 10px;
+    display: inline-block;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
+  .pr-doc-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 24px;
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+  .pr-doc-meta .meta-row {
+    padding: 4px 0;
+    border-bottom: 1px dotted #ccc;
+  }
+  .pr-doc-meta .meta-row span {
+    color: #666;
+    font-weight: 500;
+    margin-right: 6px;
+    display: inline-block;
+    min-width: 90px;
+  }
+  .pr-doc-meta .meta-row b {
+    color: #111;
+    font-weight: 600;
+  }
+  .pr-doc-items {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 14px;
+    font-size: 12.5px;
+  }
+  .pr-doc-items th {
+    background: #1f2937;
+    color: #fff;
+    padding: 8px 6px;
+    text-align: left;
+    font-weight: 600;
+  }
+  .pr-doc-items th:first-child { width: 32px; text-align: center; }
+  .pr-doc-items th.num { width: 80px; text-align: right; }
+  .pr-doc-items th.unit { width: 70px; text-align: center; }
+  .pr-doc-items td {
+    padding: 7px 6px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+  }
+  .pr-doc-items td:first-child { text-align: center; color: #666; }
+  .pr-doc-items td.num { text-align: right; font-weight: 600; }
+  .pr-doc-items td.unit { text-align: center; color: #555; }
+  .pr-doc-items tr:nth-child(even) { background: #fafaf7; }
+  .pr-doc-items .item-name-cell { font-weight: 500; }
+  .pr-doc-items .item-note-cell { color: #666; font-size: 11.5px; font-style: italic; }
+  .pr-doc-note {
+    background: #fafaf7;
+    border-left: 3px solid #1f2937;
+    padding: 10px 12px;
+    margin-bottom: 24px;
+    font-size: 12.5px;
+    min-height: 50px;
+  }
+  .pr-doc-note b {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 11px;
+    color: #666;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .pr-doc-signs {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-top: 32px;
+    margin-bottom: 14px;
+    font-size: 12px;
+    text-align: center;
+  }
+  .pr-doc-signs .sign-box {
+    border-top: 1px solid #999;
+    padding-top: 6px;
+    margin-top: 40px;
+  }
+  .pr-doc-signs .sign-name { color: #555; }
+  .pr-doc-signs .sign-role {
+    font-weight: 600;
+    color: #111;
+    margin-top: 2px;
+  }
+  .pr-doc-signs .sign-date {
+    margin-top: 8px;
+    color: #888;
+    font-size: 11px;
+  }
+  .pr-doc-footer {
+    border-top: 1px solid #ddd;
+    padding-top: 8px;
+    font-size: 10px;
+    color: #999;
+    text-align: center;
+    letter-spacing: .5px;
+  }
+  .pr-doc-urgency-stamp {
+    position: absolute;
+    top: 70px;
+    right: 16px;
+    border: 3px solid var(--red);
+    color: var(--red);
+    font-weight: 800;
+    padding: 3px 10px;
+    font-size: 14px;
+    letter-spacing: 3px;
+    transform: rotate(-12deg);
+    opacity: 0.85;
+    display: none;
+  }
+  .pr-doc.pdf-mode .pr-doc-urgency-stamp {
+    top: 90px;
+    right: 14mm;
+    padding: 4px 14px;
+    font-size: 18px;
+    letter-spacing: 4px;
+  }
+  .pr-doc.urgent .pr-doc-urgency-stamp { display: block; border-color: #ca8a04; color: #ca8a04; }
+  .pr-doc.critical .pr-doc-urgency-stamp { display: block; border-color: #dc2626; color: #dc2626; }
+  /* hide doc when generating PDF in offscreen */
+  #prDocStage {
+    position: fixed;
+    top: -10000px;
+    left: 0;
+  }
+
+  /* ─── Folder picker modal ─── */
+  .folder-modal-inner {
+    background: #fff;
+    border-radius: 16px;
+    max-width: 380px;
+    width: 100%;
+    padding: 18px;
+  }
+  .folder-list {
+    margin: 14px 0;
+    max-height: 280px;
+    overflow-y: auto;
+  }
+  .folder-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .folder-item:hover { background: #fafaf7; }
+  .folder-item[data-on="1"] {
+    border-color: var(--primary);
+    background: #fafaf7;
+  }
+  .folder-item .ico { font-size: 22px; }
+  .folder-item .info { flex: 1; line-height: 1.3; }
+  .folder-item .name { font-weight: 600; }
+  .folder-item .sub { color: var(--ink-3); font-size: 11px; }
+
+  /* ─── Empty state for items ─── */
+  .empty {
+    padding: 24px 12px;
+    text-align: center;
+    color: var(--ink-3);
+    font-size: 14px;
+  }
+  .empty-icon {
+    font-size: 36px;
+    opacity: .4;
+    margin-bottom: 6px;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-brand">WANWELA · TWO BUILD</div>
+    <div class="header-row">
+      <div class="back" onclick="alert('Demo: ย้อนกลับ')">‹</div>
+      <div style="flex:1">
+        <div class="header-title">สร้างใบขอซื้อ (PR)</div>
+        <div class="header-sub">โฟร์แมน · บันทึกเสนอแอดมิน</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Identity -->
+  <div class="section">
+    <div class="card">
+      <div class="me">
+        <div class="avatar">สก</div>
+        <div class="me-info">
+          <div class="me-name">สมชาย เกตุแก้ว</div>
+          <div class="me-role">โฟร์แมน · ทีมโก้</div>
+        </div>
+        <div class="me-pr">
+          เลขที่
+          <b>PR-2026-0042</b>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="label">เป้าหมายการใช้งาน <span class="req">*</span></div>
+        <button type="button" class="target-btn" id="targetBtn" onclick="openTargetSheet()">
+          <span class="target-btn-text" id="targetBtnText">— เลือกแปลง / งาน —</span>
+          <span class="target-btn-meta" id="targetBtnMeta"></span>
+          <span class="target-btn-chev">›</span>
+        </button>
+        <div class="card-hint" id="plotLoadHint" style="margin-top:6px;font-size:11px">
+          กำลังดึงข้อมูลแปลงจากระบบขาย…
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="label">ความเร่งด่วน <span class="req">*</span></div>
+        <div class="chips" id="urgencyChips">
+          <div class="chip" data-color="green" data-val="normal" data-on="1">ปกติ</div>
+          <div class="chip" data-color="yellow" data-val="urgent">ด่วน</div>
+          <div class="chip" data-color="red" data-val="critical">ด่วนมาก</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="label">วันที่ต้องการใช้</div>
+        <input type="date" class="input" id="needDate" value="2026-05-28">
+      </div>
+    </div>
+  </div>
+
+  <!-- Items -->
+  <div class="section">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">📦 รายการที่ขอ <span id="itemCount" style="color:var(--ink-3);font-weight:400">(0)</span></div>
+        <div class="card-hint">ลากลบ/แตะ ✕ ลบรายการ</div>
+      </div>
+      <div class="items" id="itemList">
+        <div class="empty" id="emptyItems">
+          <div class="empty-icon">🪵</div>
+          ยังไม่มีรายการ — กดเพิ่มด้านล่าง
+        </div>
+      </div>
+      <button class="add-item-btn" onclick="openItemSheet()">＋ เพิ่มรายการ</button>
+    </div>
+  </div>
+
+  <!-- Note + Photos -->
+  <div class="section">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">📝 หมายเหตุเพิ่มเติม</div>
+      </div>
+      <div class="field">
+        <textarea class="textarea" id="note" placeholder="เช่น ปูนหมดที่หน้างาน B-02 ไม่มีของลงพรุ่งนี้, ขอเหล็กสำหรับฐานราก D-01..."></textarea>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <div class="label">📸 แนบรูป (ของที่หน้างาน หรือใบสั่งของเก่า)</div>
+        <div class="photos" id="photos">
+          <div class="photo-add" onclick="fakeAddPhoto()">
+            <div class="icon">＋</div>
+            <div>ถ่ายรูป</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom action bar -->
+  <div class="bottombar">
+    <div class="bottombar-inner">
+      <button class="btn btn-secondary" onclick="saveDraft()">บันทึกร่าง</button>
+      <button class="btn btn-primary" id="submitBtn" onclick="submitPR()">
+        ส่งให้แอดมิน →
+      </button>
+    </div>
+  </div>
+
+  <!-- Bottom Sheet: Item picker -->
+  <div class="sheet-bg" id="sheetBg" onclick="closeAllSheets()"></div>
+  <div class="sheet" id="itemSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div class="sheet-title" style="margin-bottom:0">เลือกวัสดุ</div>
+        <button onclick="openCreateItem()" style="background:var(--accent-soft);color:var(--accent);border:none;border-radius:8px;padding:6px 12px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">＋ สร้างใหม่</button>
+      </div>
+      <input type="text" class="sheet-search" id="itemSearch" placeholder="ค้นหา เช่น ปูน, เหล็ก, สี..." oninput="filterItems()">
+    </div>
+    <div class="sheet-body" id="itemSheetBody"></div>
+  </div>
+
+  <!-- Modal: Create new item (master data) -->
+  <div class="doc-modal" id="createItemModal">
+    <div class="folder-modal-inner" style="max-width:420px">
+      <div style="font-weight:700;font-size:18px;margin-bottom:4px">＋ สร้างรายการสินค้าใหม่</div>
+      <div style="font-size:12px;color:var(--ink-3);margin-bottom:14px">เพิ่มเข้า Master วัสดุ — ใช้ได้กับทุก PR ในอนาคต</div>
+      <div class="field">
+        <div class="label">ชื่อสินค้า <span class="req">*</span></div>
+        <input type="text" class="input" id="newItemName" placeholder="เช่น สี Beger MoodLine ขาวมุก 9L">
+      </div>
+      <div class="field">
+        <div class="label">หมวด <span class="req">*</span></div>
+        <select class="select" id="newItemCat"></select>
+      </div>
+      <div class="field" style="display:grid;grid-template-columns:2fr 1fr;gap:8px">
+        <div>
+          <div class="label">หน่วย <span class="req">*</span></div>
+          <input type="text" class="input" id="newItemUnit" list="unitSuggestions" placeholder="เช่น ถัง">
+        </div>
+        <div>
+          <div class="label">ไอคอน</div>
+          <input type="text" class="input" id="newItemIcon" placeholder="🎨" maxlength="2" style="text-align:center;font-size:22px">
+        </div>
+      </div>
+      <div class="field" style="margin-top:14px">
+        <div class="label">หมายเหตุภายใน <span style="color:var(--ink-3);font-weight:400;font-size:11px">(ไม่บังคับ)</span></div>
+        <textarea class="textarea" id="newItemNote" placeholder="เช่น vendor หลัก: ร้านอุดมศักดิ์, ราคาประมาณ ฿850/ถัง" style="min-height:50px"></textarea>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button class="btn btn-secondary" style="flex:1" onclick="closeCreateItem()">ยกเลิก</button>
+        <button class="btn btn-primary" style="flex:1" onclick="saveNewItem()">＋ สร้างและเลือก</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Sheet: Target (plot/area) picker -->
+  <div class="sheet" id="targetSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div class="sheet-title">เลือกแปลง / งาน</div>
+      <input type="text" class="sheet-search" id="targetSearch" placeholder="ค้นหา เช่น แปลง 12, บ้านเลขที่, ชื่อลูกค้า..." oninput="filterTargets()">
+      <div class="type-chips" id="typeChips"></div>
+    </div>
+    <div class="sheet-body" id="targetSheetBody"></div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">Saved</div>
+
+  <!-- Success screen -->
+  <div class="success-screen" id="successScreen">
+    <div class="check-circle">✓</div>
+    <div class="success-title">ส่ง PR เรียบร้อย</div>
+    <div class="success-sub">แอดมินได้รับแจ้งเตือนใน LINE แล้ว</div>
+    <div class="pr-num">
+      <div class="pr-num-label">เลขที่ใบขอซื้อ</div>
+      <div class="pr-num-val" id="prNumDisplay">PR-2026-0042</div>
+    </div>
+    <div class="success-meta">
+      <div class="success-meta-row">
+        <span>ผู้ขอ</span><b>สมชาย เกตุแก้ว</b>
+      </div>
+      <div class="success-meta-row">
+        <span>เป้าหมาย</span><b id="metaTarget">—</b>
+      </div>
+      <div class="success-meta-row">
+        <span>จำนวนรายการ</span><b id="metaCount">—</b>
+      </div>
+      <div class="success-meta-row">
+        <span>ความเร่งด่วน</span><b id="metaUrgency">—</b>
+      </div>
+    </div>
+    <!-- PDF / Drive card -->
+    <div class="doc-card">
+      <div class="doc-card-title">📄 เอกสาร PR (PDF)</div>
+      <div class="doc-folder">
+        <div class="doc-folder-label">☁️ บันทึกอัตโนมัติใน Google Drive:</div>
+        <div class="doc-folder-path" id="folderPath">One Vela Sales Files / เอกสารจัดซื้อ / PR /</div>
+        <a class="doc-folder-change" onclick="openFolderPicker()">⚙ เปลี่ยนโฟลเดอร์</a>
+      </div>
+      <div class="doc-grid">
+        <button class="doc-btn" onclick="previewDoc()">
+          <span class="icon">👁️</span>
+          <span>ดูเอกสาร</span>
+        </button>
+        <button class="doc-btn" onclick="downloadPDF()">
+          <span class="icon">📥</span>
+          <span>ดาวน์โหลด PDF</span>
+        </button>
+        <button class="doc-btn primary" id="driveBtn" onclick="saveToDrive()" style="grid-column: 1 / -1;">
+          <span class="icon">☁️</span>
+          <span>บันทึกใน Google Drive</span>
+        </button>
+      </div>
+      <div class="drive-saved" id="driveSaved">
+        ✓ บันทึกแล้วใน Drive
+        <b id="drivePath">—</b>
+        <a class="drive-saved-link" id="driveLink" target="_blank" onclick="event.preventDefault(); shareLink()">📤 แชร์ลิงก์ / คัดลอก</a>
+      </div>
+    </div>
+
+    <div class="success-actions">
+      <button class="btn btn-secondary" onclick="reset()">ทำใบใหม่</button>
+      <button class="btn btn-primary" onclick="alert('Demo: ไปหน้ารายการ PR ของฉัน')">ดูรายการ</button>
+    </div>
+  </div>
+
+  <!-- Document preview modal -->
+  <div class="doc-modal" id="docModal">
+    <div class="doc-modal-inner">
+      <div class="doc-modal-head">
+        <div class="title">📄 ตัวอย่างเอกสาร PR</div>
+        <div class="doc-modal-close" onclick="closeDocPreview()">✕</div>
+      </div>
+      <div class="doc-modal-body">
+        <div id="prDocPreview"></div>
+      </div>
+      <div class="doc-modal-actions">
+        <button class="doc-btn" onclick="downloadPDF()">
+          <span class="icon">📥</span><span>ดาวน์โหลด</span>
+        </button>
+        <button class="doc-btn primary" onclick="saveToDrive()">
+          <span class="icon">☁️</span><span>บันทึก Drive</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Folder picker modal -->
+  <div class="doc-modal" id="folderModal">
+    <div class="folder-modal-inner">
+      <div style="font-weight:700;font-size:17px;margin-bottom:6px">📂 เลือกโฟลเดอร์ใน Google Drive</div>
+      <div style="font-size:12px;color:var(--ink-3);margin-bottom:4px">เลือกที่จะบันทึก PDF ของใบขอซื้อ</div>
+      <div class="folder-list" id="folderList"></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary" style="flex:1" onclick="closeFolderPicker()">ยกเลิก</button>
+        <button class="btn btn-primary" style="flex:1" onclick="confirmFolder()">ยืนยัน</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden printable doc (used by html2pdf) -->
+  <div id="prDocStage" aria-hidden="true"></div>
+
+</div>
+
+<!-- หน่วยที่ใช้บ่อย (เป็นแค่ suggestion — พิมพ์เองได้) -->
+<datalist id="unitSuggestions">
+  <option value="ถุง"></option>
+  <option value="ลัง"></option>
+  <option value="กล่อง"></option>
+  <option value="แพ็ค"></option>
+  <option value="ชุด"></option>
+  <option value="ตัว"></option>
+  <option value="เส้น"></option>
+  <option value="แผ่น"></option>
+  <option value="ก้อน"></option>
+  <option value="ม้วน"></option>
+  <option value="ถัง"></option>
+  <option value="ปี๊บ"></option>
+  <option value="ขวด"></option>
+  <option value="ลิตร"></option>
+  <option value="กก."></option>
+  <option value="ตัน"></option>
+  <option value="เมตร"></option>
+  <option value="ฟุต"></option>
+  <option value="คิว"></option>
+  <option value="ตร.ม."></option>
+  <option value="พาเลท"></option>
+  <option value="คัน"></option>
+  <option value="เที่ยว"></option>
+</datalist>
+
+<div class="demo-badge">DEMO · P0</div>
+
+<script>
+  // ─── Master data (ตัวอย่าง) ───
+  const ITEMS = [
+    { cat: 'ปูน / มวลรวม', items: [
+      { name: 'ปูนซีเมนต์ TPI ปอร์ตแลนด์ 50 กก.', unit: 'ถุง', icon: '🧱' },
+      { name: 'ปูนซีเมนต์ TPI 40 กก.', unit: 'ถุง', icon: '🧱' },
+      { name: 'ปูนซีเมนต์ปอร์ตแลนด์ขาว', unit: 'ถุง', icon: '🧱' },
+      { name: 'ทรายหยาบ', unit: 'คิว', icon: '⛰️' },
+      { name: 'ทรายละเอียด', unit: 'คิว', icon: '⛰️' },
+      { name: 'หินคลุก', unit: 'คิว', icon: '🪨' },
+      { name: 'หิน 3/4', unit: 'คิว', icon: '🪨' },
+    ]},
+    { cat: 'เหล็ก', items: [
+      { name: 'เหล็กเส้นกลม RB6', unit: 'เส้น', icon: '🔩' },
+      { name: 'เหล็กเส้นกลม RB9', unit: 'เส้น', icon: '🔩' },
+      { name: 'เหล็กข้ออ้อย DB12', unit: 'เส้น', icon: '🔩' },
+      { name: 'เหล็กข้ออ้อย DB16', unit: 'เส้น', icon: '🔩' },
+      { name: 'เหล็กข้ออ้อย DB20', unit: 'เส้น', icon: '🔩' },
+      { name: 'ลวดผูกเหล็ก', unit: 'กก.', icon: '🪢' },
+    ]},
+    { cat: 'อิฐ / บล็อก', items: [
+      { name: 'อิฐมอญ 4 รู', unit: 'ก้อน', icon: '🧱' },
+      { name: 'อิฐมวลเบา 7.5x20x60', unit: 'ก้อน', icon: '⬜' },
+      { name: 'อิฐมวลเบา 10x20x60', unit: 'ก้อน', icon: '⬜' },
+      { name: 'อิฐบล็อก 7x19x39', unit: 'ก้อน', icon: '⬛' },
+    ]},
+    { cat: 'สี / เคมีก่อสร้าง', items: [
+      { name: 'สีน้ำพลาสติก TOA Supershield ขาว 18.925L', unit: 'ถัง', icon: '🎨' },
+      { name: 'สีรองพื้น TOA 9000', unit: 'ถัง', icon: '🎨' },
+      { name: 'น้ำยากันซึม Sika', unit: 'ปี๊บ', icon: '💧' },
+      { name: 'ยาแนวกระเบื้อง Jorakay', unit: 'กก.', icon: '🧪' },
+    ]},
+    { cat: 'ไฟฟ้า / สุขภัณฑ์', items: [
+      { name: 'สายไฟ THW 2.5 sq.mm', unit: 'เมตร', icon: '⚡' },
+      { name: 'สายไฟ THW 4 sq.mm', unit: 'เมตร', icon: '⚡' },
+      { name: 'สวิตช์ไฟ Panasonic WEG', unit: 'ตัว', icon: '💡' },
+      { name: 'ปลั๊ก Panasonic 3 ตา', unit: 'ตัว', icon: '🔌' },
+      { name: 'ท่อ PVC สีฟ้า 4"', unit: 'เส้น', icon: '🟦' },
+      { name: 'ก๊อกน้ำซิงค์ COTTO', unit: 'ตัว', icon: '🚰' },
+      { name: 'สุขภัณฑ์ TOTO ครบชุด', unit: 'ชุด', icon: '🚽' },
+    ]},
+    { cat: 'กระเบื้อง / หลังคา', items: [
+      { name: 'กระเบื้องเคลือบ 60x60', unit: 'แผ่น', icon: '⬜' },
+      { name: 'กระเบื้องลาย 30x60', unit: 'แผ่น', icon: '⬜' },
+      { name: 'กระเบื้องหลังคา CPAC', unit: 'แผ่น', icon: '🏠' },
+    ]},
+  ];
+
+  // ─── Plot data (จาก One Vela API จริง) ───
+  const API_URL = 'https://script.google.com/macros/s/AKfycbzR-qHtv0GgHRVmon14YEPM_2XFACo2ZzdPTYc0UBLgAjPHYrr9FTt7L4B2xZVLAi1F/exec';
+  const PUBLIC_AREAS = [
+    { id: 'STOCK',  name: 'ทั่วไป (เข้าคลังกลาง)', sub: 'ยังไม่ระบุแปลง · ผูกแปลงตอนเบิก',  icon: '🏬', type: 'X' },
+    { id: 'ROAD',   name: 'งานถนน / ทางเข้าโครงการ', sub: 'สาธารณูปโภค', icon: '🛣️', type: 'X' },
+    { id: 'CLUB',   name: 'งานสโมสร / สวนกลาง',   sub: 'สาธารณูปโภค', icon: '🏛️', type: 'X' },
+    { id: 'FENCE',  name: 'งานรั้วโครงการ',         sub: 'สาธารณูปโภค', icon: '🚧', type: 'X' },
+    { id: 'SIGN',   name: 'งานป้าย / ทางเข้า',     sub: 'สาธารณูปโภค', icon: '🪧', type: 'X' },
+  ];
+  let allPlots = [];        // ทั้งหมดจาก API
+  let typeFilter = 'ALL';   // ALL | A | B | C | D | X (ส่วนกลาง)
+  let selectedTarget = null;
+
+  async function loadPlots() {
+    try {
+      const res = await fetch(`${API_URL}?action=getSalesData`);
+      const data = await res.json();
+      if (!data.ok || !Array.isArray(data.plots)) throw new Error('bad response');
+      allPlots = data.plots.map(p => ({
+        id: 'PLOT-' + p.plot,
+        plot: p.plot,
+        type: p.typeKey || '?',                 // A | B | C | D
+        typeCode: p.typeCode || '',              // "A ULTRA"
+        typeShort: p.typeShort || '',
+        houseNo: p.houseNo || '',
+        cName: p.cName || '',
+        status: p.status || 'ว่าง',
+        priceNet: p.priceNet || 0,
+      }));
+      document.getElementById('plotLoadHint').textContent =
+        `* ดึงข้อมูล ${allPlots.length} แปลง จากระบบขาย One Vela แล้ว — ต้นทุนจริงเกิดตอนเบิกออกจากคลัง`;
+    } catch (err) {
+      console.warn('API ล้มเหลว ใช้ mock:', err);
+      // fallback mock เผื่อ offline
+      allPlots = [
+        { id: 'PLOT-1', plot: 1, type: 'A', typeCode: 'A ULTRA', typeShort: 'บ้านเดี่ยว 2 ชั้น', houseNo: '89/1', cName: 'นาง ก', status: 'จอง' },
+        { id: 'PLOT-2', plot: 2, type: 'A', typeCode: 'A ULTRA', typeShort: 'บ้านเดี่ยว 2 ชั้น', houseNo: '89/2', cName: 'คุณละมัย', status: 'โอนแล้ว' },
+        { id: 'PLOT-100', plot: 100, type: 'B', typeCode: 'B MINUTES', typeShort: 'บ้านเดี่ยวชั้นเดียว', houseNo: '90/12', cName: '', status: 'ว่าง' },
+        { id: 'PLOT-200', plot: 200, type: 'C', typeCode: 'C SECOND', typeShort: 'บ้านแฝดชั้นเดียว', houseNo: '91/4', cName: '', status: 'ว่าง' },
+        { id: 'PLOT-300', plot: 300, type: 'D', typeCode: 'D MOMENT', typeShort: 'ทาวน์โฮม 2 ชั้น', houseNo: '92/1', cName: '', status: 'ว่าง' },
+      ];
+      document.getElementById('plotLoadHint').innerHTML =
+        '<span style="color:var(--red)">⚠ ใช้ข้อมูลตัวอย่าง (offline)</span> — ต้นทุนจริงเกิดตอนเบิกออกจากคลัง';
+    }
+    renderTypeChips();
+  }
+
+  function renderTypeChips() {
+    const counts = { ALL: allPlots.length, A: 0, B: 0, C: 0, D: 0, X: PUBLIC_AREAS.length };
+    allPlots.forEach(p => { if (counts[p.type] !== undefined) counts[p.type]++; });
+    const chips = [
+      { k: 'ALL', label: 'ทั้งหมด' },
+      { k: 'A',   label: 'A · ULTRA' },
+      { k: 'B',   label: 'B · MINUTES' },
+      { k: 'C',   label: 'C · SECOND' },
+      { k: 'D',   label: 'D · MOMENT' },
+      { k: 'X',   label: 'ส่วนกลาง' },
+    ];
+    const c = document.getElementById('typeChips');
+    c.innerHTML = '';
+    chips.forEach(({k, label}) => {
+      const el = document.createElement('div');
+      el.className = 'type-chip';
+      el.dataset.on = (k === typeFilter) ? '1' : '0';
+      el.innerHTML = `${label}<span class="count">${counts[k]||0}</span>`;
+      el.onclick = () => { typeFilter = k; renderTypeChips(); renderTargetList(); };
+      c.appendChild(el);
+    });
+  }
+
+  function renderTargetList() {
+    const q = (document.getElementById('targetSearch').value || '').trim().toLowerCase();
+    const body = document.getElementById('targetSheetBody');
+    body.innerHTML = '';
+
+    // ส่วนกลาง (เฉพาะ filter ALL หรือ X)
+    if (typeFilter === 'ALL' || typeFilter === 'X') {
+      const pubs = PUBLIC_AREAS.filter(p => !q || p.name.toLowerCase().includes(q));
+      if (pubs.length) {
+        const h = document.createElement('div');
+        h.className = 'sheet-cat';
+        h.textContent = 'งานส่วนกลาง / สาธารณูปโภค';
+        body.appendChild(h);
+        pubs.forEach(p => {
+          const el = document.createElement('div');
+          el.className = 'sheet-opt plot-row';
+          el.dataset.type = 'X';
+          el.innerHTML = `
+            <div class="opt-icon">${p.icon}</div>
+            <div class="opt-info">
+              <div class="opt-name">${p.name}</div>
+              <div class="opt-sub">${p.sub}</div>
+            </div>
+          `;
+          el.onclick = () => pickTarget({ kind: 'public', id: p.id, label: p.name, sub: p.sub, typeBadge: 'ส่วนกลาง' });
+          body.appendChild(el);
+        });
+      }
+    }
+
+    // แปลงบ้าน (ตาม filter)
+    const matched = allPlots.filter(p => {
+      if (typeFilter !== 'ALL' && typeFilter !== 'X' && p.type !== typeFilter) return false;
+      if (typeFilter === 'X') return false;
+      if (!q) return true;
+      const hay = `${p.plot} ${p.houseNo} ${p.cName} ${p.typeCode}`.toLowerCase();
+      return hay.includes(q);
+    });
+
+    if (matched.length) {
+      const groups = {};
+      matched.forEach(p => { (groups[p.type] = groups[p.type] || []).push(p); });
+      Object.keys(groups).sort().forEach(t => {
+        const sample = groups[t][0];
+        const h = document.createElement('div');
+        h.className = 'sheet-cat';
+        h.textContent = `Type ${t} · ${sample.typeShort || ''} (${groups[t].length} แปลง)`;
+        body.appendChild(h);
+        groups[t].slice(0, 80).forEach(p => {
+          const el = document.createElement('div');
+          el.className = 'sheet-opt plot-row';
+          el.dataset.type = p.type;
+          const cust = p.cName ? `· ${p.cName}` : '';
+          el.innerHTML = `
+            <div class="opt-icon">${p.type}</div>
+            <div class="opt-info">
+              <div class="opt-name">แปลง ${p.plot} <span style="font-weight:400;color:var(--ink-3);font-size:12px">บ้านเลขที่ ${p.houseNo || '-'}</span></div>
+              <div class="opt-sub">${p.typeCode} ${cust}</div>
+            </div>
+            <div class="plot-status s-${p.status}">${p.status}</div>
+          `;
+          el.onclick = () => pickTarget({
+            kind: 'plot',
+            id: p.id,
+            label: `แปลง ${p.plot}`,
+            sub: `${p.typeCode} · บ้านเลขที่ ${p.houseNo || '-'}`,
+            typeBadge: p.type,
+          });
+          body.appendChild(el);
+        });
+        if (groups[t].length > 80) {
+          const more = document.createElement('div');
+          more.className = 'empty';
+          more.style.padding = '10px';
+          more.textContent = `+ อีก ${groups[t].length - 80} แปลง — ใช้ช่องค้นหาเพื่อหาเฉพาะแปลง`;
+          body.appendChild(more);
+        }
+      });
+    }
+
+    if (body.innerHTML === '') {
+      body.innerHTML = `<div class="empty" style="padding:30px"><div class="empty-icon">🔍</div>ไม่พบรายการที่ตรงกับ "${q}"</div>`;
+    }
+  }
+  function filterTargets() { renderTargetList(); }
+
+  function openTargetSheet() {
+    if (allPlots.length === 0) { showToast('กำลังโหลดข้อมูลแปลง...'); return; }
+    document.getElementById('targetSearch').value = '';
+    renderTargetList();
+    document.getElementById('sheetBg').dataset.open = '1';
+    document.getElementById('targetSheet').dataset.open = '1';
+  }
+  function closeTargetSheet() {
+    document.getElementById('sheetBg').dataset.open = '0';
+    document.getElementById('targetSheet').dataset.open = '0';
+  }
+  function closeAllSheets() {
+    document.getElementById('sheetBg').dataset.open = '0';
+    document.getElementById('itemSheet').dataset.open = '0';
+    document.getElementById('targetSheet').dataset.open = '0';
+  }
+  function pickTarget(t) {
+    selectedTarget = t;
+    const txt = document.getElementById('targetBtnText');
+    txt.classList.remove('placeholder');
+    txt.innerHTML = `<b>${t.label}</b><span class="sub">${t.sub}</span>`;
+    document.getElementById('targetBtnMeta').textContent = t.typeBadge || '';
+    closeTargetSheet();
+  }
+
+  let cart = [];
+  let urgency = 'normal';
+  let photos = [];
+
+  // ─── Render item sheet ───
+  function renderItemSheet(filter = '') {
+    const body = document.getElementById('itemSheetBody');
+    body.innerHTML = '';
+    const q = filter.trim().toLowerCase();
+    ITEMS.forEach(group => {
+      const matched = group.items.filter(it => it.name.toLowerCase().includes(q));
+      if (matched.length === 0) return;
+      const cat = document.createElement('div');
+      cat.className = 'sheet-cat';
+      cat.textContent = group.cat;
+      body.appendChild(cat);
+      matched.forEach(it => {
+        const opt = document.createElement('div');
+        opt.className = 'sheet-opt';
+        opt.innerHTML = `
+          <div class="opt-icon">${it.icon}</div>
+          <div class="opt-info">
+            <div class="opt-name">${it.name}</div>
+            <div class="opt-sub">หน่วย: ${it.unit}</div>
+          </div>
+          <div class="opt-unit">${it.unit}</div>
+        `;
+        opt.onclick = () => pickItem(it);
+        body.appendChild(opt);
+      });
+    });
+    if (body.innerHTML === '') {
+      body.innerHTML = `
+        <div class="empty" style="padding:24px 16px">
+          <div class="empty-icon">🔍</div>
+          <div style="margin-bottom:12px">ไม่พบ "${escHtml(filter)}" ใน master</div>
+          <button onclick="openCreateItem()" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">＋ สร้าง "${escHtml(filter)}" เป็นรายการใหม่</button>
+        </div>`;
+    }
+  }
+  function filterItems() {
+    renderItemSheet(document.getElementById('itemSearch').value);
+  }
+  function openItemSheet() {
+    document.getElementById('itemSearch').value = '';
+    renderItemSheet('');
+    document.getElementById('sheetBg').dataset.open = '1';
+    document.getElementById('itemSheet').dataset.open = '1';
+  }
+  function closeItemSheet() {
+    document.getElementById('sheetBg').dataset.open = '0';
+    document.getElementById('itemSheet').dataset.open = '0';
+  }
+  function pickItem_close() { closeItemSheet(); }
+
+  // ─── Cart ───
+  function pickItem(it) {
+    cart.push({ ...it, qty: 1, note: '', defaultUnit: it.unit });
+    closeItemSheet();
+    renderCart();
+    showToast(`เพิ่ม "${it.name}"`, 'success');
+  }
+
+  // ─── Create new item (master) ───
+  // โหลด custom items จาก localStorage
+  const CUSTOM_KEY = 'wanwela_custom_items';
+  function loadCustomItems() {
+    try {
+      const raw = localStorage.getItem(CUSTOM_KEY);
+      if (!raw) return;
+      const customs = JSON.parse(raw);
+      let customCat = ITEMS.find(g => g.cat === '⭐ ของที่เพิ่มเอง');
+      if (!customCat) {
+        customCat = { cat: '⭐ ของที่เพิ่มเอง', items: [] };
+        ITEMS.unshift(customCat);
+      }
+      customs.forEach(it => {
+        if (!customCat.items.find(x => x.name === it.name)) customCat.items.push(it);
+      });
+    } catch (e) { console.warn('load custom items failed', e); }
+  }
+  function saveCustomItems() {
+    const customCat = ITEMS.find(g => g.cat === '⭐ ของที่เพิ่มเอง');
+    if (!customCat) return;
+    localStorage.setItem(CUSTOM_KEY, JSON.stringify(customCat.items));
+  }
+
+  function openCreateItem() {
+    // populate categories
+    const sel = document.getElementById('newItemCat');
+    sel.innerHTML = ITEMS.map(g => `<option value="${escHtml(g.cat)}">${escHtml(g.cat)}</option>`).join('') +
+                    `<option value="__new__">＋ สร้างหมวดใหม่...</option>`;
+    sel.value = ITEMS[0].cat;
+    // prefill ด้วยคำค้นที่พิมพ์อยู่ใน sheet
+    const q = document.getElementById('itemSearch').value.trim();
+    document.getElementById('newItemName').value = q || '';
+    document.getElementById('newItemUnit').value = '';
+    document.getElementById('newItemIcon').value = '';
+    document.getElementById('newItemNote').value = '';
+    document.getElementById('createItemModal').dataset.show = '1';
+    setTimeout(() => document.getElementById('newItemName').focus(), 200);
+  }
+  function closeCreateItem() {
+    document.getElementById('createItemModal').dataset.show = '0';
+  }
+  function saveNewItem() {
+    const name = document.getElementById('newItemName').value.trim();
+    let cat = document.getElementById('newItemCat').value;
+    const unit = document.getElementById('newItemUnit').value.trim();
+    const icon = document.getElementById('newItemIcon').value.trim() || '📦';
+
+    if (!name) { showToast('ใส่ชื่อสินค้าก่อน', 'error'); document.getElementById('newItemName').focus(); return; }
+    if (!unit) { showToast('ใส่หน่วยก่อน', 'error'); document.getElementById('newItemUnit').focus(); return; }
+
+    if (cat === '__new__') {
+      const newCat = prompt('ชื่อหมวดใหม่:', 'หมวดอื่นๆ');
+      if (!newCat || !newCat.trim()) return;
+      cat = newCat.trim();
+      ITEMS.push({ cat, items: [] });
+    }
+
+    const group = ITEMS.find(g => g.cat === cat);
+    if (group.items.find(x => x.name === name)) {
+      showToast('มีชื่อนี้ใน master อยู่แล้ว', 'error');
+      return;
+    }
+    const newItem = { name, unit, icon };
+    group.items.unshift(newItem);
+    saveCustomItems();
+    closeCreateItem();
+    pickItem(newItem); // เลือกของใหม่ทันที
+    showToast(`สร้าง "${name}" + เพิ่มลง PR แล้ว`, 'success');
+  }
+  function renderCart() {
+    const list = document.getElementById('itemList');
+    document.getElementById('itemCount').textContent = `(${cart.length})`;
+    if (cart.length === 0) {
+      list.innerHTML = `<div class="empty"><div class="empty-icon">🪵</div>ยังไม่มีรายการ — กดเพิ่มด้านล่าง</div>`;
+      return;
+    }
+    list.innerHTML = '';
+    cart.forEach((it, idx) => {
+      const el = document.createElement('div');
+      el.className = 'item';
+      const isCustom = it.unit !== it.defaultUnit;
+      const hintHtml = isCustom
+        ? `<div class="unit-label" style="color:var(--accent)">✎ แก้แล้ว (ค่าเดิม: ${it.defaultUnit})</div>`
+        : `<div class="unit-label">แตะเพื่อแก้</div>`;
+      el.innerHTML = `
+        <div class="item-head">
+          <div class="item-name">${it.icon} ${it.name}</div>
+          <div class="item-del" onclick="removeItem(${idx})">✕</div>
+        </div>
+        <div class="item-row">
+          <input type="number" class="input qty-input" value="${it.qty}" min="0.01" step="any" oninput="updateQty(${idx}, this.value)" placeholder="0">
+          <div>
+            <input type="text" class="unit-input ${isCustom ? 'custom' : ''}" list="unitSuggestions" value="${it.unit}" maxlength="12" oninput="updateUnit(${idx}, this.value)" onfocus="this.select()" placeholder="หน่วย">
+            ${hintHtml}
+          </div>
+        </div>
+        <input type="text" class="item-note" placeholder="หมายเหตุ (ไม่บังคับ) — เช่น สำหรับฐานราก, ขอภายในวันพรุ่งนี้" value="${it.note}" oninput="updateNote(${idx}, this.value)">
+      `;
+      list.appendChild(el);
+    });
+  }
+  function updateQty(idx, v) { cart[idx].qty = parseFloat(v) || 0; }
+  function updateNote(idx, v) { cart[idx].note = v; }
+  function updateUnit(idx, v) {
+    cart[idx].unit = (v || '').trim() || cart[idx].defaultUnit;
+    const isCustom = cart[idx].unit !== cart[idx].defaultUnit;
+    const el = document.querySelectorAll('#itemList .item')[idx];
+    if (!el) return;
+    const input = el.querySelector('.unit-input');
+    const label = el.querySelector('.unit-label');
+    if (isCustom) {
+      input.classList.add('custom');
+      label.style.color = 'var(--accent)';
+      label.textContent = `✎ แก้แล้ว (ค่าเดิม: ${cart[idx].defaultUnit})`;
+    } else {
+      input.classList.remove('custom');
+      label.style.color = '';
+      label.textContent = 'แตะเพื่อแก้';
+    }
+  }
+  function removeItem(idx) {
+    cart.splice(idx, 1);
+    renderCart();
+  }
+
+  // ─── Urgency chips ───
+  document.querySelectorAll('#urgencyChips .chip').forEach(chip => {
+    chip.onclick = () => {
+      document.querySelectorAll('#urgencyChips .chip').forEach(c => c.dataset.on = '0');
+      chip.dataset.on = '1';
+      urgency = chip.dataset.val;
+    };
+  });
+
+  // ─── Photos (demo) ───
+  const DEMO_PHOTOS = [
+    'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=400&q=80',
+    'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=400&q=80',
+    'https://images.unsplash.com/photo-1485083269755-a7b559a4fe5e?w=400&q=80',
+  ];
+  function fakeAddPhoto() {
+    if (photos.length >= 4) {
+      showToast('แนบได้สูงสุด 4 รูป', 'error');
+      return;
+    }
+    photos.push(DEMO_PHOTOS[photos.length % DEMO_PHOTOS.length]);
+    renderPhotos();
+  }
+  function renderPhotos() {
+    const c = document.getElementById('photos');
+    c.innerHTML = '';
+    photos.forEach((p, i) => {
+      const el = document.createElement('div');
+      el.className = 'photo';
+      el.style.backgroundImage = `url(${p})`;
+      el.innerHTML = `<div class="photo-rm" onclick="removePhoto(${i})">✕</div>`;
+      c.appendChild(el);
+    });
+    const add = document.createElement('div');
+    add.className = 'photo-add';
+    add.onclick = fakeAddPhoto;
+    add.innerHTML = `<div class="icon">＋</div><div>ถ่ายรูป</div>`;
+    c.appendChild(add);
+  }
+  function removePhoto(i) {
+    photos.splice(i, 1);
+    renderPhotos();
+  }
+
+  // ─── Toast ───
+  function showToast(msg, kind = '') {
+    const t = document.getElementById('toast');
+    t.className = `toast ${kind}`;
+    t.textContent = msg;
+    t.dataset.show = '1';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.dataset.show = '0', 2000);
+  }
+
+  // ─── Submit ───
+  function submitPR() {
+    if (!selectedTarget) {
+      showToast('เลือกเป้าหมายก่อน', 'error');
+      openTargetSheet();
+      return;
+    }
+    if (cart.length === 0) {
+      showToast('เพิ่มรายการของก่อน', 'error');
+      return;
+    }
+    const hasZero = cart.find(it => !it.qty || it.qty <= 0);
+    if (hasZero) {
+      showToast('ระบุจำนวนของทุกรายการ', 'error');
+      return;
+    }
+
+    document.getElementById('metaTarget').textContent = `${selectedTarget.label} — ${selectedTarget.sub}`;
+    document.getElementById('metaCount').textContent = `${cart.length} รายการ`;
+    const uLabel = { normal: '🟢 ปกติ', urgent: '🟡 ด่วน', critical: '🔴 ด่วนมาก' }[urgency];
+    document.getElementById('metaUrgency').textContent = uLabel;
+    document.getElementById('successScreen').dataset.show = '1';
+  }
+  function saveDraft() {
+    showToast('บันทึกร่างแล้ว', 'success');
+  }
+  function reset() {
+    cart = [];
+    photos = [];
+    urgency = 'normal';
+    selectedTarget = null;
+    driveLinkUrl = '';
+    const txt = document.getElementById('targetBtnText');
+    txt.classList.add('placeholder');
+    txt.textContent = '— เลือกแปลง / งาน —';
+    document.getElementById('targetBtnMeta').textContent = '';
+    document.getElementById('note').value = '';
+    document.querySelectorAll('#urgencyChips .chip').forEach((c,i) => c.dataset.on = i === 0 ? '1' : '0');
+    renderCart();
+    renderPhotos();
+    document.getElementById('successScreen').dataset.show = '0';
+    document.getElementById('driveSaved').dataset.show = '0';
+    const driveBtn = document.getElementById('driveBtn');
+    driveBtn.disabled = false;
+    driveBtn.innerHTML = '<span class="icon">☁️</span><span>บันทึกใน Google Drive</span>';
+  }
+
+  // ─── PR Document (PDF) ───
+  const DRIVE_FOLDERS = [
+    { id: 'pr',   icon: '🛒', name: 'เอกสารจัดซื้อ / PR', sub: 'ใบขอซื้อจากโฟร์แมน',  path: 'One Vela Sales Files / เอกสารจัดซื้อ / PR /' },
+    { id: 'rfq',  icon: '📨', name: 'เอกสารจัดซื้อ / RFQ', sub: 'ใบขอราคาส่ง vendor', path: 'One Vela Sales Files / เอกสารจัดซื้อ / RFQ /' },
+    { id: 'po',   icon: '📋', name: 'เอกสารจัดซื้อ / PO',  sub: 'ใบสั่งซื้อ',          path: 'One Vela Sales Files / เอกสารจัดซื้อ / PO /' },
+    { id: 'my',   icon: '👤', name: 'My Drive / PR สมชาย', sub: 'โฟลเดอร์ส่วนตัว',     path: 'My Drive / PR สมชาย /' },
+    { id: 'custom', icon: '➕', name: 'เลือกโฟลเดอร์อื่น...', sub: 'เปิด Google Drive Picker', path: '—' },
+  ];
+  let currentFolder = DRIVE_FOLDERS[0]; // default
+  let driveLinkUrl = '';
+
+  function buildPRDocHTML() {
+    const today = new Date();
+    const dateLabel = today.toLocaleDateString('th-TH', { day: '2-digit', month: 'long', year: 'numeric' });
+    const timeLabel = today.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+    const prNo = document.getElementById('prNumDisplay').textContent;
+    const target = selectedTarget ? `${selectedTarget.label} — ${selectedTarget.sub}` : '—';
+    const uLabel = { normal: 'ปกติ', urgent: '🟡 ด่วน', critical: '🔴 ด่วนมาก' }[urgency] || '—';
+    const needDate = document.getElementById('needDate').value;
+    const needLabel = needDate ? new Date(needDate).toLocaleDateString('th-TH', { day: '2-digit', month: 'long', year: 'numeric' }) : '—';
+    const note = (document.getElementById('note').value || '').trim() || '— ไม่มี —';
+
+    const itemRows = cart.map((it, i) => `
+      <tr>
+        <td>${i+1}</td>
+        <td>
+          <div class="item-name-cell">${it.name}</div>
+          ${it.note ? `<div class="item-note-cell">หมายเหตุ: ${escHtml(it.note)}</div>` : ''}
+        </td>
+        <td class="num">${formatNum(it.qty)}</td>
+        <td class="unit">${escHtml(it.unit)}${it.unit !== it.defaultUnit ? ` <span style="color:#b45309">*</span>` : ''}</td>
+        <td>${it.unit !== it.defaultUnit ? `<span style="color:#b45309;font-size:11px">* แก้จาก "${it.defaultUnit}"</span>` : ''}</td>
+      </tr>
+    `).join('');
+
+    return `
+      <div class="pr-doc ${urgency}" id="prDocEl" style="position:relative">
+        <div class="pr-doc-urgency-stamp">URGENT</div>
+        <div class="pr-doc-header">
+          <div class="brand">
+            <div class="logo">WANWELA · ONE VELA</div>
+            <div class="company">บริษัท ทู บิลด์ ดีเวลลอปเมนท์ จำกัด</div>
+            <div class="company-sub">โครงการ วันเวลา · One Vela — Amata Chonburi</div>
+          </div>
+          <div class="title-block">
+            <div class="title-th">ใบขอซื้อ</div>
+            <div class="title-en">PURCHASE REQUEST</div>
+            <div class="doc-no">${prNo}</div>
+          </div>
+        </div>
+
+        <div class="pr-doc-meta">
+          <div class="meta-row"><span>ผู้ขอ:</span><b>สมชาย เกตุแก้ว</b></div>
+          <div class="meta-row"><span>วันที่ออก:</span><b>${dateLabel}</b></div>
+          <div class="meta-row"><span>หน่วยงาน:</span><b>ทีมโก้ · โฟร์แมน</b></div>
+          <div class="meta-row"><span>วันต้องการใช้:</span><b>${needLabel}</b></div>
+          <div class="meta-row" style="grid-column:1/-1"><span>เป้าหมาย:</span><b>${escHtml(target)}</b></div>
+          <div class="meta-row" style="grid-column:1/-1"><span>ความเร่งด่วน:</span><b>${uLabel}</b></div>
+        </div>
+
+        <table class="pr-doc-items">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>รายการสินค้า / วัสดุ</th>
+              <th class="num">จำนวน</th>
+              <th class="unit">หน่วย</th>
+              <th>หมายเหตุ</th>
+            </tr>
+          </thead>
+          <tbody>${itemRows || '<tr><td colspan="5" style="text-align:center;color:#999;padding:20px">— ไม่มีรายการ —</td></tr>'}</tbody>
+        </table>
+
+        <div class="pr-doc-note">
+          <b>หมายเหตุเพิ่มเติม</b>
+          ${escHtml(note).replace(/\n/g, '<br>')}
+        </div>
+
+        <div class="pr-doc-signs">
+          <div class="sign-box">
+            <div class="sign-name">( สมชาย เกตุแก้ว )</div>
+            <div class="sign-role">ผู้ขอ / โฟร์แมน</div>
+            <div class="sign-date">วันที่ ........................</div>
+          </div>
+          <div class="sign-box">
+            <div class="sign-name">( .................................. )</div>
+            <div class="sign-role">ผู้รับเรื่อง / แอดมิน</div>
+            <div class="sign-date">วันที่ ........................</div>
+          </div>
+          <div class="sign-box">
+            <div class="sign-name">( .................................. )</div>
+            <div class="sign-role">ผู้อนุมัติ</div>
+            <div class="sign-date">วันที่ ........................</div>
+          </div>
+        </div>
+
+        <div class="pr-doc-footer">
+          เอกสารนี้สร้างจากระบบ One Vela ERP · ${dateLabel} เวลา ${timeLabel} น. · เลขอ้างอิง ${prNo}
+        </div>
+      </div>
+    `;
+  }
+  function escHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c])); }
+  function formatNum(n) {
+    const num = Number(n) || 0;
+    return num % 1 === 0 ? num.toLocaleString('th-TH') : num.toLocaleString('th-TH', { maximumFractionDigits: 2 });
+  }
+
+  function previewDoc() {
+    document.getElementById('prDocPreview').innerHTML = buildPRDocHTML();
+    document.getElementById('docModal').dataset.show = '1';
+  }
+  function closeDocPreview() {
+    document.getElementById('docModal').dataset.show = '0';
+  }
+
+  async function downloadPDF() {
+    showToast('⏳ กำลังสร้าง PDF...');
+    // ensure Sarabun loaded
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    // render in offscreen stage
+    const stage = document.getElementById('prDocStage');
+    stage.innerHTML = buildPRDocHTML();
+    const el = stage.querySelector('.pr-doc');
+    el.classList.add('pdf-mode');
+    const prNo = document.getElementById('prNumDisplay').textContent;
+    const filename = `${prNo}.pdf`;
+    try {
+      await html2pdf().set({
+        margin: 0,
+        filename,
+        image: { type: 'jpeg', quality: 0.96 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      }).from(el).save();
+      showToast('✓ ดาวน์โหลด PDF แล้ว', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('สร้าง PDF ไม่สำเร็จ', 'error');
+    } finally {
+      stage.innerHTML = '';
+    }
+  }
+
+  async function saveToDrive() {
+    const btn = document.getElementById('driveBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="icon">⏳</span><span>กำลังบันทึก...</span>';
+    showToast('⏳ กำลังอัปโหลดไป Google Drive...');
+    // DEMO: simulate upload. ในเวอร์ชันจริง: ส่ง PDF blob ไปที่ Apps Script endpoint
+    //   POST {action:'savePRtoDrive', folderId:..., filename:..., pdfBase64:...}
+    //   Apps Script: DriveApp.getFolderById().createFile(...) → return shareableUrl
+    await new Promise(r => setTimeout(r, 1400));
+    const prNo = document.getElementById('prNumDisplay').textContent;
+    const fakeFileId = 'demo-' + Math.random().toString(36).slice(2, 12);
+    driveLinkUrl = `https://drive.google.com/file/d/${fakeFileId}/view`;
+    document.getElementById('drivePath').textContent = `${currentFolder.path}${prNo}.pdf`;
+    document.getElementById('driveSaved').dataset.show = '1';
+    btn.disabled = false;
+    btn.innerHTML = '<span class="icon">✓</span><span>บันทึกแล้ว · บันทึกซ้ำ</span>';
+    showToast('✓ บันทึกใน Google Drive แล้ว', 'success');
+  }
+
+  // ─── Folder picker ───
+  function openFolderPicker() {
+    const list = document.getElementById('folderList');
+    list.innerHTML = '';
+    DRIVE_FOLDERS.forEach(f => {
+      const el = document.createElement('div');
+      el.className = 'folder-item';
+      el.dataset.on = (f.id === currentFolder.id) ? '1' : '0';
+      el.innerHTML = `
+        <div class="ico">${f.icon}</div>
+        <div class="info">
+          <div class="name">${f.name}</div>
+          <div class="sub">${f.sub}</div>
+        </div>
+      `;
+      el.onclick = () => {
+        document.querySelectorAll('#folderList .folder-item').forEach(i => i.dataset.on = '0');
+        el.dataset.on = '1';
+        el._pickedId = f.id;
+        list._picked = f;
+      };
+      list.appendChild(el);
+    });
+    list._picked = currentFolder;
+    document.getElementById('folderModal').dataset.show = '1';
+  }
+  function closeFolderPicker() {
+    document.getElementById('folderModal').dataset.show = '0';
+  }
+  function confirmFolder() {
+    const list = document.getElementById('folderList');
+    if (list._picked) {
+      if (list._picked.id === 'custom') {
+        showToast('Demo: เปิด Drive Picker (รอ wire จริง)', 'error');
+        closeFolderPicker();
+        return;
+      }
+      currentFolder = list._picked;
+      document.getElementById('folderPath').textContent = currentFolder.path;
+      showToast(`โฟลเดอร์: ${currentFolder.name}`, 'success');
+    }
+    closeFolderPicker();
+  }
+
+  async function shareLink() {
+    if (!driveLinkUrl) return;
+    const prNo = document.getElementById('prNumDisplay').textContent;
+    const text = `📄 ใบขอซื้อ ${prNo}\n${driveLinkUrl}`;
+    if (navigator.share) {
+      try { await navigator.share({ title: prNo, text, url: driveLinkUrl }); return; } catch {}
+    }
+    try {
+      await navigator.clipboard.writeText(driveLinkUrl);
+      showToast('คัดลอกลิงก์แล้ว', 'success');
+    } catch {
+      prompt('คัดลอกลิงก์:', driveLinkUrl);
+    }
+  }
+
+  // ─── Init ───
+  document.getElementById('targetBtnText').classList.add('placeholder');
+  loadCustomItems();
+  renderCart();
+  renderPhotos();
+  loadPlots();
+</script>
+
+</body>
+</html>
