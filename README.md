@@ -6,7 +6,7 @@
 
 ## 🚀 เปิด Demo
 
-👉 **[เปิด Hub รวมทั้ง 9 หน้า](https://icebergiced-cmyk.github.io/wanwela-erp/00-hub-demo.html)**
+👉 **[เปิด Hub รวมทั้ง 9 หน้า](https://icebergiced-cmyk.github.io/onevela-erp/00-hub-demo.html)**
 
 ## 📦 หน้าจอทั้งหมด (10 ไฟล์)
 
@@ -66,7 +66,7 @@
 ## 📁 โครงสร้างไฟล์
 
 ```
-wanwela-erp/
+onevela-erp/
 ├── 00-hub-demo.html        # หน้ารวม + iframe preview
 ├── 01-pr-create-demo.html  # ฟอร์มสร้าง PR (โฟร์แมน)
 ├── 02-pr-inbox-demo.html   # Inbox จัดการ PR
@@ -84,8 +84,8 @@ wanwela-erp/
 
 ```bash
 # Clone
-git clone https://github.com/icebergiced-cmyk/wanwela-erp.git
-cd wanwela-erp
+git clone https://github.com/icebergiced-cmyk/onevela-erp.git
+cd onevela-erp
 
 # เปิดด้วย browser หรือ live server
 open 00-hub-demo.html
